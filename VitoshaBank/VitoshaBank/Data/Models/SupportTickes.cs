@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace VitoshaBank.Data.Models
 {
-    public partial class SupportTicke
+    public partial class SupportTickes
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -13,6 +11,6 @@ namespace VitoshaBank.Data.Models
         public DateTime Date { get; set; }
         public sbyte HasResponce { get; set; }
 
-        public virtual User User { get; set; }
+        public virtual Users User { get; set; }
     }
 }

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace VitoshaBank.Data.Models
 {
-    public partial class Transaction
+    public partial class Transactions
     {
-        public Transaction()
+        public Transactions()
         {
-            Users = new HashSet<User>();
+            Users = new HashSet<Users>();
         }
 
         public int Id { get; set; }
@@ -18,8 +16,8 @@ namespace VitoshaBank.Data.Models
         public decimal TransactionAmount { get; set; }
         public DateTime Date { get; set; }
 
-        public virtual BankAccount RecieverAccount { get; set; }
-        public virtual BankAccount SenderAccount { get; set; }
-        public virtual ICollection<User> Users { get; set; }
+        public virtual BankAccounts RecieverAccount { get; set; }
+        public virtual BankAccounts SenderAccount { get; set; }
+        public virtual ICollection<Users> Users { get; set; }
     }
 }

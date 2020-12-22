@@ -24,7 +24,7 @@ namespace VitoshaBank
 		{
 
 			services.AddControllersWithViews();
-			services.AddDbContext<BankDbContext>(options => options.UseMySql(Configuration.GetConnectionString("BankConnection")));
+			services.AddDbContext<BankSystemContext>(options => options.UseMySql(Configuration.GetConnectionString("BankConnection")));
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{

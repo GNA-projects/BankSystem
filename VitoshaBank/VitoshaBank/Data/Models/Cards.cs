@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#nullable disable
-
 namespace VitoshaBank.Data.Models
 {
-    public partial class Card
+    public partial class Cards
     {
         public int Id { get; set; }
         public int UserId { get; set; }
@@ -14,8 +12,8 @@ namespace VitoshaBank.Data.Models
         public int BankAccountId { get; set; }
         public decimal Amount { get; set; }
 
-        public virtual BankAccount BankAccountNavigation { get; set; }
-        public virtual User User { get; set; }
-        public virtual BankAccount BankAccount { get; set; }
+        public virtual BankAccounts BankAccount { get; set; }
+        public virtual Users User { get; set; }
+        public virtual BankAccounts BankAccounts { get; set; }
     }
 }
