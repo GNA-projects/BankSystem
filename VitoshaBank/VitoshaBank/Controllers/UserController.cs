@@ -40,6 +40,12 @@ namespace VitoshaBank.Controllers
         [HttpPost]
         public async Task<ActionResult<BankSystemContext>> PostUser(Users user)
         {
+            user.FirstName = "Nik";
+            user.LastName = "Nik";
+            user.Email = "dsada";
+            user.Password = "asdsadas";
+            user.RegisterDate = DateTime.Now;
+            user.BirthDate = DateTime.Now;
             _context.Add(user);
             await _context.SaveChangesAsync();
 

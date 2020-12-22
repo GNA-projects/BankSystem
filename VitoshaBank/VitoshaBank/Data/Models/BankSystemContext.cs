@@ -23,15 +23,6 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseMySql("server=remotemysql.com;port=3306;user=7Fv3OS8L1w;password=q5yOBEVSOh;database=7Fv3OS8L1w", x => x.ServerVersion("8.0.13-mysql"));
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BankAccounts>(entity =>
@@ -391,11 +382,6 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.RegisterDate)
                     .HasColumnName("register_date")
                     .HasColumnType("datetime");
-
-                entity.HasOne(d => d.LastTransaction)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.LastTransactionId)
-                    .HasConstraintName("fk_users_transaction_id_Transactions_id");
             });
 
             modelBuilder.Entity<Wallets>(entity =>
