@@ -13,6 +13,7 @@ namespace VitoshaBank.Data.Models
         public DateTime RegisterDate { get; set; }
         public int? LastTransactionId { get; set; }
         public DateTime BirthDate { get; set; }
+        public sbyte? IsAdmin { get; set; }
 
         public virtual BankAccounts BankAccounts { get; set; }
         public virtual Cards Cards { get; set; }

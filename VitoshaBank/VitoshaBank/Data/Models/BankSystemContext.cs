@@ -24,6 +24,15 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseMySql("server=remotemysql.com;port=3306;user=7Fv3OS8L1w;password=q5yOBEVSOh;database=7Fv3OS8L1w", x => x.ServerVersion("8.0.13-mysql"));
+            }
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BankAccounts>(entity =>
@@ -242,7 +251,6 @@ namespace VitoshaBank.Data.Models
                     .HasConstraintName("fk_deposits_user_id_Users_id");
             });
 
-
             modelBuilder.Entity<SupportTickets>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -355,6 +363,10 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("varchar(45)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_unicode_ci");
+
+                entity.Property(e => e.IsAdmin)
+                    .HasColumnName("isAdmin")
+                    .HasColumnType("tinyint(4)");
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
