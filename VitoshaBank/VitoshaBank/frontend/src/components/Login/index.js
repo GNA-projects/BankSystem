@@ -8,6 +8,7 @@ import {
   Submit,
   InputContainer,
   InputHeader,
+  Header,
 } from "./style";
 
 export default function Login() {
@@ -20,13 +21,14 @@ export default function Login() {
     setPassword(e.target.value);
   };
   const handleSubmit = () => {
-   axios.post('api/users',{
-     username: username,
-     password: password
-   })
+    axios.post("api/users", {
+      username: username,
+      password: password,
+    });
   };
   return (
     <div>
+      <Header>Log in with your bank account</Header>
       <Container>
         <FormOuter>
           <FormInner>

@@ -4,7 +4,7 @@ export const Container = styled.div`
   display: flex;
   width: 300px;
   margin: auto;
-  background-color: rgb(100,100,100,0.2);
+  box-shadow: 1px 1px 10px;
   padding: 10px 10px;
   margin-top: 20px;
   border-width: 1px;
@@ -31,6 +31,10 @@ export const InputContainer = styled.div`
 export const InputHeader = styled.p`
   font-size: 2rem;
   margin-bottom: 10px;
+`;
+export const Header = styled.p`
+  font-size: 2.5rem;
+  text-align: center;
 `;
 
 export const Input = styled.input`

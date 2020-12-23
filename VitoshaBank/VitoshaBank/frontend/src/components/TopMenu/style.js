@@ -6,7 +6,8 @@ export const NavContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: red;
+  box-shadow: 1px 1px 20px;
+  background-image: linear-gradient(to right, #384062, cyan);
   height: 80px;
 `;
 
@@ -17,7 +18,7 @@ export const DropdownContainer = styled.div`
   position: absolute;
   z-index: 1;
   overflow: hidden;
-  background-color: orange;
+  background-color: white;
   top: 0;
   height: ${(props) => (props.active ? "100vh" : "0vh")};
   transition: height 1s ease;
@@ -35,7 +36,7 @@ export const DropdownItemHeading = styled.p`
 
 export const DropdownItem = styled.div`
   z-index: 0;
-  background-color: green;
+  box-shadow: 1px 5px 10px;
   margin: auto;
   display: flex;
   flex-direction: row;
