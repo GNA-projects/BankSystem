@@ -364,9 +364,7 @@ namespace VitoshaBank.Data.Models
                     .HasCharSet("utf8")
                     .HasCollation("utf8_unicode_ci");
 
-                entity.Property(e => e.IsAdmin)
-                    .HasColumnName("isAdmin")
-                    .HasColumnType("tinyint(4)");
+                entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
