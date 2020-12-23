@@ -19,10 +19,12 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Cards> Cards { get; set; }
         public virtual DbSet<Credits> Credits { get; set; }
         public virtual DbSet<Deposits> Deposits { get; set; }
+        public virtual DbSet<EfmigrationsHistory> EfmigrationsHistory { get; set; }
         public virtual DbSet<SupportTickets> SupportTickets { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BankAccounts>(entity =>
@@ -241,6 +243,25 @@ namespace VitoshaBank.Data.Models
                     .HasConstraintName("fk_deposits_user_id_Users_id");
             });
 
+            modelBuilder.Entity<EfmigrationsHistory>(entity =>
+            {
+                entity.HasKey(e => e.MigrationId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("__EFMigrationsHistory");
+
+                entity.Property(e => e.MigrationId)
+                    .HasColumnType("varchar(150)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
+
+                entity.Property(e => e.ProductVersion)
+                    .IsRequired()
+                    .HasColumnType("varchar(32)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
+            });
+
             modelBuilder.Entity<SupportTickets>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -328,16 +349,16 @@ namespace VitoshaBank.Data.Models
 
             modelBuilder.Entity<Users>(entity =>
             {
-                entity.HasIndex(e => e.Email)
-                    .HasName("Userscol_UNIQUE")
-                    .IsUnique();
-
                 entity.HasIndex(e => e.Id)
                     .HasName("id_UNIQUE")
                     .IsUnique();
 
                 entity.HasIndex(e => e.LastTransactionId)
                     .HasName("fk_users_transaction_id_Transactions_id");
+
+                entity.HasIndex(e => e.Username)
+                    .HasName("Userscol_UNIQUE")
+                    .IsUnique();
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
@@ -346,13 +367,6 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.BirthDate)
                     .HasColumnName("birth_date")
                     .HasColumnType("datetime");
-
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasColumnName("email")
-                    .HasColumnType("varchar(45)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.FirstName)
                     .IsRequired()
@@ -375,13 +389,20 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasColumnName("password")
-                    .HasColumnType("varchar(45)")
+                    .HasColumnType("varchar(60)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.RegisterDate)
                     .HasColumnName("register_date")
                     .HasColumnType("datetime");
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasColumnName("username")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
             });
 
             modelBuilder.Entity<Wallets>(entity =>
