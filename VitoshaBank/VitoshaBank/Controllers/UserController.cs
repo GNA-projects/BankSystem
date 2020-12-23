@@ -16,6 +16,7 @@ using VitoshaBank.Data.Models;
 namespace VitoshaBank.Controllers
 {
     [ApiController]
+
     [Route("api/users")]
     public class UserController : ControllerBase
     {
