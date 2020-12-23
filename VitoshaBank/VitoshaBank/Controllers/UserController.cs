@@ -9,7 +9,7 @@ using VitoshaBank.Data.Models;
 namespace VitoshaBank.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly BankSystemContext _context;
