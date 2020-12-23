@@ -20,8 +20,13 @@ export default function TopMenu() {
   const history = useHistory();
 
   const goHome = () => {
-      history.push('/home')
+      history.push('/')
+      setDropdown(false)
   }
+  const goLogin = () => {
+    history.push('/login')
+    setDropdown(false)
+}
   return (
     <div>
       <NavContainer>
@@ -43,7 +48,7 @@ export default function TopMenu() {
           <DropdownItemIcon icon={faUserNinja}></DropdownItemIcon>
           <DropdownItemHeading>About</DropdownItemHeading>
         </DropdownItem>
-        <DropdownItem>
+        <DropdownItem onClick={goLogin}>
           <DropdownItemIcon icon={faSignOutAlt}></DropdownItemIcon>
           <DropdownItemHeading>Logout</DropdownItemHeading>
         </DropdownItem>
