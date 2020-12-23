@@ -37,7 +37,8 @@ namespace VitoshaBank.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("users/{id}")]
+        [Authorize]
         public async Task<ActionResult<Users>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -52,25 +53,43 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult<BankSystemContext>> PostUser(Users user)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(Users user)
         {
-            user.FirstName = "Ni666k";
-            user.LastName = "dsddadadada";
-            user.Username = "66666666";
-            user.Password = "666666";
-            user.RegisterDate = DateTime.Now;
-            user.BirthDate = DateTime.Now;
-            _context.Add(user);
-            await _context.SaveChangesAsync();
+            var currentUser = HttpContext.User;
+            string role = "";
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+
+            if (role == "Admin")
+            {
+                user.FirstName = "Dimo";
+                user.LastName = "Dim";
+                user.Username = "dimdim";
+                user.Password = "12345";
+                user.RegisterDate = DateTime.Now;
+                user.BirthDate = DateTime.Now;
+                user.IsAdmin = false;
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult LoginPerson(Users userLogin)
+        public ActionResult LoginUser(Users userLogin)
         {
-            IActionResult response = Unauthorized();
+            ActionResult response = Unauthorized();
+
             var user = AuthenticateUser(userLogin);
 
             if (user != null)
@@ -80,51 +99,40 @@ namespace VitoshaBank.Controllers
             }
 
             return response;
-        }
-
-        [HttpGet]
-        [Authorize]
-        public IActionResult AdminGet()
-        {
-            var currentUser = HttpContext.User;
-            string name = "";
-
-            if (currentUser.HasClaim(c => c.Type == "Username"))
-            {
-                string userName = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-                name = userName;
-            }
-            var userAuthenticate = _context.Users.Find(name);
-
-            if (name == userAuthenticate.Username)
-            {
-                return Ok(name);
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
-
+        }   
         private Users AuthenticateUser(Users userLogin)
         {
-            Users user = null;
-            var userAuthenticate =  _context.Users.FirstOrDefault(x => x.Username == userLogin.Username);
+            var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == userLogin.Username);
 
-            if (userLogin.Username == userAuthenticate.Username && userLogin.Password == userAuthenticate.Password)
+            if (userAuthenticate == null)
             {
-                user = new Users { Username = userLogin.Username, Password = userLogin.Password };
+                return userAuthenticate;
             }
-            return user;
+            else if (userLogin.Username == userAuthenticate.Username && userLogin.Password == userAuthenticate.Password)
+            {
+                return userAuthenticate;
+            }
+            return userAuthenticate;
         }
         private string GenerateJSONWebToken(Users userInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var role = "";
+
+            if (userInfo.IsAdmin == true)
+            {
+                role = "Admin";
+            }
+            else
+            {
+                role = "User";
+            }
 
             var claims = new[] {
                          new Claim("Username", userInfo.Username),
                          new Claim("Password", userInfo.Password),
+                         new Claim("Roles", role)
                                 };
 
             var token = new JwtSecurityToken(
