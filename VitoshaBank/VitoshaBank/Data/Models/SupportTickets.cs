@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VitoshaBank.Data.Models
 {
-    public partial class SupportTickes
+    public partial class SupportTickets
     {
         public int Id { get; set; }
         public int UserId { get; set; }
