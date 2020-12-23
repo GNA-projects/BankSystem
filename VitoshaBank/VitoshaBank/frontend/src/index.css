@@ -1,6 +1,10 @@
 *{
   margin: 0;
   padding: 0;
-  font-family: monospace;
+  font-family: sans-serif;
   color: #384062;
+}
+
+path{
+  color: white;
 }

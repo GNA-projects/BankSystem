@@ -1,14 +1,15 @@
 import axios from "axios";
+import { faMountain } from "@fortawesome/free-solid-svg-icons";
 import React, { useState } from "react";
 import {
   Container,
+  Input,
+  UserIcon,
   FormInner,
   FormOuter,
-  Input,
-  Submit,
-  InputContainer,
-  InputHeader,
-  Header,
+  Heading,
+  Group,
+  Submit
 } from "./style";
 
 export default function Login() {
@@ -28,20 +29,19 @@ export default function Login() {
   };
   return (
     <div>
-      <Header>Log in with your bank account</Header>
       <Container>
         <FormOuter>
           <FormInner>
-            <InputContainer>
-              <InputHeader>Username</InputHeader>
-              <Input value={username} onChange={handleChangeUsername}></Input>
-            </InputContainer>
-            <InputContainer>
-              <InputHeader>Password</InputHeader>
-              <Input value={password} onChange={handleChangePassword}></Input>
-            </InputContainer>
-
-            <Submit onClick={handleSubmit}>Log in</Submit>
+            <UserIcon icon={faMountain}></UserIcon>
+            <Group>
+              <Heading>username</Heading>
+              <Input onChange={handleChangeUsername} value={username}></Input>
+            </Group>
+            <Group>
+              <Heading>password</Heading>
+              <Input type='password' onChange={handleChangePassword} value={password}></Input>
+            </Group>
+            <Submit onClick={handleSubmit}>Login</Submit>
           </FormInner>
         </FormOuter>
       </Container>

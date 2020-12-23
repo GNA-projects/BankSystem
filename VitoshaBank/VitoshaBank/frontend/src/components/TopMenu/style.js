@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import image from './mountain.jpg'
 
 export const NavContainer = styled.div`
   position: relative;
@@ -7,7 +8,7 @@ export const NavContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   box-shadow: 1px 1px 20px;
-  background-image: linear-gradient(to right, #384062, cyan);
+  background-image: url(${image});
   height: 80px;
 `;
 
@@ -15,10 +16,10 @@ export const DropdownContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: absolute;
+  position: fixed;
   z-index: 1;
   overflow: hidden;
-  background-color: white;
+  background-image: url(${image});
   top: 0;
   height: ${(props) => (props.active ? "100vh" : "0vh")};
   transition: height 1s ease;
@@ -28,18 +29,22 @@ export const DropdownContainer = styled.div`
 export const DropdownItemIcon = styled(FontAwesomeIcon)`
   font-size: 3rem;
   margin: 10px;
+  color: white;
 `;
 export const DropdownItemHeading = styled.p`
   font-size: 3rem;
   margin: 10px;
+  color: white;
 `;
 
 export const DropdownItem = styled.div`
   z-index: 0;
-  box-shadow: 1px 5px 10px;
   margin: auto;
   display: flex;
   flex-direction: row;
+  &:hover{
+    box-shadow: 1px 1px 10px white;
+  }
 `;
 
 export const BurgerButton = styled.img`
