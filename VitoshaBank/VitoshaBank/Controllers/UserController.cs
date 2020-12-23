@@ -9,7 +9,7 @@ using VitoshaBank.Data.Models;
 namespace VitoshaBank.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     public class UserController : ControllerBase
     {
         private readonly BankSystemContext _context;
@@ -40,10 +40,10 @@ namespace VitoshaBank.Controllers
         [HttpPost]
         public async Task<ActionResult<BankSystemContext>> PostUser(Users user)
         {
-            user.FirstName = "Nik";
-            user.LastName = "Nik";
-            user.Email = "dsada";
-            user.Password = "asdsadas";
+            user.FirstName = "Ni666k";
+            user.LastName = "dsddadadada";
+            user.Email = "66666666";
+            user.Password = "666666";
             user.RegisterDate = DateTime.Now;
             user.BirthDate = DateTime.Now;
             _context.Add(user);

@@ -19,7 +19,7 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Cards> Cards { get; set; }
         public virtual DbSet<Credits> Credits { get; set; }
         public virtual DbSet<Deposits> Deposits { get; set; }
-        public virtual DbSet<SupportTickes> SupportTickes { get; set; }
+        public virtual DbSet<SupportTickets> SupportTickets { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
@@ -241,7 +241,7 @@ namespace VitoshaBank.Data.Models
                     .HasConstraintName("fk_deposits_user_id_Users_id");
             });
 
-            modelBuilder.Entity<SupportTickes>(entity =>
+            modelBuilder.Entity<SupportTickets>(entity =>
             {
                 entity.HasIndex(e => e.Id)
                     .HasName("id_UNIQUE")
@@ -275,8 +275,8 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("int(11)");
 
                 entity.HasOne(d => d.User)
-                    .WithOne(p => p.SupportTickes)
-                    .HasForeignKey<SupportTickes>(d => d.UserId)
+                    .WithOne(p => p.SupportTickets)
+                    .HasForeignKey<SupportTickets>(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_tickets_user_id_Users_id");
             });

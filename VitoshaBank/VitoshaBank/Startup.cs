@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VitoshaBank.Data.Models;
 
+
 namespace VitoshaBank
 {
 	public class Startup
@@ -24,7 +25,7 @@ namespace VitoshaBank
 		{
 
 			services.AddControllersWithViews();
-			services.AddDbContext<BankSystemContext>(options => options.UseMySql(Configuration.GetConnectionString("BankConnection")));
+			services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
