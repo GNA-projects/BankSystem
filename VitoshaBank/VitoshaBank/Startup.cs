@@ -10,7 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VitoshaBank.Data.Models;
-
+using VitoshaBank.Services;
+using VitoshaBank.Services.Interfaces;
 
 namespace VitoshaBank
 {
@@ -26,6 +27,7 @@ namespace VitoshaBank
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
