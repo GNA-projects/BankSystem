@@ -22,7 +22,7 @@ export default function Login() {
     setPassword(e.target.value);
   };
   const handleSubmit = () => {
-    axios.post("api/users", {
+    axios.post("api/users/login", {
       username: username,
       password: password,
     });

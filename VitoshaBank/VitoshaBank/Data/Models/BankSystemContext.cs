@@ -19,7 +19,6 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Cards> Cards { get; set; }
         public virtual DbSet<Credits> Credits { get; set; }
         public virtual DbSet<Deposits> Deposits { get; set; }
-        public virtual DbSet<EfmigrationsHistory> EfmigrationsHistory { get; set; }
         public virtual DbSet<SupportTickets> SupportTickets { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
@@ -243,24 +242,6 @@ namespace VitoshaBank.Data.Models
                     .HasConstraintName("fk_deposits_user_id_Users_id");
             });
 
-            modelBuilder.Entity<EfmigrationsHistory>(entity =>
-            {
-                entity.HasKey(e => e.MigrationId)
-                    .HasName("PRIMARY");
-
-                entity.ToTable("__EFMigrationsHistory");
-
-                entity.Property(e => e.MigrationId)
-                    .HasColumnType("varchar(150)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_unicode_ci");
-
-                entity.Property(e => e.ProductVersion)
-                    .IsRequired()
-                    .HasColumnType("varchar(32)")
-                    .HasCharSet("utf8")
-                    .HasCollation("utf8_unicode_ci");
-            });
 
             modelBuilder.Entity<SupportTickets>(entity =>
             {

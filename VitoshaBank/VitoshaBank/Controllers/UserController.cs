@@ -110,7 +110,7 @@ namespace VitoshaBank.Controllers
         {
             Users user = null;
             var userAuthenticate =  _context.Users.FirstOrDefault(x => x.Username == userLogin.Username);
-
+            if (userAuthenticate == null) return userAuthenticate;
             if (userLogin.Username == userAuthenticate.Username && userLogin.Password == userAuthenticate.Password)
             {
                 user = new Users { Username = userLogin.Username, Password = userLogin.Password };
