@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useContext } from "react";
+import { Redirect } from "react-router-dom";
+import {LoggedInContext, JwtContext} from "../../context/context";
 
 export default function Home() {
-    return (
-        <div>
-         <h1>
-            click the left corner
-         </h1>
-        </div>
-    )
+  const { loggedIn, setLoggedIn } = useContext(LoggedInContext);
+  const { jwtKey, setJwtKey } = useContext(JwtContext);
+  return (jwtKey !== "") ? (
+    <div>
+      <h1>welcome, You are logged in {jwtKey}</h1>
+    </div>
+  ) : (
+    <div>
+      <Redirect to='/login'></Redirect>
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { faMountain } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
+import {LoggedInContext ,JwtContext} from '../../context/context'
+import React, { useContext, useState } from "react";
 import {
   Container,
   Input,
@@ -9,23 +10,40 @@ import {
   FormOuter,
   Heading,
   Group,
-  Submit
+  Submit,
 } from "./style";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [jwt, setJwt] = useState("");
+
+  const {loggedIn, setLoggedIn} = useContext(LoggedInContext)
+  const {jwtKey, setJwtKey } = useContext(JwtContext);
+
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
   };
   const handleChangePassword = (e) => {
     setPassword(e.target.value);
   };
-  const handleSubmit = () => {
-    axios.post("api/users/login", {
-      username: username,
-      password: password,
-    });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("api/users/login", {
+        username: username,
+        password: password,
+      })
+      .then(
+        (res) => {
+          setLoggedIn(true);
+          setJwtKey(res.data)
+        },
+        (error) => {
+          setLoggedIn(false);
+          setJwtKey("")
+        }
+      );
   };
   return (
     <div>
@@ -39,7 +57,11 @@ export default function Login() {
             </Group>
             <Group>
               <Heading>password</Heading>
-              <Input type='password' onChange={handleChangePassword} value={password}></Input>
+              <Input
+                type="password"
+                onChange={handleChangePassword}
+                value={password}
+              ></Input>
             </Group>
             <Submit onClick={handleSubmit}>Login</Submit>
           </FormInner>

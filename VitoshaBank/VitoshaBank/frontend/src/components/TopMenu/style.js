@@ -52,3 +52,12 @@ export const BurgerButton = styled.img`
   z-index: 2;
   height: 80px;
 `;
+
+export const LoggedInHeading = styled.h1`
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 50%;
+  transform: translate(0,-50%);
+  color: white;
+`;
