@@ -1,21 +1,6 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const Body = styled.div`
-  max-width: 1000px;
-  margin: auto;
-`;
-
-export const HeadingGreet = styled.h1`
-  margin: 20px;
-`;
-
-
-export const ActivitySection = styled.p``;
-export const ActivityHeading = styled.p`
-  margin: 20px;
-`;
-
 export const ActivityBlock = styled.p`
   display: flex;
   justify-content: space-between;

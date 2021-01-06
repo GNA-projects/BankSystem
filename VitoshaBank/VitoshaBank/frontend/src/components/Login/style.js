@@ -45,7 +45,6 @@ export const Input = styled.input`
   outline: none;
   border: 1px;
   border-radius: 20px;
-
 `;
 
 export const Submit = styled.button`

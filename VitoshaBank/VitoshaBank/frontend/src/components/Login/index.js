@@ -1,6 +1,7 @@
 import axios from "axios";
 import { faMountain } from "@fortawesome/free-solid-svg-icons";
 import {LoggedInContext ,JwtContext} from '../../context/context'
+import { useHistory } from "react-router-dom";
 import React, { useContext, useState } from "react";
 import {
   Container,
@@ -14,12 +15,19 @@ import {
 } from "./style";
 
 export default function Login() {
+  const [adminCounter, setAdminCounter] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [jwt, setJwt] = useState("");
 
   const {loggedIn, setLoggedIn} = useContext(LoggedInContext)
   const {jwtKey, setJwtKey } = useContext(JwtContext);
+
+  const history = useHistory()
+  const handleAdmin = () => {
+    setAdminCounter(adminCounter+1)
+    if (adminCounter === 5) history.push('/admin')
+  }
 
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
@@ -50,7 +58,7 @@ export default function Login() {
       <Container>
         <FormOuter>
           <FormInner>
-            <UserIcon icon={faMountain}></UserIcon>
+            <UserIcon icon={faMountain} onClick={handleAdmin}></UserIcon>
             <Group>
               <Heading>username</Heading>
               <Input onChange={handleChangeUsername} value={username}></Input>
