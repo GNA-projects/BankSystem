@@ -64,7 +64,7 @@ namespace VitoshaBank.Controllers
         {
             return await _userService.ChangePassword(user, _context, _BCrypt);
         }
-
+        
         [HttpDelete("delete/{id}")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteUser(int id)

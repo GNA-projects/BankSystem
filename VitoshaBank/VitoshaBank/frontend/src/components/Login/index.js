@@ -1,47 +1,77 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { faMountain } from "@fortawesome/free-solid-svg-icons";
+import {LoggedInContext ,JwtContext} from '../../context/context'
+import { useHistory } from "react-router-dom";
+import React, { useContext, useState } from "react";
 import {
   Container,
+  Input,
+  UserIcon,
   FormInner,
   FormOuter,
-  Input,
+  Heading,
+  Group,
   Submit,
-  InputContainer,
-  InputHeader,
-  Header,
 } from "./style";
 
 export default function Login() {
+  const [adminCounter, setAdminCounter] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [jwt, setJwt] = useState("");
+
+  const {loggedIn, setLoggedIn} = useContext(LoggedInContext)
+  const {jwtKey, setJwtKey } = useContext(JwtContext);
+
+  const history = useHistory()
+  const handleAdmin = () => {
+    setAdminCounter(adminCounter+1)
+    if (adminCounter === 5) history.push('/admin')
+  }
+
   const handleChangeUsername = (e) => {
     setUsername(e.target.value);
   };
   const handleChangePassword = (e) => {
     setPassword(e.target.value);
   };
-  const handleSubmit = () => {
-    axios.post("api/users", {
-      username: username,
-      password: password,
-    });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("api/users/login", {
+        username: username,
+        password: password,
+      })
+      .then(
+        (res) => {
+          setLoggedIn(true);
+          setJwtKey(res.data)
+        },
+        (error) => {
+          setLoggedIn(false);
+          setJwtKey("")
+        }
+      );
   };
   return (
     <div>
-      <Header>Log in with your bank account</Header>
       <Container>
         <FormOuter>
           <FormInner>
-            <InputContainer>
-              <InputHeader>Username</InputHeader>
-              <Input value={username} onChange={handleChangeUsername}></Input>
-            </InputContainer>
-            <InputContainer>
-              <InputHeader>Password</InputHeader>
-              <Input value={password} onChange={handleChangePassword}></Input>
-            </InputContainer>
-
-            <Submit onClick={handleSubmit}>Log in</Submit>
+            <UserIcon icon={faMountain} onClick={handleAdmin}></UserIcon>
+            <Group>
+              <Heading>username</Heading>
+              <Input onChange={handleChangeUsername} value={username}></Input>
+            </Group>
+            <Group>
+              <Heading>password</Heading>
+              <Input
+                type="password"
+                onChange={handleChangePassword}
+                value={password}
+              ></Input>
+            </Group>
+            <Submit onClick={handleSubmit}>Login</Submit>
           </FormInner>
         </FormOuter>
       </Container>

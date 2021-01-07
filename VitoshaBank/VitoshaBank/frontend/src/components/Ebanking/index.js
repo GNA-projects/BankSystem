@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import Balance from "./Balance";
+import Activity from "./Activity";
+import { Body, HeadingGreet } from "./style";
 
 export default function Ebanking() {
-    return (
-        <div>
-            <p>Ebanking</p>
-        </div>
-    )
+  return (
+    <div>
+      <Body>
+        <HeadingGreet>Hi, Sam!</HeadingGreet>
+        <Balance />
+        <Activity />
+      </Body>
+    </div>
+  );
 }
