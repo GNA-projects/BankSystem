@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VitoshaBank.Data.Models;
+﻿using VitoshaBank.Data.Models;
 
 namespace VitoshaBank.Services.Interfaces
 {
