@@ -1,140 +1,76 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Services.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
     [ApiController]
-
     [Route("api/users")]
     public class UserController : ControllerBase
     {
         private readonly BankSystemContext _context;
+        private readonly IBCryptPasswordHasherService _BCrypt;
         private readonly ILogger<Users> _logger;
         private readonly IConfiguration _config;
-        public UserController(BankSystemContext context, ILogger<Users> logger, IConfiguration config)
+        private readonly IUsersService _userService;
+        public UserController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService)
         {
             _context = context;
             _logger = logger;
             _config = config;
+            _BCrypt = BCrypt;
+            _userService = userService;
         }
 
         [HttpGet("users")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var currentUser = HttpContext.User;
+            return await _userService.GetAllUsers(currentUser, _context);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("users/{id}")]
+        [Authorize]
         public async Task<ActionResult<Users>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
+            var currentUser = HttpContext.User;
+            return await _userService.GetUser(currentUser, id, _context);
         }
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult<BankSystemContext>> PostUser(Users user)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(Users user)
         {
-            user.FirstName = "Ni666k";
-            user.LastName = "dsddadadada";
-            user.Username = "66666666";
-            user.Password = "666666";
-            user.RegisterDate = DateTime.Now;
-            user.BirthDate = DateTime.Now;
-            _context.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            var currentUser = HttpContext.User;
+            return await _userService.CreateUser(currentUser, user, _BCrypt, _context);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public IActionResult LoginPerson(Users userLogin)
+        public async Task<ActionResult> LoginUser(Users userLogin)
         {
-            IActionResult response = Unauthorized();
-            var user = AuthenticateUser(userLogin);
-
-            if (user != null)
-            {
-                var tokenString = GenerateJSONWebToken(user);
-                response = Ok(tokenString);
-            }
-
-            return response;
+            return await _userService.LoginUser(userLogin, _context, _BCrypt, _config);
         }
 
-        [HttpGet]
+        [HttpPut("changePassword")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ChangePassword(Users user)
+        {
+            return await _userService.ChangePassword(user, _context, _BCrypt);
+        }
+        
+        [HttpDelete("delete/{id}")]
         [Authorize]
-        public IActionResult AdminGet()
+        public async Task<ActionResult<Users>> DeleteUser(int id)
         {
             var currentUser = HttpContext.User;
-            string name = "";
-
-            if (currentUser.HasClaim(c => c.Type == "Username"))
-            {
-                string userName = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-                name = userName;
-            }
-            var userAuthenticate = _context.Users.Find(name);
-
-            if (name == userAuthenticate.Username)
-            {
-                return Ok(name);
-            }
-            else
-            {
-                return Unauthorized();
-            }
-        }
-
-        private Users AuthenticateUser(Users userLogin)
-        {
-            Users user = null;
-            var userAuthenticate =  _context.Users.FirstOrDefault(x => x.Username == userLogin.Username);
-            if (userAuthenticate == null) return userAuthenticate;
-            if (userLogin.Username == userAuthenticate.Username && userLogin.Password == userAuthenticate.Password)
-            {
-                user = new Users { Username = userLogin.Username, Password = userLogin.Password };
-            }
-            return user;
-        }
-        private string GenerateJSONWebToken(Users userInfo)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[] {
-                         new Claim("Username", userInfo.Username),
-                         new Claim("Password", userInfo.Password),
-                                };
-
-            var token = new JwtSecurityToken(
-                null,
-                null,
-                claims,
-                null,
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return await _userService.DeleteUser(currentUser, id, _context);
         }
     }
 }

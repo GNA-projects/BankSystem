@@ -242,7 +242,6 @@ namespace VitoshaBank.Data.Models
                     .HasConstraintName("fk_deposits_user_id_Users_id");
             });
 
-
             modelBuilder.Entity<SupportTickets>(entity =>
             {
                 entity.HasIndex(e => e.Id)
@@ -355,6 +354,8 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("varchar(45)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_unicode_ci");
+
+                entity.Property(e => e.IsAdmin).HasColumnName("isAdmin");
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
