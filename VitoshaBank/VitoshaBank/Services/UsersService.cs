@@ -124,9 +124,8 @@ namespace VitoshaBank.Services
             return NoContent();
         }
 
-        public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context)
+        public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
         {
-            
             string role = "";
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
@@ -137,7 +136,7 @@ namespace VitoshaBank.Services
 
             if (role == "Admin")
             {
-                var user = await _context.Users.FindAsync(id);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 if (user == null)
                 {
                     return NotFound();
