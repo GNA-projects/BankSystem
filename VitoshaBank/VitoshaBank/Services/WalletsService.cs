@@ -24,10 +24,41 @@ namespace VitoshaBank.Services
 
             if (role == "Admin")
             {
-                await PerpareWallet(_context, username, wallet);
-            }
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Wallets walletExists = null;
 
-            return Unauthorized();
+                if (userAuthenticate != null)
+                {
+                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+
+                if (walletExists == null)
+                {
+                    if (ValidateUser(userAuthenticate) && ValidateWallet(wallet))
+                    {
+                        wallet.UserId = userAuthenticate.Id;
+                        _context.Add(wallet);
+                        await _context.SaveChangesAsync();
+
+                        return Ok();
+                    }
+                    else if (ValidateUser(userAuthenticate) == false)
+                    {
+                        return NotFound("Idiot no such user is found!");
+                    }
+                    else if (ValidateWallet(wallet) == false)
+                    {
+                        return BadRequest("Idiot don't put negative value!");
+                    }
+                }
+
+                return BadRequest("User already has a wallet!");
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         public async Task<ActionResult<Users>> DeleteWallet(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
@@ -87,38 +118,5 @@ namespace VitoshaBank.Services
             return false;
         }
 
-        private async Task<ActionResult> PerpareWallet(BankSystemContext _context, string username, Wallets wallet)
-        {
-            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-            Wallets walletExists = null;
-
-            if (userAuthenticate != null)
-            {
-                 walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-            }
-            
-
-            if (walletExists == null)
-            {
-                if (ValidateUser(userAuthenticate) && ValidateWallet(wallet))
-                {
-                    wallet.UserId = userAuthenticate.Id;
-                    _context.Add(wallet);
-                    await _context.SaveChangesAsync();
-
-                    return Ok();
-                }
-                else if (ValidateUser(userAuthenticate) == false)
-                {
-                    return NotFound("Idiot no such user is found!");
-                }
-                else if (ValidateWallet(wallet) == false)
-                {
-                    return BadRequest("Idiot don't put negative value!");
-                }
-            }
-
-            return BadRequest("User already has a wallet!");
-        }
     }
 }
