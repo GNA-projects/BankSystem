@@ -5,11 +5,12 @@ namespace VitoshaBank.Data.Models
 {
     public partial class Wallets
     {
-        public int Id { get; set; }
-        public string Iban { get; set; }
+        private const decimal defaultValue = 0.0M;
+        public int Id { get; }
+        public string Iban { get; } = "BGN1111";
         public int UserId { get; set; }
-        public decimal Amount { get; set; }
+        public decimal Amount { get; set; } = defaultValue;
 
-        public virtual Users User { get; set; }
+        public virtual Users User { get; }
     }
 }

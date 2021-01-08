@@ -11,14 +11,14 @@ namespace VitoshaBank.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly BankSystemContext _context;
         private readonly IBCryptPasswordHasherService _BCrypt;
         private readonly ILogger<Users> _logger;
         private readonly IConfiguration _config;
         private readonly IUsersService _userService;
-        public UserController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService)
+        public UsersController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService)
         {
             _context = context;
             _logger = logger;
@@ -65,7 +65,7 @@ namespace VitoshaBank.Controllers
             return await _userService.ChangePassword(user, _context, _BCrypt);
         }
         
-        [HttpDelete("delete")]
+        [HttpDelete("delete/{username}")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteUser(string username)
         {
