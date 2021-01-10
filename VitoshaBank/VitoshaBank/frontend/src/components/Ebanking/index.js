@@ -1,7 +1,7 @@
 import React from "react";
 import Balance from "./Balance";
 import Activity from "./Activity";
-import { Body, HeadingGreet } from "./style";
+import { Body, HeadingGreet } from "../../style/eBankingStyle";
 
 export default function Ebanking() {
   return (

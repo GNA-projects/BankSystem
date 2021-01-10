@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import image from './mountain.jpg'
+import image from '../Images/mountain.jpg'
 
 export const NavContainer = styled.div`
   position: relative;
