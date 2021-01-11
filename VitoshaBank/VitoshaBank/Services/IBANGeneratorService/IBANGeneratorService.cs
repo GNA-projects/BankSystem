@@ -4,21 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VitoshaBank.Services
+namespace VitoshaBank.Services.IBANGeneratorService
 {
-    public class IBANGeneratorService
+    public static class IBANGeneratorService
     {
         //IBAN=BG 18 VITB 123456789 01 001
-        string countryCode = "BG";
-        string uniqueNumber = "18";
-        string bankBIC = "VITB";
-        string secondUniqueNumber = "123456789";
-        string bankAccountTypeCode = "";
-        string currentBankAccountNumber = "001";
+        
 
-        public string GenerateIBANInVitoshaBank(string BankAccountType) 
+        public static string GenerateIBANInVitoshaBank(string BankAccountType) 
         {
-           
+            Bank
+            string countryCode = "BG";
+            string uniqueNumber = "18";
+            string bankBIC = "VITB";
+            string secondUniqueNumber = "123456789";
+            string bankAccountTypeCode = "";
+            string currentBankAccountNumber = "001";
+
             if (BankAccountType == "BankAccount")
             {
                 bankAccountTypeCode = "01";
@@ -39,11 +41,11 @@ namespace VitoshaBank.Services
             string IBAN = $"{countryCode}{uniqueNumber}{bankBIC}{secondUniqueNumber}{bankAccountTypeCode}{currentBankAccountNumber}";
             return IBAN;
         }
-        private void GetCurrentAvailabeAccountNumber(string BankAccountType)
+        private static void GetCurrentAvailabeAccountNumber(string BankAccountType)
         {
             if (BankAccountType == "BankAccount")
             {
-                // Get From DB
+                
             }
             else if (BankAccountType == "Credit")
             {
