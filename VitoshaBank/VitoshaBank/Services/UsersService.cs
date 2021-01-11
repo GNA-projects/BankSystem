@@ -164,6 +164,7 @@ namespace VitoshaBank.Services
             {
                 return userAuthenticate;
             }
+            userAuthenticate = null;
             return userAuthenticate;
         }
         private string GenerateJSONWebToken(Users userInfo, IConfiguration _config)
