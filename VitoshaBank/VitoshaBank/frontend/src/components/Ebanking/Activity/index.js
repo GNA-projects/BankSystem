@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react/cjs/react.development";
 import { useHistory } from "react-router-dom";
 import ActivityBlock from "./ActivityBlock";
-import { ActivitySection, ActivityHeading, ActivityButton } from "./style";
+import { ActivitySection, ActivityHeading, ActivityButton } from "../../../style/activityStyle";
 
 export default function Activity(props) {
   const history = useHistory();

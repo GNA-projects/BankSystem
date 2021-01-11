@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import image from "./bg.jpg";
+import image from "../Images/login.jpg";
 
 export const Container = styled.div`
   display: flex;

@@ -1,8 +1,7 @@
 import axios from "axios";
 import { faMountain } from "@fortawesome/free-solid-svg-icons";
-import {LoggedInContext ,JwtContext} from '../../context/context'
 import { useHistory } from "react-router-dom";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Input,
@@ -12,16 +11,12 @@ import {
   Heading,
   Group,
   Submit,
-} from "./style";
+} from "../../style/loginStyle";
 
 export default function Login() {
   const [adminCounter, setAdminCounter] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [jwt, setJwt] = useState("");
-
-  const {loggedIn, setLoggedIn} = useContext(LoggedInContext)
-  const {jwtKey, setJwtKey } = useContext(JwtContext);
 
   const history = useHistory()
   const handleAdmin = () => {
@@ -36,7 +31,6 @@ export default function Login() {
     setPassword(e.target.value);
   };
   const handleSubmit = (e) => {
-    e.preventDefault();
     axios
       .post("api/users/login", {
         username: username,
@@ -44,14 +38,13 @@ export default function Login() {
       })
       .then(
         (res) => {
-          setLoggedIn(true);
-          setJwtKey(res.data)
+          sessionStorage['jwt'] = res.data;
         },
         (error) => {
-          setLoggedIn(false);
-          setJwtKey("")
+          sessionStorage.removeItem('jwt');
         }
       );
+    window.location.reload();
   };
   return (
     <div>
@@ -72,6 +65,7 @@ export default function Login() {
               ></Input>
             </Group>
             <Submit onClick={handleSubmit}>Login</Submit>
+            <Submit onClick={() => {sessionStorage.removeItem('jwt')}}>LogOut</Submit>
           </FormInner>
         </FormOuter>
       </Container>

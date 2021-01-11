@@ -9,7 +9,7 @@ import {
   DropdownItemHeading,
   DropdownItemIcon,
   LoggedInHeading,
-} from "./style";
+} from "../../style/topMenuStyle";
 
 import logo from "../../Images/logo.png";
 import { faPiggyBank } from "@fortawesome/free-solid-svg-icons";
@@ -46,7 +46,7 @@ export default function TopMenu() {
           src={logo}
           onClick={() => setDropdown(!dropDown)}
         ></BurgerButton>
-        <LoggedInHeading>{loggedIn ? "logged" : "not logged"}</LoggedInHeading>
+        <LoggedInHeading>{sessionStorage['jwt'] ? "logged" : "not logged"}</LoggedInHeading>
       </NavContainer>
       <DropdownContainer active={dropDown}>
         <DropdownItem onClick={goHome}>
