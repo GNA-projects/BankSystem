@@ -44,7 +44,6 @@ export default function Login() {
           sessionStorage.removeItem('jwt');
         }
       );
-    window.location.reload();
   };
   return (
     <div>

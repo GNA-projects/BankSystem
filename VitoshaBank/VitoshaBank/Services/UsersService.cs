@@ -60,13 +60,8 @@ namespace VitoshaBank.Services
 
             if (role == "Admin")
             {
-                user.FirstName = "Didak";
-                user.LastName = "Maniak";
-                user.Username = "TazerFace";
-                user.Password = _BCrypt.HashPassword("12345");
+                user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
-                user.BirthDate = DateTime.Now;
-                user.IsAdmin = false;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 
