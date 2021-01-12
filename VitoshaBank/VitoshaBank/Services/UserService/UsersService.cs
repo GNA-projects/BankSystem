@@ -38,17 +38,31 @@ namespace VitoshaBank.Services.UserService
 
         public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context)
         {
-            var user = await _context.Users.FindAsync(id);
+            string role = "";
 
-            if (user == null)
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
-                return NotFound();
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
             }
 
-            return user;
+            if (role == "Admin")
+            {
+                var user = await _context.Users.FindAsync(id);
+
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return user;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
-        public async Task<ActionResult<BankSystemContext>>CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context)
         {
             string role = "";
 
@@ -60,13 +74,8 @@ namespace VitoshaBank.Services.UserService
 
             if (role == "Admin")
             {
-                user.FirstName = "Didak";
-                user.LastName = "Maniak";
-                user.Username = "TazerFace";
-                user.Password = _BCrypt.HashPassword("12345");
+                user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
-                user.BirthDate = DateTime.Now;
-                user.IsAdmin = false;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 

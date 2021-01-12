@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces.WalletService;
 
@@ -31,6 +32,14 @@ namespace VitoshaBank.Controllers
             _IBAN = IBAN;
         }
 
+        [HttpGet("getWallets/{username}")]
+        [Authorize]
+        public async Task<ActionResult<WalletResponseModel>> GetWalletInfo(string username)
+        {
+            var currentUser = HttpContext.User;
+            return await _walletService.GetWalletInfo(currentUser, username, _context);
+        }
+
         [HttpPost("create/{username}")]
         [Authorize]
         public async Task<ActionResult> CreateWallet(Wallets wallet, string username)
@@ -39,9 +48,28 @@ namespace VitoshaBank.Controllers
             return await _walletService.CreateWallet(currentUser, username, wallet,_IBAN, _context);
         }
 
+        [HttpPut("deposit/{username}")]
+        [Authorize]
+        public async Task<ActionResult> DepositInWallet(Wallets wallet, decimal amount, string username)
+        {
+            amount = 0.50M;
+            var currentUser = HttpContext.User;
+            return await _walletService.DepositMoney(wallet, currentUser, username, amount, _context);
+        }
+
+        [HttpPut("purchase/{username}")]
+        [Authorize]
+        public async Task<ActionResult> PurchaseWithWallet(Wallets wallet, string product, decimal amount, string username)
+        {
+            amount = 10000;
+            product = "Headphones";
+            var currentUser = HttpContext.User;
+            return await _walletService.SimulatePurchase(wallet, product, currentUser, username, amount, _context);
+        }
+
         [HttpDelete("delete/{username}")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteUser(string username)
+        public async Task<ActionResult<Users>> DeleteWallet(string username)
         {
             var currentUser = HttpContext.User;
             return await _walletService.DeleteWallet(currentUser, username, _context);
