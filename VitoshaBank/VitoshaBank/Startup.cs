@@ -50,9 +50,12 @@ namespace VitoshaBank
                     };
                 });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                                .AddNewtonsoftJson(options =>
+                                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                                    );
 
-			services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
+            services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
