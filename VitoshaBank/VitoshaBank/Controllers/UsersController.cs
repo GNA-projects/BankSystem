@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 
 namespace VitoshaBank.Controllers
 {

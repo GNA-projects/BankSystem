@@ -6,13 +6,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
-using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.Interfaces.WalletService;
 
-namespace VitoshaBank.Services
+namespace VitoshaBank.Services.WalletService
 {
     public class WalletsService : ControllerBase, IWalletsService
     {
-        public async Task<ActionResult> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, BankSystemContext _context)
+        public async Task<ActionResult> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context)
         {
             string role = "";
 
@@ -38,6 +39,7 @@ namespace VitoshaBank.Services
                     if (ValidateUser(userAuthenticate) && ValidateWallet(wallet))
                     {
                         wallet.UserId = userAuthenticate.Id;
+                        wallet.Iban = _IBAN.GenerateIBANInVitoshaBank("Wallet", _context);
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 

@@ -8,7 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
-using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.Interfaces.WalletService;
 
 namespace VitoshaBank.Controllers
 {
@@ -20,12 +21,14 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Users> _logger;
         private readonly IConfiguration _config;
         private readonly IWalletsService _walletService;
-        public WalletsController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IWalletsService walletService)
+        private readonly IIBANGeneratorService _IBAN;
+        public WalletsController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IWalletsService walletService, IIBANGeneratorService IBAN)
         {
             _context = context;
             _logger = logger;
             _config = config;
             _walletService = walletService;
+            _IBAN = IBAN;
         }
 
         [HttpPost("create/{username}")]
@@ -33,7 +36,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult> CreateWallet(Wallets wallet, string username)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, username, wallet, _context);
+            return await _walletService.CreateWallet(currentUser, username, wallet,_IBAN, _context);
         }
 
         [HttpDelete("delete/{username}")]

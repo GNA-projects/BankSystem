@@ -10,9 +10,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
-using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 
-namespace VitoshaBank.Services
+namespace VitoshaBank.Services.UserService
 {
     public class UsersService : ControllerBase, IUsersService
     {

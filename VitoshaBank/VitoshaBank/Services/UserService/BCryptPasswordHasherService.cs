@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using VitoshaBank.Data.Models;
-using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 
-namespace VitoshaBank.Services
+namespace VitoshaBank.Services.UserService
 {
     public class BCryptPasswordHasherService : IBCryptPasswordHasherService
     {

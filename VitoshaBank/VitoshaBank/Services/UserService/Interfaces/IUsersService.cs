@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
 
-namespace VitoshaBank.Services.Interfaces
+namespace VitoshaBank.Services.Interfaces.UserService
 {
     public interface IUsersService
     {

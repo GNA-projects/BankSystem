@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.IBANGeneratorService
 {
-    public static class IBANGeneratorService
+    public class IBANGeneratorService : IIBANGeneratorService
     {
         //IBAN=BG 18 VITB 123456789 01 001
-        
-
-        public static string GenerateIBANInVitoshaBank(string BankAccountType) 
+        public string GenerateIBANInVitoshaBank(string BankAccountType, BankSystemContext dbContext) 
         {
             string countryCode = "BG";
             string uniqueNumber = "18";
@@ -32,7 +31,7 @@ namespace VitoshaBank.Services.IBANGeneratorService
             {
                 bankAccountTypeCode = "03";
             }
-            else if(BankAccountType == "wallet")
+            else if(BankAccountType == "Wallet")
             {
                 bankAccountTypeCode = "04";
             }
@@ -40,17 +39,26 @@ namespace VitoshaBank.Services.IBANGeneratorService
             {
                 return null;
             }
-            string currentBankAccountNumber = GetCurrentAvailabeAccountNumber(BankAccountType);
+            string currentBankAccountNumber = GetCurrentAvailabeAccountNumber(BankAccountType, dbContext);
             string IBAN = $"{countryCode}{uniqueNumber}{bankBIC}{secondUniqueNumber}{bankAccountTypeCode}{currentBankAccountNumber}";
             return IBAN;
         }
-        private static string GetCurrentAvailabeAccountNumber(string BankAccountType)
+        private static string GetCurrentAvailabeAccountNumber(string BankAccountType, BankSystemContext dbContext)
         {
-            BankSystemContext dbContext = new BankSystemContext();
+           
             if (BankAccountType == "BankAccount")
             {
-                var lastBankAcc = dbContext.BankAccounts.LastOrDefault();
-                var serialNumber = lastBankAcc.Id + 1;
+                var lastBankAccount = dbContext.Wallets.ToList();
+                int serialNumber = 0;
+                if (lastBankAccount.Count() == 0)
+                {
+                    serialNumber = 1;
+                }
+                else
+                {
+                    serialNumber = lastBankAccount.LastOrDefault().Id + 1;
+                }
+
                 if (serialNumber >= 10 && serialNumber < 100)
                 {
                     return $"0000{serialNumber}";
@@ -81,8 +89,17 @@ namespace VitoshaBank.Services.IBANGeneratorService
             }
             else if (BankAccountType == "Credit")
             {
-                var lastCredit = dbContext.Credits.LastOrDefault();
-                var serialNumber = lastCredit.Id + 1;
+                var lastCredit = dbContext.Wallets.ToList();
+                int serialNumber = 0;
+                if (lastCredit.Count() == 0)
+                {
+                    serialNumber = 1;
+                }
+                else
+                {
+                    serialNumber = lastCredit.LastOrDefault().Id + 1;
+                }
+
                 if (serialNumber >= 10 && serialNumber < 100)
                 {
                     return $"0000{serialNumber}";
@@ -113,8 +130,17 @@ namespace VitoshaBank.Services.IBANGeneratorService
             }
             else if (BankAccountType == "Deposit")
             {
-                var lastDeposit = dbContext.Deposits.LastOrDefault();
-                var serialNumber = lastDeposit.Id + 1;
+                var lastDeposit = dbContext.Wallets.ToList();
+                int serialNumber = 0;
+                if (lastDeposit.Count() == 0)
+                {
+                    serialNumber = 1;
+                }
+                else
+                {
+                    serialNumber = lastDeposit.LastOrDefault().Id + 1;
+                }
+
                 if (serialNumber >= 10 && serialNumber < 100)
                 {
                     return $"0000{serialNumber}";
@@ -145,8 +171,17 @@ namespace VitoshaBank.Services.IBANGeneratorService
             }
             else if(BankAccountType == "Wallet")
             {
-                var lastWallet = dbContext.Wallets.LastOrDefault();
-                var serialNumber = lastWallet.Id + 1;
+                var lastWallet = dbContext.Wallets.ToList();
+                int serialNumber = 0;
+                if (lastWallet.Count() == 0)
+                {
+                    serialNumber = 1;
+                }
+                else
+                {
+                    serialNumber = lastWallet.LastOrDefault().Id + 1;
+                }
+
                 if (serialNumber >= 10 && serialNumber < 100)
                 {
                     return $"0000{serialNumber}";

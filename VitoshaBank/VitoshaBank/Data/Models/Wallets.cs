@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitoshaBank.Services.IBANGeneratorService;
 
 namespace VitoshaBank.Data.Models
 {
@@ -7,7 +8,7 @@ namespace VitoshaBank.Data.Models
     {
         private const decimal defaultValue = 0.0M;
         public int Id { get; }
-        public string Iban { get; } = "BGN1111";
+        public string Iban { get; set; } 
         public int UserId { get; set; }
         public decimal Amount { get; set; } = defaultValue;
 

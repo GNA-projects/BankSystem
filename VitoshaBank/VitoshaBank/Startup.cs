@@ -10,7 +10,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services;
+using VitoshaBank.Services.IBANGeneratorService;
+using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
+using VitoshaBank.Services.Interfaces.WalletService;
+using VitoshaBank.Services.UserService;
+using VitoshaBank.Services.WalletService;
 
 namespace VitoshaBank
 {
@@ -28,8 +34,9 @@ namespace VitoshaBank
         {
 
             services.AddScoped<IUsersService, UsersService>();
-            services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
             services.AddScoped<IWalletsService, WalletsService>();
+            services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
+            services.AddScoped<IIBANGeneratorService, IBANGeneratorService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
