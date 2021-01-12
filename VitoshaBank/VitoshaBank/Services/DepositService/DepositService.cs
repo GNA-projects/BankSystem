@@ -11,7 +11,7 @@ using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.DepositService
 {
-    public class DepositService : ControllerBase
+    public class DepositService : ControllerBase, IDepositService
     {
         public async Task<ActionResult> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context)
         {
