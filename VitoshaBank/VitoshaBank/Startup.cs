@@ -10,6 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services;
+using VitoshaBank.Services.BankAccountService;
+using VitoshaBank.Services.BankAccountService.Interfaces;
+using VitoshaBank.Services.CalculateDividendService;
+using VitoshaBank.Services.CalculateDividendService.Interfaces;
+using VitoshaBank.Services.DebitCardService;
+using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -22,7 +28,7 @@ using VitoshaBank.Services.WalletService;
 namespace VitoshaBank
 {
     public class Startup
-	{
+    {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,6 +43,8 @@ namespace VitoshaBank
             services.AddScoped<IUsersService, UsersService>();
             services.AddScoped<IWalletsService, WalletsService>();
             services.AddScoped<IDepositService, DepositService>();
+            services.AddScoped<IBankAccountService, BankAccountService>();
+            services.AddScoped<IDebitCardService, DebitCardService>();
             services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
             services.AddScoped<IIBANGeneratorService, IBANGeneratorService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -54,7 +62,7 @@ namespace VitoshaBank
 
             services.AddControllersWithViews();
 
-			services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
+            services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

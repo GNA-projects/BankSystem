@@ -4,11 +4,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.DebitCardService;
 
 namespace VitoshaBank.Services.BankAccountService
 {
-    public class BankAccountService:ControllerBase
+    public class BankAccountService : ControllerBase, IBankAccountService
     {
         public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context)
         {
@@ -39,7 +41,7 @@ namespace VitoshaBank.Services.BankAccountService
                         bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
                         bankAccount.Card = new Cards();
                         DebitCardService.DebitCardService debitCardService = new DebitCardService.DebitCardService();
-                        await debitCardService.CreateDebitCard(currentUser, username, bankAccount, _IBAN, _context, bankAccount.Card);
+                        await debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, bankAccount.Card);
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
 

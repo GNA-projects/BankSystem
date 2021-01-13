@@ -6,13 +6,14 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.DebitCardService
 {
-    public class DebitCardService :ControllerBase
+    public class DebitCardService :ControllerBase, IDebitCardService
     {
-        public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, Cards card)
+        public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card)
         {
             string role = "";
 
