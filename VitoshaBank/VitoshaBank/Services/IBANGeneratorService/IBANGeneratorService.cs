@@ -48,7 +48,7 @@ namespace VitoshaBank.Services.IBANGeneratorService
            
             if (BankAccountType == "BankAccount")
             {
-                var lastBankAccount = dbContext.Wallets.ToList();
+                var lastBankAccount = dbContext.BankAccounts.ToList();
                 int serialNumber = 0;
                 if (lastBankAccount.Count() == 0)
                 {
@@ -89,7 +89,7 @@ namespace VitoshaBank.Services.IBANGeneratorService
             }
             else if (BankAccountType == "Credit")
             {
-                var lastCredit = dbContext.Wallets.ToList();
+                var lastCredit = dbContext.Credits.ToList();
                 int serialNumber = 0;
                 if (lastCredit.Count() == 0)
                 {
@@ -130,7 +130,7 @@ namespace VitoshaBank.Services.IBANGeneratorService
             }
             else if (BankAccountType == "Deposit")
             {
-                var lastDeposit = dbContext.Wallets.ToList();
+                var lastDeposit = dbContext.Deposits.ToList();
                 int serialNumber = 0;
                 if (lastDeposit.Count() == 0)
                 {

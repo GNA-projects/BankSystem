@@ -9,7 +9,7 @@ using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.BankAccountService.Interfaces
 {
-    interface IBankAccountService
+    public interface IBankAccountService
     {
         public Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccounts, IIBANGeneratorService _IBAN, BankSystemContext _context);
         public Task<ActionResult<Users>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context);
