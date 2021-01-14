@@ -4,7 +4,7 @@ import {
   BalanceHeading,
   BalanceMoney,
   BalanceMoneyHeading,
-} from "../../../style/balanceStyle";
+} from "./style";
 
 export default function Balance() {
   return (

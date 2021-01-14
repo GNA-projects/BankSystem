@@ -9,7 +9,7 @@ import {
   DropdownItemHeading,
   DropdownItemIcon,
   LoggedInHeading,
-} from "../../style/topMenuStyle";
+} from "./style";
 
 import logo from "../../Images/logo.png";
 import { faPiggyBank } from "@fortawesome/free-solid-svg-icons";

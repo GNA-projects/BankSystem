@@ -11,7 +11,7 @@ import {
   Heading,
   Group,
   Submit,
-} from "../../style/loginStyle";
+} from "./style";
 
 export default function Login() {
   const [adminCounter, setAdminCounter] = useState(0);

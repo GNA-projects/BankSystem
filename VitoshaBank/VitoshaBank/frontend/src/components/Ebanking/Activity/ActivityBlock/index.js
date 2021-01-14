@@ -7,7 +7,7 @@ import {
   ActivityBlockHeading,
   ActivityBlockDate,
   ActivityBlockMoney,
-} from "../../../../style/activityBlockStyle";
+} from "./style";
 import { faStore } from "@fortawesome/free-solid-svg-icons";
 
 export default function Ebanking(props) {
