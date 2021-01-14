@@ -7,13 +7,14 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services.CalculateDividendService;
+using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.DepositService
 {
     public class DepositService : ControllerBase, IDepositService
     {
-        public async Task<ActionResult> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context)
+        public async Task<ActionResult> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateDividentService _dividentDepositService)
         {
             string role = "";
 
@@ -39,9 +40,11 @@ namespace VitoshaBank.Services.DepositService
                     if (ValidateUser(userAuthenticate) && ValidateDeposits(deposits))
                     {
                         deposits.UserId = userAuthenticate.Id;
+                        deposits.TermOfPayment = 6;
                         deposits.Iban = _IBAN.GenerateIBANInVitoshaBank("Deposit", _context);
                         deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
-                        deposits.Divident = CalculateDividentService.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
+                        deposits.Amount = 45;
+                        deposits.Divident = _dividentDepositService.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
                         _context.Add(deposits);
                         await _context.SaveChangesAsync();
 

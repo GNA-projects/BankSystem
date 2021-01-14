@@ -7,12 +7,13 @@ using VitoshaBank.Data.Models;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.DebitCardService;
+using VitoshaBank.Services.DebitCardService.Interfaces;
 
 namespace VitoshaBank.Services.BankAccountService
 {
     public class BankAccountService : ControllerBase, IBankAccountService
     {
-        public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context)
+        public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService)
         {
             string role = "";
 
@@ -39,18 +40,13 @@ namespace VitoshaBank.Services.BankAccountService
                     {
                         bankAccount.UserId = userAuthenticate.Id;
                         bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
-                        
+                        bankAccount.Amount = 5;
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
-                        //bankAccount.Card = new Cards();
-                        DebitCardService.DebitCardService debitCardService = new DebitCardService.DebitCardService();
-                        await debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
-                        Cards newCard = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccount.Id);
-                        
-                        await _context.SaveChangesAsync();
+                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
 
-                        return Ok();
+                        return Ok(201);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
@@ -84,10 +80,11 @@ namespace VitoshaBank.Services.BankAccountService
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 BankAccounts bankAccountExists = null;
-
+                Cards cardExists = null;
                 if (user != null)
                 {
                     bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                    cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccountExists.Id);
                 }
 
                 if (user == null)
@@ -98,11 +95,20 @@ namespace VitoshaBank.Services.BankAccountService
                 {
                     return BadRequest("Dumbass, user doesn't have a deposits!");
                 }
+                else if (cardExists == null)
+                {
 
-                _context.BankAccounts.Remove(bankAccountExists);
-                await _context.SaveChangesAsync();
+                    return BadRequest("No debit card found!");
+                }
+                else
+                {
+                    _context.Cards.Remove(cardExists);
+                    _context.BankAccounts.Remove(bankAccountExists);
+                    await _context.SaveChangesAsync();
 
-                return Ok();
+                    return Ok();
+
+                }
             }
             else
             {
@@ -127,4 +133,5 @@ namespace VitoshaBank.Services.BankAccountService
             return false;
         }
     }
-}
+} 
+

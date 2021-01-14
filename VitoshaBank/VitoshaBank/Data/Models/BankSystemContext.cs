@@ -340,6 +340,13 @@ namespace VitoshaBank.Data.Models
                     .HasColumnName("birth_date")
                     .HasColumnType("date");
 
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasColumnName("email")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasColumnName("first_name")

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services.BankAccountService.Interfaces;
+using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Controllers
@@ -21,23 +22,33 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Users> _logger;
         private readonly IConfiguration _config;
         private readonly IBankAccountService _bankAccountService;
+        private readonly IDebitCardService _debitCardService;
         private readonly IIBANGeneratorService _IBAN;
 
-        public BankAccountController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBankAccountService bankAccountService, IIBANGeneratorService IBAN)
+        public BankAccountController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService)
         {
             _context = context;
             _logger = logger;
             _config = config;
             _bankAccountService = bankAccountService;
+            _debitCardService = debitCardService;
             _IBAN = IBAN;
         }
 
         [HttpPost("create/{username}")]
         [Authorize]
-        public async Task<ActionResult> CreateWallet(BankAccounts bankAccount, string username)
+        public async Task<ActionResult> CreateBankAccount(BankAccounts bankAccount, string username)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, username, bankAccount,_IBAN, _context);
+            return await _bankAccountService.CreateBankAccount(currentUser, username, bankAccount,_IBAN, _context, _debitCardService);
+        }
+
+        [HttpDelete("delete/{username}")]
+        [Authorize]
+        public async Task<ActionResult<Users>> DeleteBankAccount (string username)
+        {
+            var currentUser = HttpContext.User;
+            return await _bankAccountService.DeleteBankAccount(currentUser, username, _context);
         }
     }
 }

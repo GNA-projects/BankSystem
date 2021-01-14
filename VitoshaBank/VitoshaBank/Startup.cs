@@ -47,6 +47,7 @@ namespace VitoshaBank
             services.AddScoped<IDebitCardService, DebitCardService>();
             services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
             services.AddScoped<IIBANGeneratorService, IBANGeneratorService>();
+            services.AddScoped<ICalculateDividentService, CalculateDividentService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
