@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -33,6 +34,14 @@ namespace VitoshaBank.Controllers
             _bankAccountService = bankAccountService;
             _debitCardService = debitCardService;
             _IBAN = IBAN;
+        }
+
+        [HttpGet("get/{username}")]
+        [Authorize]
+        public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo(string username)
+        {
+            var currentUser = HttpContext.User;
+            return await _bankAccountService.GetBankAccountInfo(currentUser, username, _context);
         }
 
         [HttpPost("create/{username}")]

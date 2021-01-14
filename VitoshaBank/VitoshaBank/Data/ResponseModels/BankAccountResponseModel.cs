@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace VitoshaBank.Data.ResponseModels
 {
-    public class WalletResponseModel
+    public class BankAccountResponseModel
     {
-        public string CardNumber { get; set; }
+        public string IBAN { get; set; }
         public decimal Amount { get; set; }
     }
 }

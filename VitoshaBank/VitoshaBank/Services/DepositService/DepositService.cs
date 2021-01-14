@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService;
 using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -14,6 +15,33 @@ namespace VitoshaBank.Services.DepositService
 {
     public class DepositService : ControllerBase, IDepositService
     {
+        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Deposits depositExists = null;
+                DepositResponseModel depositResponseModel = new DepositResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    depositExists = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (depositExists != null)
+                {
+                    depositResponseModel.IBAN = depositExists.Iban;
+                    depositResponseModel.Amount = depositExists.Amount;
+                    depositResponseModel.PaymentDate = depositExists.PaymentDate;
+                    return Ok(depositResponseModel);
+                }
+            }
+            return Ok("You don't have a deposit");
+        }
         public async Task<ActionResult> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateDividentService _dividentDepositService)
         {
             string role = "";

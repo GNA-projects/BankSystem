@@ -8,11 +8,38 @@ using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.DebitCardService;
 using VitoshaBank.Services.DebitCardService.Interfaces;
+using VitoshaBank.Data.ResponseModels;
 
 namespace VitoshaBank.Services.BankAccountService
 {
     public class BankAccountService : ControllerBase, IBankAccountService
     {
+        public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                BankAccounts bankAccountExists = null;
+                BankAccountResponseModel bankAccountResponseModel = new BankAccountResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (bankAccountExists != null)
+                {
+                    bankAccountResponseModel.IBAN = bankAccountExists.Iban;
+                    bankAccountResponseModel.Amount = bankAccountExists.Amount;
+                    return Ok(bankAccountResponseModel);
+                }
+            }
+            return Ok("You don't have a wallet");
+        }
         public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService)
         {
             string role = "";

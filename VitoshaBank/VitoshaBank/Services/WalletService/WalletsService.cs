@@ -33,7 +33,7 @@ namespace VitoshaBank.Services.WalletService
 
                 if (walletExists != null)
                 {
-                    walletResponseModel.IBAN = walletExists.Iban;
+                    walletResponseModel.CardNumber = walletExists.Iban;
                     walletResponseModel.Amount = walletExists.Amount;
                     return Ok(walletResponseModel);
                 }

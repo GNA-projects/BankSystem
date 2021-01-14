@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -33,6 +34,15 @@ namespace VitoshaBank.Controllers
             _dividentService = dividentDepositService;
             _IBAN = IBAN;
         }
+
+        [HttpGet("get/{username}")]
+        [Authorize]
+        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo(string username)
+        {
+            var currentUser = HttpContext.User;
+            return await _depositService.GetDepositInfo(currentUser, username, _context);
+        }
+
         [HttpPost("create/{username}")]
         [Authorize]
         public async Task<ActionResult> CreateDeposit(Deposits deposits, string username)

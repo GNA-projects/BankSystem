@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 
 namespace VitoshaBank.Controllers
@@ -30,6 +31,15 @@ namespace VitoshaBank.Controllers
             _debitCardService = debitCardService;
             
         }
+
+        [HttpGet("get/{username}")]
+        [Authorize]
+        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(string username)
+        {
+            var currentUser = HttpContext.User;
+            return await _debitCardService.GetDebitCardInfo(currentUser, username, _context);
+        }
+
         [HttpDelete("delete/{username}")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteDebitCard(string username)

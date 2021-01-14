@@ -6,13 +6,44 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.DebitCardService
 {
-    public class DebitCardService :ControllerBase, IDebitCardService
+    public class DebitCardService : ControllerBase, IDebitCardService
     {
+
+        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                BankAccounts bankAccountExits = null;
+                Cards debitCardExists = null;
+                DebitCardResponseModel debitCardResponseModel = new DebitCardResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    bankAccountExits = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    debitCardExists = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccountExits.Id);
+                }
+
+                if (debitCardExists != null)
+                {
+                    debitCardResponseModel.IBAN = debitCardExists.CardNumber;
+                    debitCardResponseModel.Amount = debitCardExists.Amount;
+                    return Ok(debitCardResponseModel);
+                }
+            }
+            return Ok("You don't have a deposit");
+        }
+
         public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card)
         {
             string role = "";
