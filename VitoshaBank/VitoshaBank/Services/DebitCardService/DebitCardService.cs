@@ -41,7 +41,7 @@ namespace VitoshaBank.Services.DebitCardService
                         card.UserId = userAuthenticate.Id;
                         card.BankAccountId = bankAccount.Id;
                         card.CardNumber = "1234 5678 90123";
-                        card.Cvv = 123;
+                        card.Cvv = "123";
                         card.Amount = bankAccount.Amount;
                         _context.Add(card);
                         await _context.SaveChangesAsync();

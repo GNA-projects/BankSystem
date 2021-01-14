@@ -9,7 +9,7 @@ namespace VitoshaBank.Data.Models
         public int UserId { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
-        public sbyte HasResponce { get; set; }
+        public bool HasResponce { get; set; }
 
         public virtual Users User { get; set; }
     }

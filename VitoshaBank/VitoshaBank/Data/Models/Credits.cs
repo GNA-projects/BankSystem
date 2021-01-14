@@ -12,6 +12,7 @@ namespace VitoshaBank.Data.Models
         public decimal Interest { get; set; }
         public decimal Instalment { get; set; }
         public decimal CreditAmount { get; set; }
+        public DateTime PaymentDate { get; set; }
 
         public virtual Users User { get; set; }
     }

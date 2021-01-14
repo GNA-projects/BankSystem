@@ -39,7 +39,7 @@ namespace VitoshaBank.Services.BankAccountService
                     {
                         bankAccount.UserId = userAuthenticate.Id;
                         bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
-                        bankAccount.CardId = 0;
+                        
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
@@ -47,7 +47,7 @@ namespace VitoshaBank.Services.BankAccountService
                         DebitCardService.DebitCardService debitCardService = new DebitCardService.DebitCardService();
                         await debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
                         Cards newCard = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccount.Id);
-                        bankAccount.CardId = newCard.Id;
+                        
                         await _context.SaveChangesAsync();
 
                         return Ok();
