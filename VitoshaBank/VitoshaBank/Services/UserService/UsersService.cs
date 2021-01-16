@@ -79,6 +79,7 @@ namespace VitoshaBank.Services.UserService
                 userResponseModel.FirstName = user.FirstName;
                 userResponseModel.LastName = user.LastName;
                 userResponseModel.Username = user.Username;
+                //userResponseModel.Emal = user.Email;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
                 user.BirthDate = DateTime.Now;

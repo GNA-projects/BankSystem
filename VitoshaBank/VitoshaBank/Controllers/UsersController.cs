@@ -49,26 +49,26 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult<BankSystemContext>> CreateUser(UserRequestModel user)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(UserRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _userService.CreateUser(currentUser, user.User, _BCrypt, _context);
+            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult> LoginUser(UserRequestModel userLogin)
+        public async Task<ActionResult> LoginUser(UserRequestModel requestModel)
         {
-            return await _userService.LoginUser(userLogin.User, _context, _BCrypt, _config);
+            return await _userService.LoginUser(requestModel.User, _context, _BCrypt, _config);
         }
 
         [HttpPut("changepass")]
         [Authorize]
-        public async Task<ActionResult> ChangePassword(UserRequestModel password)
+        public async Task<ActionResult> ChangePassword(UserRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _userService.ChangePassword(username, password.User.Password, _context, _BCrypt);
+            return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt);
         }
         
         [HttpDelete("delete")]

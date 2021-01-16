@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces.WalletService;
@@ -41,39 +42,38 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateWallet(Wallets wallet, string username)
+        public async Task<ActionResult> CreateWallet(WalletRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, username, wallet,_IBAN, _context);
+            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _context);
         }
 
         [HttpPut("deposit")]
         [Authorize]
-        public async Task<ActionResult> DepositInWallet(Wallets wallet, decimal amount)
+        public async Task<ActionResult> DepositInWallet(WalletRequestModel requestModel)
         {
             //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.DepositMoney(wallet, currentUser, username, amount, _context);
+            return await _walletService.DepositMoney(requestModel.Wallet, currentUser, username, requestModel.Amount, _context);
         }
 
         [HttpPut("purchase")]
         [Authorize]
-        public async Task<ActionResult> PurchaseWithWallet(Wallets wallet, string product, decimal amount)
+        public async Task<ActionResult> PurchaseWithWallet(WalletRequestModel requestModel)
         {
             //amount = 10000;
-            product = "Headphones";
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.SimulatePurchase(wallet, product, currentUser, username, amount, _context);
+            return await _walletService.SimulatePurchase(requestModel.Wallet, requestModel.Product, currentUser, username, requestModel.Amount, _context);
         }
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteWallet(UserResponseModel username)
+        public async Task<ActionResult<Users>> DeleteWallet(WalletRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.DeleteWallet(currentUser, username.Username, _context);
+            return await _walletService.DeleteWallet(currentUser, requestModel.Username, _context);
         }
     }
 }

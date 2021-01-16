@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.DepositService;
@@ -44,18 +45,18 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateDeposit(Deposits deposits, string username)
+        public async Task<ActionResult> CreateDeposit(DepositRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _depositService.CreateDeposit(currentUser, username, deposits, _IBAN, _context, _dividentService);
+            return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _context, _dividentService);
         }
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteBankAccount(UserResponseModel username)
+        public async Task<ActionResult<Users>> DeleteBankAccount(DepositRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _depositService.DeleteDeposit(currentUser, username.Username, _context);
+            return await _depositService.DeleteDeposit(currentUser, requestModel.Username, _context);
         }
     }
 }

@@ -54,10 +54,10 @@ namespace VitoshaBank.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteBankAccount(UserResponseModel username)
+        public async Task<ActionResult<Users>> DeleteBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.DeleteBankAccount(currentUser, username.Username, _context);
+            return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context);
         }
     }
 }
