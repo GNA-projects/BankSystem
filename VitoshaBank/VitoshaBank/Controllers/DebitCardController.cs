@@ -40,10 +40,10 @@ namespace VitoshaBank.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteDebitCard(string username)
+        public async Task<ActionResult<Users>> DeleteDebitCard(UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _debitCardService.DeleteDebitCard(currentUser, username, _context);
+            return await _debitCardService.DeleteDebitCard(currentUser, username.Username, _context);
         }
     }
 }
