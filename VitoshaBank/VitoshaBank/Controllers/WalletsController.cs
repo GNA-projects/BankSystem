@@ -41,31 +41,31 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateWallet(Wallets wallet, UserResponseModel username)
+        public async Task<ActionResult> CreateWallet(Wallets wallet, string username)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, username.Username, wallet,_IBAN, _context);
+            return await _walletService.CreateWallet(currentUser, username, wallet,_IBAN, _context);
         }
 
         [HttpPut("deposit")]
         [Authorize]
-        public async Task<ActionResult> DepositInWallet(Wallets wallet, WalletResponseModel amount)
+        public async Task<ActionResult> DepositInWallet(Wallets wallet, decimal amount)
         {
             //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.DepositMoney(wallet, currentUser, username, amount.Amount, _context);
+            return await _walletService.DepositMoney(wallet, currentUser, username, amount, _context);
         }
 
         [HttpPut("purchase")]
         [Authorize]
-        public async Task<ActionResult> PurchaseWithWallet(Wallets wallet, string product, WalletResponseModel amount)
+        public async Task<ActionResult> PurchaseWithWallet(Wallets wallet, string product, decimal amount)
         {
             //amount = 10000;
             product = "Headphones";
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.SimulatePurchase(wallet, product, currentUser, username, amount.Amount, _context);
+            return await _walletService.SimulatePurchase(wallet, product, currentUser, username, amount, _context);
         }
 
         [HttpDelete("delete")]

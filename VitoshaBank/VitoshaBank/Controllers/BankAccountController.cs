@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
@@ -45,10 +46,10 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateBankAccount(BankAccounts bankAccount, UserResponseModel username)
+        public async Task<ActionResult> CreateBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, username.Username, bankAccount,_IBAN, _context, _debitCardService);
+            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService);
         }
 
         [HttpDelete("delete")]

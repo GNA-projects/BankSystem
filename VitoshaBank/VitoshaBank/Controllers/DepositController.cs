@@ -44,10 +44,10 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateDeposit(Deposits deposits, UserResponseModel username)
+        public async Task<ActionResult> CreateDeposit(Deposits deposits, string username)
         {
             var currentUser = HttpContext.User;
-            return await _depositService.CreateDeposit(currentUser, username.Username, deposits, _IBAN, _context, _dividentService);
+            return await _depositService.CreateDeposit(currentUser, username, deposits, _IBAN, _context, _dividentService);
         }
 
         [HttpDelete("delete")]

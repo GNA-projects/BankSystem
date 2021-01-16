@@ -40,10 +40,10 @@ namespace VitoshaBank.Controllers
 
         [HttpGet("get/user")]
         [Authorize]
-        public async Task<ActionResult<Users>> GetUser(UserResponseModel id)
+        public async Task<ActionResult<Users>> GetUser(Users id)
         {
             var currentUser = HttpContext.User;
-            return await _userService.GetUser(currentUser, id.ID, _context);
+            return await _userService.GetUser(currentUser, id.Id, _context);
         }
 
         [HttpPost("create")]
@@ -63,7 +63,7 @@ namespace VitoshaBank.Controllers
 
         [HttpPut("changePassword")]
         [Authorize]
-        public async Task<ActionResult> ChangePassword(UserResponseModel password)
+        public async Task<ActionResult> ChangePassword(Users password)
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
