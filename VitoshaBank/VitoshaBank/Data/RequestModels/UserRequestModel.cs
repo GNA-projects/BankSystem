@@ -10,5 +10,6 @@ namespace VitoshaBank.Data.RequestModels
     {
         public Users User { get; set; }
         public string Username { get; set; }
+        public int Id { get; set; }
     }
 }

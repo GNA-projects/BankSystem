@@ -44,7 +44,11 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<Users>> GetUser(UserRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
+<<<<<<< Updated upstream
             return await _userService.GetUser(currentUser, requestModel.User.Id, _context);
+=======
+            return await _userService.GetUser(currentUser, userId.Id, _context);
+>>>>>>> Stashed changes
         }
 
         [HttpPost("create")]
