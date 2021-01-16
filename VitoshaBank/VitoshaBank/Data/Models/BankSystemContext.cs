@@ -89,10 +89,6 @@ namespace VitoshaBank.Data.Models
                     .HasColumnName("id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.Amount)
-                    .HasColumnName("amount")
-                    .HasColumnType("decimal(10,6)");
-
                 entity.Property(e => e.BankAccountId)
                     .HasColumnName("bankAccount_id")
                     .HasColumnType("int(11)");
@@ -204,7 +200,7 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(65,6)");
 
                 entity.Property(e => e.Divident)
                     .HasColumnName("divident")
@@ -280,10 +276,10 @@ namespace VitoshaBank.Data.Models
                     .HasName("id_UNIQUE")
                     .IsUnique();
 
-                entity.HasIndex(e => e.RecieverAccountId)
+                entity.HasIndex(e => e.RecieverAccountInfo)
                     .HasName("fk_transactions_reciever_id_BankAccount_id");
 
-                entity.HasIndex(e => e.SenderAccountId)
+                entity.HasIndex(e => e.SenderAccountInfo)
                     .HasName("fk_transactions_sender_id_BankAccount_id");
 
                 entity.Property(e => e.Id)
@@ -294,29 +290,30 @@ namespace VitoshaBank.Data.Models
                     .HasColumnName("date")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.RecieverAccountId)
-                    .HasColumnName("reciever_account_id")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.Reason)
+                    .IsRequired()
+                    .HasColumnName("reason")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
 
-                entity.Property(e => e.SenderAccountId)
-                    .HasColumnName("sender_account_id")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.RecieverAccountInfo)
+                    .IsRequired()
+                    .HasColumnName("reciever_account_info")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
+
+                entity.Property(e => e.SenderAccountInfo)
+                    .IsRequired()
+                    .HasColumnName("sender_account_info")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.TransactionAmount)
                     .HasColumnName("transaction_amount")
                     .HasColumnType("decimal(10,6)");
-
-                entity.HasOne(d => d.RecieverAccount)
-                    .WithMany(p => p.TransactionsRecieverAccount)
-                    .HasForeignKey(d => d.RecieverAccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_transactions_reciever_id_BankAccount_id");
-
-                entity.HasOne(d => d.SenderAccount)
-                    .WithMany(p => p.TransactionsSenderAccount)
-                    .HasForeignKey(d => d.SenderAccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_transactions_sender_id_BankAccount_id");
             });
 
             modelBuilder.Entity<Users>(entity =>
@@ -326,7 +323,7 @@ namespace VitoshaBank.Data.Models
                     .IsUnique();
 
                 entity.HasIndex(e => e.LastTransactionId)
-                    .HasName("fk_users_transaction_id_Transactions_id");
+                    .HasName("fk_transactions_id_Users_transaction_id");
 
                 entity.HasIndex(e => e.Username)
                     .HasName("Userscol_UNIQUE")
@@ -384,12 +381,25 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("varchar(60)")
                     .HasCharSet("utf8")
                     .HasCollation("utf8_unicode_ci");
+
+                entity.HasOne(d => d.LastTransaction)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.LastTransactionId)
+                    .HasConstraintName("fk_transactions_id_Users_transaction_id");
             });
 
             modelBuilder.Entity<Wallets>(entity =>
             {
                 entity.HasIndex(e => e.Amount)
                     .HasName("amount_UNIQUE")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.CardNumber)
+                    .HasName("card_number_UNIQUE")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Cvv)
+                    .HasName("CVV_UNIQUE")
                     .IsUnique();
 
                 entity.HasIndex(e => e.Iban)
@@ -411,6 +421,20 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
                     .HasColumnType("decimal(10,6)");
+
+                entity.Property(e => e.CardNumber)
+                    .IsRequired()
+                    .HasColumnName("card_number")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
+
+                entity.Property(e => e.Cvv)
+                    .IsRequired()
+                    .HasColumnName("CVV")
+                    .HasColumnType("varchar(60)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.Iban)
                     .IsRequired()

@@ -10,7 +10,6 @@ namespace VitoshaBank.Data.Models
         public string CardNumber { get; set; }
         public string Cvv { get; set; }
         public int BankAccountId { get; set; }
-        public decimal Amount { get; set; }
 
         public virtual BankAccounts BankAccount { get; set; }
         public virtual Users User { get; set; }

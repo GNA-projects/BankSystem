@@ -37,7 +37,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (debitCardExists != null)
                 {
                     debitCardResponseModel.IBAN = debitCardExists.CardNumber;
-                    debitCardResponseModel.Amount = debitCardExists.Amount;
+                    
                     return Ok(debitCardResponseModel);
                 }
             }
@@ -73,7 +73,7 @@ namespace VitoshaBank.Services.DebitCardService
                         card.BankAccountId = bankAccount.Id;
                         card.CardNumber = "1234 5678 90123";
                         card.Cvv = "123";
-                        card.Amount = bankAccount.Amount;
+                        
                         _context.Add(card);
                         await _context.SaveChangesAsync();
 
@@ -138,7 +138,7 @@ namespace VitoshaBank.Services.DebitCardService
         }
         private bool ValidateCard(Cards card)
         {
-            if (card.Amount < 0)
+            if (card.BankAccountId == 0)
             {
                 return false;
             }

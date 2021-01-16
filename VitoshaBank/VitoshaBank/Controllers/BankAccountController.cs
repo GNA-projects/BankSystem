@@ -45,18 +45,18 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateBankAccount(BankAccounts bankAccount, string username)
+        public async Task<ActionResult> CreateBankAccount(BankAccounts bankAccount, UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, username, bankAccount,_IBAN, _context, _debitCardService);
+            return await _bankAccountService.CreateBankAccount(currentUser, username.Username, bankAccount,_IBAN, _context, _debitCardService);
         }
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteBankAccount(string username)
+        public async Task<ActionResult<Users>> DeleteBankAccount(UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.DeleteBankAccount(currentUser, username, _context);
+            return await _bankAccountService.DeleteBankAccount(currentUser, username.Username, _context);
         }
     }
 }

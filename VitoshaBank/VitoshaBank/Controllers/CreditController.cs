@@ -45,18 +45,18 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateCredit(Credits credits, string username)
+        public async Task<ActionResult> CreateCredit(Credits credits, UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, username, credits, _IBAN, _context, _interestService);
+            return await _creditService.CreateCredit(currentUser, username.Username, credits, _IBAN, _context, _interestService);
         }
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteCredit(string username)
+        public async Task<ActionResult<Users>> DeleteCredit(UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.DeleteCredit(currentUser, username, _context);
+            return await _creditService.DeleteCredit(currentUser, username.Username, _context);
         }
     }
 

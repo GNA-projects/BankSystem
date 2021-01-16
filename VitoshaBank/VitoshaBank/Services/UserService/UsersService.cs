@@ -81,6 +81,7 @@ namespace VitoshaBank.Services.UserService
                 userResponseModel.Username = user.Username;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
+                user.BirthDate = DateTime.Now;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 
@@ -113,6 +114,16 @@ namespace VitoshaBank.Services.UserService
 
             if (userAuthenticate != null)
             {
+                if (newPassword == null || newPassword == "")
+                {
+                    return BadRequest();
+                }
+                else if (newPassword.Length < 6)
+                {
+                    return BadRequest();
+
+                }
+
                 userAuthenticate.Password = _BCrypt.HashPassword(newPassword);
                 await _context.SaveChangesAsync();
                 

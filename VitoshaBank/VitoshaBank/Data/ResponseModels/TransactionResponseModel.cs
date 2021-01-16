@@ -7,8 +7,8 @@ namespace VitoshaBank.Data.ResponseModels
 {
     public class TransactionResponseModel
     {
-        public string senderIBAN { get; set; }
-        public string reciverIBAN { get; set; }
+        public string senderInfo { get; set; }
+        public string reciverInfo { get; set; }
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
     }
