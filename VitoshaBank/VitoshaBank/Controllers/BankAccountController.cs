@@ -16,7 +16,7 @@ using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
-    [Route("api/bankAccount")]
+    [Route("api/bankaccount")]
     [ApiController]
     public class BankAccountController : ControllerBase
     {
@@ -35,7 +35,7 @@ namespace VitoshaBank.Controllers
             _IBAN = IBAN;
         }
 
-        [HttpGet("get")]
+        [HttpGet("all")]
         [Authorize]
         public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo()
         {
@@ -54,10 +54,10 @@ namespace VitoshaBank.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteBankAccount(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<Users>> DeleteBankAccount(UserResponseModel username)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context);
+            return await _bankAccountService.DeleteBankAccount(currentUser, username.Username, _context);
         }
     }
 }

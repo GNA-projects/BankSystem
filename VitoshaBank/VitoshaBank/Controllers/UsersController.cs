@@ -31,7 +31,7 @@ namespace VitoshaBank.Controllers
             _userService = userService;
         }
 
-        [HttpGet("get")]
+        [HttpGet("all")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
@@ -39,49 +39,45 @@ namespace VitoshaBank.Controllers
             return await _userService.GetAllUsers(currentUser, _context);
         }
 
-        [HttpGet("get/user")]
+        [HttpGet("{id}")]
         [Authorize]
-        public async Task<ActionResult<Users>> GetUser(UserRequestModel requestModel)
+        public async Task<ActionResult<Users>> GetUser(int id)
         {
             var currentUser = HttpContext.User;
-<<<<<<< Updated upstream
-            return await _userService.GetUser(currentUser, requestModel.User.Id, _context);
-=======
-            return await _userService.GetUser(currentUser, userId.Id, _context);
->>>>>>> Stashed changes
+            return await _userService.GetUser(currentUser, id, _context);
         }
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult<BankSystemContext>> CreateUser(UserRequestModel requestModel)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(UserRequestModel user)
         {
             var currentUser = HttpContext.User;
-            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context);
+            return await _userService.CreateUser(currentUser, user.User, _BCrypt, _context);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult> LoginUser(UserRequestModel requestModel)
+        public async Task<ActionResult> LoginUser(UserRequestModel userLogin)
         {
-            return await _userService.LoginUser(requestModel.User, _context, _BCrypt, _config);
+            return await _userService.LoginUser(userLogin.User, _context, _BCrypt, _config);
         }
 
-        [HttpPut("changePassword")]
+        [HttpPut("changepass")]
         [Authorize]
-        public async Task<ActionResult> ChangePassword(UserRequestModel requestModel)
+        public async Task<ActionResult> ChangePassword(UserRequestModel password)
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt);
+            return await _userService.ChangePassword(username, password.User.Password, _context, _BCrypt);
         }
         
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteUser(UserRequestModel requestModel)
+        public async Task<ActionResult<Users>> DeleteUser(UserRequestModel username)
         {
             //username = "";
             var currentUser = HttpContext.User;
-            return await _userService.DeleteUser(currentUser, requestModel.Username, _context);
+            return await _userService.DeleteUser(currentUser, username.Username, _context);
         }
     }
 }
