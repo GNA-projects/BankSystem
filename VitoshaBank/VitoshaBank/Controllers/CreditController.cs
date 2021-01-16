@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CreditService;
 using VitoshaBank.Services.CreditService.Interfaces;
@@ -26,11 +27,12 @@ namespace VitoshaBank.Controllers
         private readonly IIBANGeneratorService _IBAN;
         private readonly ICalculateInterestService _interestService; 
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, ICalculateInterestService interestService)
         {
             _context = context;
             _logger = logger;
             _creditService = creditService;
+            _interestService = interestService;
             _IBAN = IBAN;
         }
 
@@ -45,19 +47,18 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateCredit(Credits credits, string username)
+        public async Task<ActionResult> CreateCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, username, credits, _IBAN, _context, _interestService);
+            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, _IBAN, _context, _interestService);
         }
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteCredit(UserResponseModel username)
+        public async Task<ActionResult<Users>> DeleteCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.DeleteCredit(currentUser, username.Username, _context);
+            return await _creditService.DeleteCredit(currentUser, requestModel.Username, _context);
         }
     }
-
 }
