@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.Interfaces.UserService;
 
 namespace VitoshaBank.Services.UserService
@@ -74,12 +75,16 @@ namespace VitoshaBank.Services.UserService
 
             if (role == "Admin")
             {
+                UserResponseModel userResponseModel = new UserResponseModel();
+                userResponseModel.FirstName = user.FirstName;
+                userResponseModel.LastName = user.LastName;
+                userResponseModel.Username = user.Username;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction("GetUser", new { id = user.Id }, user);
+                return StatusCode(201, userResponseModel);
             }
             else
             {
