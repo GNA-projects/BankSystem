@@ -9,8 +9,7 @@ namespace VitoshaBank.Data.ResponseModels
     {
         public string senderIBAN { get; set; }
         public string reciverIBAN { get; set; }
-
-        public decimal senderAmount { get; set; }
-        public decimal reciverAmount { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; }
     }
 }

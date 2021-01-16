@@ -38,7 +38,7 @@ namespace VitoshaBank.Services.BankAccountService
                     return Ok(bankAccountResponseModel);
                 }
             }
-            return Ok("You don't have a wallet");
+            return Ok("You don't have a bank account!");
         }
         public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService)
         {
@@ -67,13 +67,12 @@ namespace VitoshaBank.Services.BankAccountService
                     {
                         bankAccount.UserId = userAuthenticate.Id;
                         bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
-                        bankAccount.Amount = 5;
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
                         await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
 
-                        return Ok(201);
+                        return Ok();
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
@@ -85,7 +84,7 @@ namespace VitoshaBank.Services.BankAccountService
                     }
                 }
 
-                return BadRequest("User already has a Deposit!");
+                return BadRequest("User already has a bank account!");
             }
             else
             {
@@ -120,7 +119,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else if (bankAccountExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a deposits!");
+                    return BadRequest("Dumbass, user doesn't have a bank account!");
                 }
                 else if (cardExists == null)
                 {

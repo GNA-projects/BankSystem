@@ -102,32 +102,19 @@ namespace VitoshaBank.Services.UserService
             return response;
         }
 
-        public async Task<ActionResult> ChangePassword(Users user, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
+        public async Task<ActionResult> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
         {
-            var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+            var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == username);
 
             if (userAuthenticate != null)
             {
-                userAuthenticate.Password = _BCrypt.HashPassword(user.Password);
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!(user.Username == userAuthenticate.Username))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                userAuthenticate.Password = _BCrypt.HashPassword(newPassword);
+                await _context.SaveChangesAsync();
+                
             }
             else
             {
-                return BadRequest();
+                return NotFound();
             }
 
             return NoContent();
@@ -150,7 +137,6 @@ namespace VitoshaBank.Services.UserService
                 {
                     return NotFound();
                 }
-
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
 
@@ -193,7 +179,6 @@ namespace VitoshaBank.Services.UserService
 
             var claims = new[] {
                          new Claim("Username", userInfo.Username),
-                         new Claim("Password", userInfo.Password),
                          new Claim("Roles", role)
                                 };
 

@@ -19,28 +19,26 @@ namespace VitoshaBank.Controllers
     {
         private readonly BankSystemContext _context;
         private readonly ILogger<Cards> _logger;
-        private readonly IConfiguration _config;
         private readonly IDebitCardService _debitCardService;
        
 
-        public DebitCardController(BankSystemContext context, ILogger<Cards> logger, IConfiguration config, IDebitCardService debitCardService)
+        public DebitCardController(BankSystemContext context, ILogger<Cards> logger, IDebitCardService debitCardService)
         {
             _context = context;
             _logger = logger;
-            _config = config;
             _debitCardService = debitCardService;
-            
         }
 
-        [HttpGet("get/{username}")]
+        [HttpGet("get")]
         [Authorize]
-        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(string username)
+        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo()
         {
             var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _debitCardService.GetDebitCardInfo(currentUser, username, _context);
         }
 
-        [HttpDelete("delete/{username}")]
+        [HttpDelete("delete")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteDebitCard(string username)
         {

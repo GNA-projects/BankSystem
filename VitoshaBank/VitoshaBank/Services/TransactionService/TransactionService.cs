@@ -26,7 +26,7 @@ namespace VitoshaBank.Services.TransactionService
                     if (ValidateTransaction(transaction, bankSender.Amount))
                     {
                         transaction.SenderAccountId = bankSender.Id;
-                        transaction.TransactionAmount = 10;
+                        //transaction.TransactionAmount = 10;
                         transaction.RecieverAccountId = bankReciever.Id;
                         transaction.Date = DateTime.Now;
                         _context.Add(transaction);
@@ -36,18 +36,26 @@ namespace VitoshaBank.Services.TransactionService
 
                         return Ok();
                     }
-
-                    else
+                    else if (transaction.TransactionAmount < 0)
                     {
                         return BadRequest("Idiot don't put negative value!");
+                    }
+                    else
+                    {
+                        return BadRequest($"Sender has {bankSender.Amount} money in bank account. You are trying to send {transaction.TransactionAmount} money!!!");
                     }
 
                 }
                 else
-                    return BadRequest("Incorrect IBAN");
+                {
+                    return BadRequest("Incorrect sender or reciver IBAN");
+                }
+
             }
             else
+            {
                 return Unauthorized();
+            }
         }
 
 
@@ -56,8 +64,8 @@ namespace VitoshaBank.Services.TransactionService
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                Transactions transactionExists = null;
-                //transactionExists.SenderAccount.User != userAuthenticate || transactionExists.RecieverAccount.User != userAuthenticate)
+                List<TransactionResponseModel> allTransactions = null;
+                
 
                 if (userAuthenticate == null)
                 {
@@ -67,20 +75,21 @@ namespace VitoshaBank.Services.TransactionService
                 {
                     var senderTransactions = userAuthenticate.BankAccounts.TransactionsSenderAccount;
                     var recieverTransactions = userAuthenticate.BankAccounts.TransactionsRecieverAccount;
-                    var allTransactions = new List<TransactionResponseModel>();
+                    allTransactions = new List<TransactionResponseModel>();
                     if (senderTransactions.Count != 0)
                     {
                         foreach (var transaction in senderTransactions)
                         {
                             TransactionResponseModel transactionsResponseModel = new TransactionResponseModel();
                             transactionsResponseModel.Amount = transaction.TransactionAmount;
-                            transactionsResponseModel.date = transaction.Date;
+                            transactionsResponseModel.Date = transaction.Date;
                             transactionsResponseModel.senderIBAN = transaction.SenderAccount.Iban;
                             transactionsResponseModel.reciverIBAN = transaction.RecieverAccount.Iban;
                             allTransactions.Add(transactionsResponseModel);
                         }
                         return Ok(allTransactions);
                     }
+
                     return Ok("You don't have any transactions!");
                 }
             }
@@ -94,6 +103,7 @@ namespace VitoshaBank.Services.TransactionService
             {
                 return false;
             }
+
             return true;
         }
     }

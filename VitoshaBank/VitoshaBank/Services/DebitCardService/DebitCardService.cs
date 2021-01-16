@@ -41,7 +41,7 @@ namespace VitoshaBank.Services.DebitCardService
                     return Ok(debitCardResponseModel);
                 }
             }
-            return Ok("You don't have a deposit");
+            return Ok("You don't have a debit card");
         }
 
         public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card)
@@ -89,7 +89,7 @@ namespace VitoshaBank.Services.DebitCardService
                     }
                 }
 
-                return BadRequest("User already has a Deposit!");
+                return BadRequest("User already has a card!");
             }
             else
             {
@@ -123,7 +123,7 @@ namespace VitoshaBank.Services.DebitCardService
                 }
                 else if (cardExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a deposits!");
+                    return BadRequest("Dumbass, user doesn't have a debit card!");
                 }
 
                 _context.Cards.Remove(cardExists);

@@ -68,10 +68,10 @@ namespace VitoshaBank.Services.DepositService
                     if (ValidateUser(userAuthenticate) && ValidateDeposits(deposits))
                     {
                         deposits.UserId = userAuthenticate.Id;
-                        deposits.TermOfPayment = 6;
+                        //deposits.TermOfPayment = 6;
                         deposits.Iban = _IBAN.GenerateIBANInVitoshaBank("Deposit", _context);
                         deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
-                        deposits.Amount = 45;
+                        //deposits.Amount = 45;
                         deposits.Divident = _dividentDepositService.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
                         _context.Add(deposits);
                         await _context.SaveChangesAsync();
@@ -88,7 +88,7 @@ namespace VitoshaBank.Services.DepositService
                     }
                 }
 
-                return BadRequest("User already has a Deposit!");
+                return BadRequest("User already has a deposit!");
             }
             else
             {

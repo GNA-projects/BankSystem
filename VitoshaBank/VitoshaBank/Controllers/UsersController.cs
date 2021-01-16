@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services.Interfaces;
@@ -28,7 +29,7 @@ namespace VitoshaBank.Controllers
             _userService = userService;
         }
 
-        [HttpGet("users")]
+        [HttpGet("get")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
@@ -36,7 +37,7 @@ namespace VitoshaBank.Controllers
             return await _userService.GetAllUsers(currentUser, _context);
         }
 
-        [HttpGet("users/{id}")]
+        [HttpGet("get/user")]
         [Authorize]
         public async Task<ActionResult<Users>> GetUser(int id)
         {
@@ -60,16 +61,19 @@ namespace VitoshaBank.Controllers
         }
 
         [HttpPut("changePassword")]
-        [AllowAnonymous]
-        public async Task<ActionResult> ChangePassword(Users user)
+        [Authorize]
+        public async Task<ActionResult> ChangePassword(string password)
         {
-            return await _userService.ChangePassword(user, _context, _BCrypt);
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _userService.ChangePassword(username, password, _context, _BCrypt);
         }
         
-        [HttpDelete("delete/{username}")]
+        [HttpDelete("delete")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteUser(string username)
         {
+            //username = "";
             var currentUser = HttpContext.User;
             return await _userService.DeleteUser(currentUser, username, _context);
         }

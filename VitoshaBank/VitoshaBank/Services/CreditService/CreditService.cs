@@ -12,8 +12,37 @@ using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.CreditService
 {
-    public class CreditService :ControllerBase, ICreditService
+    public class CreditService : ControllerBase, ICreditService
     {
+        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Credits creditsExists = null;
+                CreditResponseModel creditResponseModel = new CreditResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (creditsExists != null)
+                {
+                    creditResponseModel.IBAN = creditsExists.Iban;
+                    creditResponseModel.Amount = creditsExists.Amount;
+                    creditResponseModel.CreditAmount = creditsExists.CreditAmount;
+                    creditResponseModel.Instalment = creditsExists.Instalment;
+
+                    return Ok(creditResponseModel);
+                }
+            }
+            return Ok("You don't have a credit");
+        }
         public async Task<ActionResult> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestDepositService)
         {
             string role = "";
@@ -40,7 +69,7 @@ namespace VitoshaBank.Services.CreditService
                     if (ValidateUser(userAuthenticate) && ValidateCredit(credits))
                     {
                         credits.UserId = userAuthenticate.Id;
-                        credits.Amount = 1000;
+                        //credits.Amount = 1000;
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
                         credits.PaymentDate = DateTime.Now.AddMonths(1);
                         credits.CreditAmount = 2500;
@@ -63,7 +92,7 @@ namespace VitoshaBank.Services.CreditService
                     }
                 }
 
-                return BadRequest("User already has a Deposit!");
+                return BadRequest("User already has a credit!");
             }
             else
             {
@@ -109,35 +138,7 @@ namespace VitoshaBank.Services.CreditService
                 return Unauthorized();
             }
         }
-        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
-        {
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                Credits creditsExists = null;
-                CreditResponseModel creditResponseModel = new CreditResponseModel();
-
-                if (userAuthenticate == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                }
-
-                if (creditsExists != null)
-                {
-                    creditResponseModel.IBAN = creditsExists.Iban;
-                    creditResponseModel.Amount = creditsExists.Amount;
-                    creditResponseModel.CreditAmount = creditsExists.CreditAmount;
-                    creditResponseModel.Instalment = creditsExists.Instalment;
-
-                    return Ok(creditResponseModel);
-                }
-            }
-            return Ok("You don't have a credit");
-        }
+        
         private bool ValidateCredit(Credits credits)
         {
             if (credits.Amount < 0)

@@ -13,7 +13,7 @@ namespace VitoshaBank.Services.Interfaces.UserService
         public Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context);
         public Task<ActionResult<BankSystemContext>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context);
         public Task<ActionResult> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config);
-        public Task<ActionResult> ChangePassword(Users user, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt);
+        public Task<ActionResult> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt);
         public Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context);
     }
 }

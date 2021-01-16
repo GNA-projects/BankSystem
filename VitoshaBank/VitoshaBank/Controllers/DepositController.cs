@@ -21,29 +21,28 @@ namespace VitoshaBank.Controllers
     {
         private readonly BankSystemContext _context;
         private readonly ILogger<Deposits> _logger;
-        private readonly IConfiguration _config;
         private readonly IDepositService _depositService;
         private readonly IIBANGeneratorService _IBAN;
         private readonly ICalculateDividentService _dividentService;
-        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IConfiguration config, IDepositService depositService, IIBANGeneratorService IBAN, ICalculateDividentService dividentDepositService)
+        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN, ICalculateDividentService dividentDepositService)
         {
             _context = context;
             _logger = logger;
-            _config = config;
             _depositService = depositService;
             _dividentService = dividentDepositService;
             _IBAN = IBAN;
         }
 
-        [HttpGet("get/{username}")]
+        [HttpGet("get")]
         [Authorize]
-        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo(string username)
+        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo()
         {
             var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _depositService.GetDepositInfo(currentUser, username, _context);
         }
 
-        [HttpPost("create/{username}")]
+        [HttpPost("create")]
         [Authorize]
         public async Task<ActionResult> CreateDeposit(Deposits deposits, string username)
         {
@@ -51,7 +50,7 @@ namespace VitoshaBank.Controllers
             return await _depositService.CreateDeposit(currentUser, username, deposits, _IBAN, _context, _dividentService);
         }
 
-        [HttpDelete("delete/{username}")]
+        [HttpDelete("delete")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteBankAccount(string username)
         {

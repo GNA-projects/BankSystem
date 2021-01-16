@@ -22,20 +22,28 @@ namespace VitoshaBank.Controllers
     {
         private readonly BankSystemContext _context;
         private readonly ILogger<Credits> _logger;
-        private readonly IConfiguration _config;
         private readonly ICreditService _creditService;
         private readonly IIBANGeneratorService _IBAN;
         private readonly ICalculateInterestService _interestService; 
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, IConfiguration config, ICreditService creditService, IIBANGeneratorService IBAN)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN)
         {
             _context = context;
             _logger = logger;
-            _config = config;
             _creditService = creditService;
             _IBAN = IBAN;
         }
-        [HttpPost("create/{username}")]
+
+        [HttpGet("get")]
+        [Authorize]
+        public async Task<ActionResult<CreditResponseModel>> GetWalletInfo()
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _creditService.GetCreditInfo(currentUser, username, _context);
+        }
+
+        [HttpPost("create")]
         [Authorize]
         public async Task<ActionResult> CreateCredit(Credits credits, string username)
         {
@@ -43,19 +51,12 @@ namespace VitoshaBank.Controllers
             return await _creditService.CreateCredit(currentUser, username, credits, _IBAN, _context, _interestService);
         }
 
-        [HttpDelete("delete/{username}")]
+        [HttpDelete("delete")]
         [Authorize]
         public async Task<ActionResult<Users>> DeleteCredit(string username)
         {
             var currentUser = HttpContext.User;
             return await _creditService.DeleteCredit(currentUser, username, _context);
-        }
-        [HttpGet("get/{username}")]
-        [Authorize]
-        public async Task<ActionResult<CreditResponseModel>> GetWalletInfo(string username)
-        {
-            var currentUser = HttpContext.User;
-            return await _creditService.GetCreditInfo(currentUser, username, _context);
         }
     }
 

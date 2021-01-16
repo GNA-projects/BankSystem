@@ -33,11 +33,16 @@ namespace VitoshaBank.Services.WalletService
 
                 if (walletExists != null)
                 {
-                    walletResponseModel.CardNumber = walletExists.Iban;
+                    walletResponseModel.IBAN = walletExists.Iban;
                     walletResponseModel.Amount = walletExists.Amount;
                     return Ok(walletResponseModel);
                 }
             }
+            else
+            {
+                return Unauthorized();
+            }
+
             return Ok("You don't have a wallet");
         }
         public async Task<ActionResult> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context)
@@ -94,6 +99,7 @@ namespace VitoshaBank.Services.WalletService
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
+            BankAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -108,7 +114,8 @@ namespace VitoshaBank.Services.WalletService
 
                 if (walletExists != null)
                 {
-                    return await ValidateDepositAmountAndBankAccount(walletExists, amount, _context);
+                    bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
+                    return await ValidateDepositAmountAndBankAccount(walletExists, amount, bankAccounts,_context);
                 }
                 else
                 {
@@ -206,7 +213,7 @@ namespace VitoshaBank.Services.WalletService
             return false;
         }
 
-        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Wallets walletExists, decimal amount, BankSystemContext _context)
+        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context)
         {
             if (amount < 0)
             {
@@ -218,10 +225,16 @@ namespace VitoshaBank.Services.WalletService
             }
             else
             {
-                walletExists.Amount = walletExists.Amount + amount;
-                await _context.SaveChangesAsync();
-                //TODO: GET MONEY FROM BANKACCOUNT !!!!!!!!!!!!!!!
-                //TODO: VALIDATE IF BANKACCOUNT HAS MONEY !!!!
+                if (bankAccount != null && bankAccount.Amount > amount)
+                {
+                    walletExists.Amount = walletExists.Amount + amount;
+                    bankAccount.Amount = bankAccount.Amount - amount;
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return StatusCode(406, "You don't have enough money in bank account!!!");
+                }
             }
 
             return Ok($"Succesfully deposited {amount} leva.");
