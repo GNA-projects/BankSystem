@@ -126,8 +126,8 @@ namespace VitoshaBank.Services.UserService
                 user.BirthDate = DateTime.Now;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-                responseMessage.Message = "User created succesfully!";
-                return StatusCode(201, userResponseModel);
+                responseMessage.Message = $"User {user.Username} created succesfully!";
+                return StatusCode(201, responseMessage);
             }
             else
             {
