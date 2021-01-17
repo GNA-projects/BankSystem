@@ -24,14 +24,14 @@ namespace VitoshaBank.Controllers
         private readonly IConfiguration _config;
         private readonly IUsersService _userService;
         private readonly MessageModel _responseMessage;
-        public UsersController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService, MessageModel responseMessage)
+        public UsersController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService)
         {
             _context = context;
             _logger = logger;
             _config = config;
             _BCrypt = BCrypt;
             _userService = userService;
-            _responseMessage = responseMessage;
+            _responseMessage = new MessageModel();
         }
 
         [HttpGet("all")]
