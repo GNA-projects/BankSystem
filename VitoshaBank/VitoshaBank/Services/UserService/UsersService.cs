@@ -19,7 +19,6 @@ namespace VitoshaBank.Services.UserService
     public class UsersService : ControllerBase, IUsersService
     {
         public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel responseMessage)
-
         {
             string role = "";
 
@@ -147,7 +146,8 @@ namespace VitoshaBank.Services.UserService
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user, _config);
-                response = StatusCode(200, tokenString);
+                responseMessage.Message = tokenString;
+                response = StatusCode(200, responseMessage);
             }
 
             return response;
@@ -205,7 +205,8 @@ namespace VitoshaBank.Services.UserService
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
 
-                return StatusCode(200, user);
+                responseMessage.Message = $"Succsesfully deleted user {user.Username}";
+                return StatusCode(200, responseMessage);
             }
             else
             {

@@ -77,11 +77,11 @@ namespace VitoshaBank.Controllers
         
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteUser(UserRequestModel username)
+        public async Task<ActionResult<Users>> DeleteUser(UserRequestModel requestModel)
         {
             //username = "";
             var currentUser = HttpContext.User;
-            return await _userService.DeleteUser(currentUser, username.Username, _context, _responseMessage);
+            return await _userService.DeleteUser(currentUser, requestModel.Username, _context, _responseMessage);
         }
     }
 }
