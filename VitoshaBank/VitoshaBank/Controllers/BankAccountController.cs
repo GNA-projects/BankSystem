@@ -44,7 +44,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _bankAccountService.GetBankAccountInfo(currentUser, username, _context);
+            return await _bankAccountService.GetBankAccountInfo(currentUser, username, _context, _messageModel);
         }
 
         [HttpPost("create")]
@@ -52,7 +52,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult> CreateBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService);
+            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService, _messageModel);
         }
 
         [HttpDelete("delete")]
@@ -60,7 +60,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<Users>> DeleteBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context);
+            return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context, _messageModel);
         }
     }
 }

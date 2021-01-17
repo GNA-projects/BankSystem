@@ -37,7 +37,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (debitCardExists != null)
                 {
                     debitCardResponseModel.IBAN = debitCardExists.CardNumber;
-                    
+
                     return Ok(debitCardResponseModel);
                 }
             }
@@ -71,9 +71,9 @@ namespace VitoshaBank.Services.DebitCardService
                     {
                         card.UserId = userAuthenticate.Id;
                         card.BankAccountId = bankAccount.Id;
-                        card.CardNumber = "1234 5678 90123";
-                        card.Cvv = "123";
-                        
+                        card.CardNumber = GenerateNumber(15);
+                        card.Cvv = GenerateCVV(3);
+
                         _context.Add(card);
                         await _context.SaveChangesAsync();
 
@@ -95,6 +95,14 @@ namespace VitoshaBank.Services.DebitCardService
             {
                 return Unauthorized();
             }
+        }
+
+        private string GenerateCVV(int number)
+        {
+            Random random = new Random();
+            const string chars = "0123456789";
+            return new string(Enumerable.Repeat(chars, number)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         public async Task<ActionResult<Users>> DeleteDebitCard(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
@@ -138,7 +146,7 @@ namespace VitoshaBank.Services.DebitCardService
         }
         private bool ValidateCard(Cards card)
         {
-            if (card.BankAccountId == 0)
+            if (card.BankAccountId ==-1)
             {
                 return false;
             }
@@ -152,6 +160,18 @@ namespace VitoshaBank.Services.DebitCardService
                 return true;
             }
             return false;
+        }
+        private static string GenerateNumber(int number)
+        {
+            Random random = new Random();
+            const string chars = "0123456789";
+            var serial = (Enumerable.Repeat(chars, number)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+            Random random1 = new Random();
+            const string nums = "45";
+            var type = (Enumerable.Repeat(nums, 1)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+            return $"{string.Join("", type)}{string.Join("",serial)}";
         }
     }
 }

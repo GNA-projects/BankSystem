@@ -49,7 +49,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You don't have a bank account!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService)
+        public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
         {
             string role = "";
 
@@ -80,24 +80,27 @@ namespace VitoshaBank.Services.BankAccountService
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
                         await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
-
-                        return Ok();
+                        messageModel.Message = "Bank Account created succesfully";
+                        return StatusCode(201, messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
-                        return NotFound("User not found");
+                        messageModel.Message = "User not found!";
+                        return StatusCode(404, messageModel);
                     }
                     else if (ValidateBankAccount(bankAccount) == false)
                     {
-                        return BadRequest("Idiot don't put negative value!");
+                        messageModel.Message = "Invalid parameteres!";
+                        return StatusCode(400, messageModel);
                     }
                 }
-
-                return BadRequest("User already has a bank account!");
+                messageModel.Message = "BankAccount already exists!";
+                return StatusCode(400, messageModel);
             }
             else
             {
-                return Unauthorized();
+                messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, messageModel);
             }
         }
 
