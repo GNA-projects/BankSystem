@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
@@ -25,6 +26,7 @@ namespace VitoshaBank.Controllers
         private readonly IBankAccountService _bankAccountService;
         private readonly IDebitCardService _debitCardService;
         private readonly IIBANGeneratorService _IBAN;
+        private readonly MessageModel _messageModel;
 
         public BankAccountController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService)
         {
@@ -33,9 +35,10 @@ namespace VitoshaBank.Controllers
             _bankAccountService = bankAccountService;
             _debitCardService = debitCardService;
             _IBAN = IBAN;
+            _messageModel = new MessageModel();
         }
 
-        [HttpGet("all")]
+        [HttpGet]
         [Authorize]
         public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo()
         {
