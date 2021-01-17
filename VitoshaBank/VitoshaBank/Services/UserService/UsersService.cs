@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.Interfaces.UserService;
@@ -17,6 +18,7 @@ namespace VitoshaBank.Services.UserService
 {
     public class UsersService : ControllerBase, IUsersService
     {
+        MessageModel responseMessageCode = new MessageModel();
         public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context)
         {
             string role = "";
@@ -33,7 +35,8 @@ namespace VitoshaBank.Services.UserService
             }
             else
             {
-                return Unauthorized();
+                responseMessageCode.Message = "You are unauthorized";
+                return StatusCode(401, responseMessageCode);
             }
         }
 
@@ -53,7 +56,8 @@ namespace VitoshaBank.Services.UserService
 
                 if (user == null)
                 {
-                    return NotFound();
+                    responseMessageCode.Message = "User not found";
+                    return NotFound(responseMessageCode);
                 }
                 return user;
             }

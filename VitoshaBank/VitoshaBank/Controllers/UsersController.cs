@@ -35,6 +35,7 @@ namespace VitoshaBank.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
+            //return all users
             var currentUser = HttpContext.User;
             return await _userService.GetAllUsers(currentUser, _context);
         }
