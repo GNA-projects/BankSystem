@@ -56,7 +56,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<BankSystemContext>> CreateUser(UserRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context);
+            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context, _responseMessage);
         }
 
         [HttpPost("login")]
@@ -72,7 +72,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt);
+            return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt, _responseMessage);
         }
         
         [HttpDelete("delete")]

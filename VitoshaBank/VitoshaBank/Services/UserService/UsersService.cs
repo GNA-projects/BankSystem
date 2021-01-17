@@ -18,8 +18,8 @@ namespace VitoshaBank.Services.UserService
 {
     public class UsersService : ControllerBase, IUsersService
     {
-
         public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel responseMessage)
+
         {
             string role = "";
 
@@ -69,7 +69,7 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult<BankSystemContext>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context)
+        public async Task<ActionResult<BankSystemContext>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -82,21 +82,58 @@ namespace VitoshaBank.Services.UserService
             if (role == "Admin")
             {
                 UserResponseModel userResponseModel = new UserResponseModel();
+                if (user.FirstName.Length < 1)
+                {
+
+                    responseMessage.Message = "First name cannot be less than 1 symbol";
+                    return StatusCode(400, responseMessage);
+
+                }
+                if (user.LastName.Length < 1)
+                {
+
+                    responseMessage.Message = "Last name cannot be less than 1 symbol";
+                    return StatusCode(400, responseMessage);
+
+                }
+                if (user.Email.Length < 6)
+                {
+
+                    responseMessage.Message = "Email cannot be less than 1 symbol";
+                    return StatusCode(400, responseMessage);
+
+                }
                 userResponseModel.FirstName = user.FirstName;
                 userResponseModel.LastName = user.LastName;
+                userResponseModel.Email = user.Email;
+                if (user.Username.Length < 6)
+                {
+                    responseMessage.Message = "Username cannot be less than 6 symbols";
+                    return StatusCode(400, responseMessage);
+                }
                 userResponseModel.Username = user.Username;
-                //userResponseModel.Emal = user.Email;
+                if (user.Password.Length < 6)
+                {
+                    responseMessage.Message = "Password cannot be less than 6 symbols";
+                    return StatusCode(400, responseMessage);
+                }
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
+                if ((user.RegisterDate - user.BirthDate).TotalDays<6570)
+                {
+                    responseMessage.Message = "User cannot be less than 18 years old";
+                    return StatusCode(400, responseMessage);
+                }
                 user.BirthDate = DateTime.Now;
                 _context.Add(user);
                 await _context.SaveChangesAsync();
-
+                responseMessage.Message = "User created succesfully!";
                 return StatusCode(201, userResponseModel);
             }
             else
             {
-                return Unauthorized();
+                responseMessage.Message = "You are not autorized to do such action!";
+                return StatusCode(401, responseMessage);
             }
         }
 
@@ -116,7 +153,7 @@ namespace VitoshaBank.Services.UserService
             return response;
         }
 
-        public async Task<ActionResult> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
+        public async Task<ActionResult> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel responseMessage)
         {
             var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == username);
 
@@ -124,24 +161,27 @@ namespace VitoshaBank.Services.UserService
             {
                 if (newPassword == null || newPassword == "")
                 {
-                    return BadRequest();
+                    responseMessage.Message = "Password cannot be null";
+                    return StatusCode(400, responseMessage);
                 }
                 else if (newPassword.Length < 6)
                 {
-                    return BadRequest();
+                    responseMessage.Message = "Password cannot be less than 6 symbols";
+                    return StatusCode(400, responseMessage);
 
                 }
 
                 userAuthenticate.Password = _BCrypt.HashPassword(newPassword);
                 await _context.SaveChangesAsync();
 
+                responseMessage.Message = "Password changed successfully!";
+                return StatusCode(200, responseMessage);
             }
             else
             {
-                return NotFound();
+                responseMessage.Message = "User not found!";
+                return StatusCode(404, responseMessage);
             }
-
-            return NoContent();
         }
 
         public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
