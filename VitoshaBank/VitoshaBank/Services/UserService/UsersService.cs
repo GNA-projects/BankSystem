@@ -18,8 +18,8 @@ namespace VitoshaBank.Services.UserService
 {
     public class UsersService : ControllerBase, IUsersService
     {
-        MessageModel responseMessageCode = new MessageModel();
-        public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context)
+
+        public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -35,12 +35,12 @@ namespace VitoshaBank.Services.UserService
             }
             else
             {
-                responseMessageCode.Message = "You are unauthorized";
-                return StatusCode(401, responseMessageCode);
+                responseMessage.Message = "You are not authorized to do such actions";
+                return StatusCode(401, responseMessage);
             }
         }
 
-        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context)
+        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -56,14 +56,16 @@ namespace VitoshaBank.Services.UserService
 
                 if (user == null)
                 {
-                    responseMessageCode.Message = "User not found";
-                    return NotFound(responseMessageCode);
+                    responseMessage.Message = "User not found";
+                    return StatusCode(404, responseMessage);
                 }
-                return user;
+
+                return StatusCode(200, user);
             }
             else
             {
-                return Unauthorized();
+                responseMessage.Message = "You are not authorized to do such actions";
+                return StatusCode(401, responseMessage);
             }
         }
 
@@ -98,16 +100,17 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config)
+        public async Task<ActionResult> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
-            ActionResult response = Unauthorized();
+            responseMessage.Message = "You are not authorized to do such actions";
+            ActionResult response = StatusCode(401, responseMessage);
 
             var user = await AuthenticateUser(userLogin, _context, _BCrypt);
 
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user, _config);
-                response = Ok(tokenString);
+                response = StatusCode(200, tokenString);
             }
 
             return response;
@@ -131,7 +134,7 @@ namespace VitoshaBank.Services.UserService
 
                 userAuthenticate.Password = _BCrypt.HashPassword(newPassword);
                 await _context.SaveChangesAsync();
-                
+
             }
             else
             {
@@ -141,7 +144,7 @@ namespace VitoshaBank.Services.UserService
             return NoContent();
         }
 
-        public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -156,16 +159,18 @@ namespace VitoshaBank.Services.UserService
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 if (user == null)
                 {
-                    return NotFound();
+                    responseMessage.Message = "User not found";
+                    return StatusCode(404, responseMessage);
                 }
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
 
-                return Ok(user);
+                return StatusCode(200, user);
             }
             else
             {
-                return Unauthorized();
+                responseMessage.Message = "You are not authorized to do such actions";
+                return StatusCode(401, responseMessage);
             }
         }
         private async Task<Users> AuthenticateUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
@@ -176,7 +181,7 @@ namespace VitoshaBank.Services.UserService
             {
                 return userAuthenticate;
             }
-            else if (userLogin.Username == userAuthenticate.Username && _BCrypt.Authenticate(userLogin, userAuthenticate) == true)
+            else if ((userLogin.Email == userAuthenticate.Email && _BCrypt.Authenticate(userLogin, userAuthenticate) == true) || (userLogin.Username == userAuthenticate.Username && _BCrypt.Authenticate(userLogin, userAuthenticate) == true))
             {
                 return userAuthenticate;
             }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
@@ -22,13 +23,15 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Users> _logger;
         private readonly IConfiguration _config;
         private readonly IUsersService _userService;
-        public UsersController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService)
+        private readonly MessageModel _responseMessage;
+        public UsersController(BankSystemContext context, ILogger<Users> logger, IConfiguration config, IBCryptPasswordHasherService BCrypt, IUsersService userService, MessageModel responseMessage)
         {
             _context = context;
             _logger = logger;
             _config = config;
             _BCrypt = BCrypt;
             _userService = userService;
+            _responseMessage = responseMessage;
         }
 
         [HttpGet("all")]
@@ -37,7 +40,7 @@ namespace VitoshaBank.Controllers
         {
             //return all users
             var currentUser = HttpContext.User;
-            return await _userService.GetAllUsers(currentUser, _context);
+            return await _userService.GetAllUsers(currentUser, _context, _responseMessage);
         }
 
         [HttpGet("{id}")]
@@ -45,7 +48,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<Users>> GetUser(int id)
         {
             var currentUser = HttpContext.User;
-            return await _userService.GetUser(currentUser, id, _context);
+            return await _userService.GetUser(currentUser, id, _context, _responseMessage);
         }
 
         [HttpPost("create")]
@@ -60,7 +63,7 @@ namespace VitoshaBank.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> LoginUser(UserRequestModel requestModel)
         {
-            return await _userService.LoginUser(requestModel.User, _context, _BCrypt, _config);
+            return await _userService.LoginUser(requestModel.User, _context, _BCrypt, _config, _responseMessage);
         }
 
         [HttpPut("changepass")]
@@ -78,7 +81,7 @@ namespace VitoshaBank.Controllers
         {
             //username = "";
             var currentUser = HttpContext.User;
-            return await _userService.DeleteUser(currentUser, username.Username, _context);
+            return await _userService.DeleteUser(currentUser, username.Username, _context, _responseMessage);
         }
     }
 }
