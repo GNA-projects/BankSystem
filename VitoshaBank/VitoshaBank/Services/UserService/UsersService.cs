@@ -118,7 +118,7 @@ namespace VitoshaBank.Services.UserService
                 }
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
-                if ((user.RegisterDate - user.BirthDate).TotalDays<6570)
+                if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
                 {
                     responseMessage.Message = "User cannot be less than 18 years old";
                     return StatusCode(400, responseMessage);
@@ -216,18 +216,29 @@ namespace VitoshaBank.Services.UserService
         }
         private async Task<Users> AuthenticateUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
         {
-            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == userLogin.Username);
-
-            if (userAuthenticate == null)
+            var userAuthenticateUsername = await _context.Users.FirstOrDefaultAsync(x => x.Username == userLogin.Username);
+            var userAuthenticateEmail = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email);
+            if (userAuthenticateUsername == null && userAuthenticateEmail == null)
             {
-                return userAuthenticate;
+                return null;
             }
-            else if ((userLogin.Email == userAuthenticate.Email && _BCrypt.Authenticate(userLogin, userAuthenticate) == true) || (userLogin.Username == userAuthenticate.Username && _BCrypt.Authenticate(userLogin, userAuthenticate) == true))
+            else if (userAuthenticateEmail == null)
             {
-                return userAuthenticate;
+                if ((userLogin.Username == userAuthenticateUsername.Username && _BCrypt.Authenticate(userLogin, userAuthenticateUsername) == true))
+                {
+                    return userAuthenticateUsername;
+                }
+                return null;
             }
-            userAuthenticate = null;
-            return userAuthenticate;
+            else if( userAuthenticateUsername == null)
+            {
+                if ((userLogin.Email == userAuthenticateEmail.Email && _BCrypt.Authenticate(userLogin, userAuthenticateEmail) == true))
+                {
+                    return userAuthenticateEmail;
+                }
+                return null;
+            }
+            return null;
         }
         private string GenerateJSONWebToken(Users userInfo, IConfiguration _config)
         {
