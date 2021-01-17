@@ -34,8 +34,8 @@ namespace VitoshaBank.Services.UserService
             }
             else
             {
-                responseMessage.Message = "You are not authorized to do such actions";
-                return StatusCode(401, responseMessage);
+                responseMessage.Message = "You are not authorized to do such actions!";
+                return StatusCode(403, responseMessage);
             }
         }
 
@@ -64,7 +64,7 @@ namespace VitoshaBank.Services.UserService
             else
             {
                 responseMessage.Message = "You are not authorized to do such actions";
-                return StatusCode(401, responseMessage);
+                return StatusCode(403, responseMessage);
             }
         }
 
@@ -132,14 +132,14 @@ namespace VitoshaBank.Services.UserService
             else
             {
                 responseMessage.Message = "You are not autorized to do such action!";
-                return StatusCode(401, responseMessage);
+                return StatusCode(403, responseMessage);
             }
         }
 
         public async Task<ActionResult> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
-            responseMessage.Message = "You are not authorized to do such actions";
-            ActionResult response = StatusCode(401, responseMessage);
+            responseMessage.Message = "You are not authorized to do such actions!";
+            ActionResult response = StatusCode(403, responseMessage);
 
             var user = await AuthenticateUser(userLogin, _context, _BCrypt);
 
@@ -211,7 +211,7 @@ namespace VitoshaBank.Services.UserService
             else
             {
                 responseMessage.Message = "You are not authorized to do such actions";
-                return StatusCode(401, responseMessage);
+                return StatusCode(403, responseMessage);
             }
         }
         private async Task<Users> AuthenticateUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
