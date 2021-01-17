@@ -3,7 +3,7 @@ import {useHistory} from 'react-router-dom'
 import { Body, Form, InputBlock, Heading, Input, Button, BodyHeading, BackButton } from "../style";
 
 
-export default function DeleteForm() {
+export default function DeleteUserForm() {
     const history = useHistory()
 
     return (

@@ -1,15 +1,7 @@
-import React, { useContext, useState } from "react";
-import { LoggedInContext } from "../../context/context";
+import React, { useState } from "react";
+import { checkIfLogged } from "../../Api/user";
 import { useHistory } from "react-router-dom";
-import {
-  NavContainer,
-  DropdownContainer,
-  DropdownItem,
-  BurgerButton,
-  DropdownItemHeading,
-  DropdownItemIcon,
-  LoggedInHeading,
-} from "./style";
+import { Navigation, Dropdown } from "./style";
 
 import logo from "../../Images/logo.png";
 import { faPiggyBank } from "@fortawesome/free-solid-svg-icons";
@@ -21,51 +13,40 @@ export default function TopMenu() {
   const [dropDown, setDropdown] = useState(false);
   const history = useHistory();
 
-  const { loggedIn, setLoggedIn } = useContext(LoggedInContext);
+  const toPath = (path) => {
+    history.push(`/${path}`);
+    setDropdown(false);
+  };
 
-  const goHome = () => {
-    history.push("/");
-    setDropdown(false);
-  };
-  const goLogin = () => {
-    history.push("/login");
-    setDropdown(false);
-  };
-  const goAbout = () => {
-    history.push("/about");
-    setDropdown(false);
-  };
-  const goEbanking = () => {
-    history.push("/ebanking");
-    setDropdown(false);
-  };
   return (
-    <div>
-      <NavContainer>
-        <BurgerButton
-          src={logo}
-          onClick={() => setDropdown(!dropDown)}
-        ></BurgerButton>
-        <LoggedInHeading>{sessionStorage['jwt'] ? "logged" : "not logged"}</LoggedInHeading>
-      </NavContainer>
-      <DropdownContainer active={dropDown}>
-        <DropdownItem onClick={goHome}>
-          <DropdownItemIcon icon={faHome}></DropdownItemIcon>
-          <DropdownItemHeading>Home</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem onClick={goEbanking}>
-          <DropdownItemIcon icon={faPiggyBank}></DropdownItemIcon>
-          <DropdownItemHeading>Ebanking</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem onClick={goAbout}>
-          <DropdownItemIcon icon={faUserNinja}></DropdownItemIcon>
-          <DropdownItemHeading>About</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem onClick={goLogin}>
-          <DropdownItemIcon icon={faSignOutAlt}></DropdownItemIcon>
-          <DropdownItemHeading>Logout</DropdownItemHeading>
-        </DropdownItem>
-      </DropdownContainer>
-    </div>
+    <React.Fragment>
+      <Navigation>
+        <Navigation.Burger src={logo} onClick={() => setDropdown(!dropDown)} />
+        <Navigation.Logged>{checkIfLogged()}</Navigation.Logged>
+      </Navigation>
+
+      <Dropdown active={dropDown}>
+        <Dropdown.Item
+          onClick={() => toPath("")}
+          icon={faHome}
+          heading="Home"
+        />
+        <Dropdown.Item
+          onClick={() => toPath("ebanking")}
+          icon={faPiggyBank}
+          heading="Ebanking"
+        />
+        <Dropdown.Item
+          onClick={() => toPath("about")}
+          icon={faUserNinja}
+          heading="About"
+        />
+        <Dropdown.Item
+          onClick={() => toPath("login")}
+          icon={faSignOutAlt}
+          heading="Logout"
+        />
+      </Dropdown>
+    </React.Fragment>
   );
 }

@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import image from './mountain.jpg'
+import image from "./Images/mountain.jpg";
 
-export const NavContainer = styled.div`
+import DropdownItem from "./DropdownItem";
+
+
+export const StyledNavigation = styled.div`
   position: relative;
   display: flex;
   flex-direction: row;
@@ -12,7 +14,7 @@ export const NavContainer = styled.div`
   height: 80px;
 `;
 
-export const DropdownContainer = styled.div`
+export const StyledDropdown = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -26,27 +28,6 @@ export const DropdownContainer = styled.div`
   width: 100vw;
 `;
 
-export const DropdownItemIcon = styled(FontAwesomeIcon)`
-  font-size: 3rem;
-  margin: 10px;
-  color: white;
-`;
-export const DropdownItemHeading = styled.p`
-  font-size: 3rem;
-  margin: 10px;
-  color: white;
-`;
-
-export const DropdownItem = styled.div`
-  z-index: 0;
-  margin: auto;
-  display: flex;
-  flex-direction: row;
-  &:hover{
-    box-shadow: 1px 1px 10px white;
-  }
-`;
-
 export const BurgerButton = styled.img`
   position: absolute;
   z-index: 2;
@@ -58,6 +39,13 @@ export const LoggedInHeading = styled.h1`
   z-index: 2;
   right: 10px;
   top: 50%;
-  transform: translate(0,-50%);
+  transform: translate(0, -50%);
   color: white;
 `;
+
+export const Navigation = (props) => {return <StyledNavigation>{props.children}</StyledNavigation>}
+Navigation.Logged = (props) => (<LoggedInHeading>{props.children}</LoggedInHeading>)
+Navigation.Burger = (props) => (<BurgerButton src={props.src} onClick={props.onClick}></BurgerButton>)
+
+export const Dropdown = (props) => {return <StyledDropdown active={props.active}>{props.children}</StyledDropdown>}
+Dropdown.Item = (props) => (<DropdownItem onClick={props.onClick} icon={props.icon} heading={props.heading}>{props.children}</DropdownItem>)

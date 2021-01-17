@@ -3,17 +3,21 @@ import { useHistory } from "react-router-dom";
 import { BodyHeading, Button } from "./style";
 export default function Admin() {
   const history = useHistory();
-  const goCreate = () => {
-    history.push("/admin/create");
+  const goCreateUser = () => {
+    history.push("/admin/create/user");
   };
-  const goDelete = () => {
-    history.push("/admin/delete");
+  const goDeleteUser = () => {
+    history.push("/admin/delete/user");
+  };
+  const goCreateAccount = () => {
+    history.push("/admin/create/account");
   };
   return (
     <div>
       <BodyHeading>Welcome to the admin panel</BodyHeading>
-      <Button onClick={goCreate}>Create a User</Button>
-      <Button onClick={goDelete}>Delete a User</Button>
+      <Button onClick={goCreateUser}>Create a User</Button>
+      <Button onClick={goDeleteUser}>Delete a User</Button>
+      <Button onClick={goCreateAccount}>Create an Account</Button>
     </div>
   );
 }

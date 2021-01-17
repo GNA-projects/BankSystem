@@ -11,15 +11,9 @@ import {
   BodyHeading,
   BackButton,
 } from "../style";
-import {
-  BalanceButonGroup,
-  BalanceButtonCircle,
-  BalanceButtonCircleValue,
-} from "./style";
 
-export default function CreateForm() {
+export default function CreateUserForm() {
   const history = useHistory();
-  const [balance, setBalance] = useState(0);
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
   const [uname, setUname] = useState("");
@@ -99,6 +93,17 @@ export default function CreateForm() {
               setBdate(e.target.value);
             }}
           ></Input>
+        </InputBlock>
+
+        <InputBlock>
+          <Heading>Admin {isAdmin ? "true" : "False"}</Heading>
+          <Button
+            onClick={() => {
+              setIsAdmin(!isAdmin);
+            }}
+          >
+            User is {isAdmin ? "Admin" : "not Admin"}{" "}
+          </Button>
         </InputBlock>
 
         <Button onClick={handleCreate}>Create User </Button>
