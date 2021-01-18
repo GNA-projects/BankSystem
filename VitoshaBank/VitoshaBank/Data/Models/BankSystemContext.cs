@@ -24,7 +24,6 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BankAccounts>(entity =>
@@ -92,6 +91,10 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.BankAccountId)
                     .HasColumnName("bankAccount_id")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.CardExiprationDate)
+                    .HasColumnName("card_exipration_date")
+                    .HasColumnType("date");
 
                 entity.Property(e => e.CardNumber)
                     .IsRequired()
@@ -318,6 +321,10 @@ namespace VitoshaBank.Data.Models
 
             modelBuilder.Entity<Users>(entity =>
             {
+                entity.HasIndex(e => e.Email)
+                    .HasName("email_UNIQUE")
+                    .IsUnique();
+
                 entity.HasIndex(e => e.Id)
                     .HasName("id_UNIQUE")
                     .IsUnique();
@@ -421,6 +428,10 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
                     .HasColumnType("decimal(10,6)");
+
+                entity.Property(e => e.CardExipirationDate)
+                    .HasColumnName("card_exipiration_date")
+                    .HasColumnType("date");
 
                 entity.Property(e => e.CardNumber)
                     .IsRequired()

@@ -54,6 +54,25 @@ namespace VitoshaBank.Controllers
             var currentUser = HttpContext.User;
             return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService, _messageModel);
         }
+        [HttpPut("deposit")]
+        [Authorize]
+        public async Task<ActionResult> DepositInBankAcc(BankAccountRequestModel requestModel)
+        {
+            //amount = 0.50M;
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _bankAccountService.DepositMoney(requestModel.BankAccount, currentUser, username, requestModel.Amount, _context,_messageModel);
+        }
+
+        [HttpPut("purchase")]
+        [Authorize]
+        public async Task<ActionResult> PurchaseWithWallet(BankAccountRequestModel requestModel)
+        {
+            
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _bankAccountService.SimulatePurchase(requestModel.BankAccount, requestModel.Product, currentUser, username, requestModel.Amount, _context,_messageModel);
+        }
 
         [HttpDelete("delete")]
         [Authorize]
