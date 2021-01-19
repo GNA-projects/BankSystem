@@ -142,7 +142,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
