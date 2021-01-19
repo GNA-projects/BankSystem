@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.DebitCardService.Interfaces;
@@ -15,7 +16,7 @@ namespace VitoshaBank.Services.DebitCardService
     public class DebitCardService : ControllerBase, IDebitCardService
     {
 
-        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -26,7 +27,8 @@ namespace VitoshaBank.Services.DebitCardService
 
                 if (userAuthenticate == null)
                 {
-                    return NotFound();
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
                 else
                 {
@@ -37,14 +39,14 @@ namespace VitoshaBank.Services.DebitCardService
                 if (debitCardExists != null)
                 {
                     debitCardResponseModel.IBAN = debitCardExists.CardNumber;
-
+                    
                     return Ok(debitCardResponseModel);
                 }
             }
-            return Ok("You don't have a debit card");
+            _messageModel.Message = "You don't have a debit card!!";
+            return StatusCode(400,"You don't have a debit card");
         }
-
-        public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card)
+        public async Task<ActionResult> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card, MessageModel _messageModel)
         {
             string role = "";
 
@@ -73,39 +75,34 @@ namespace VitoshaBank.Services.DebitCardService
                         card.BankAccountId = bankAccount.Id;
                         card.CardNumber = GenerateNumber(15);
                         card.Cvv = GenerateCVV(3);
-
+                        card.CardExiprationDate = DateTime.Now.AddMonths(60);
                         _context.Add(card);
                         await _context.SaveChangesAsync();
-
-                        return Ok();
+                        _messageModel.Message = "DebitCard created succesfully!";
+                        return StatusCode(200, _messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
-                        return NotFound("User not found");
+                        _messageModel.Message = "User not found!";
+                        return StatusCode(404, _messageModel);
                     }
                     else if (ValidateCard(card) == false)
                     {
-                        return BadRequest("Idiot don't put negative value!");
+                        _messageModel.Message = "Invalid parameteres!";
+                        return StatusCode(400, _messageModel);
                     }
                 }
 
-                return BadRequest("User already has a card!");
+                _messageModel.Message = "User already has a DebitCard!";
+                return StatusCode(400, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
         }
-
-        private string GenerateCVV(int number)
-        {
-            Random random = new Random();
-            const string chars = "0123456789";
-            return new string(Enumerable.Repeat(chars, number)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-        public async Task<ActionResult<Users>> DeleteDebitCard(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<Users>> DeleteDebitCard(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -127,22 +124,33 @@ namespace VitoshaBank.Services.DebitCardService
 
                 if (user == null)
                 {
-                    return NotFound("Idiot no such user is found!");
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
                 else if (cardExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a debit card!");
+                    _messageModel.Message = "User doesn't have a DebitCard!";
+                    return StatusCode(400, _messageModel);
                 }
 
                 _context.Cards.Remove(cardExists);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                _messageModel.Message = "DebitCard deleted succesfully!";
+                return StatusCode(200, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
+        }
+        private string GenerateCVV(int number)
+        {
+            Random random = new Random();
+            const string chars = "0123456789";
+            return new string(Enumerable.Repeat(chars, number)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
         private bool ValidateCard(Cards card)
         {
@@ -152,7 +160,6 @@ namespace VitoshaBank.Services.DebitCardService
             }
             return true;
         }
-
         private bool ValidateUser(Users user)
         {
             if (user != null)

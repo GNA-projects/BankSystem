@@ -35,7 +35,7 @@ namespace VitoshaBank.Controllers
             _IBAN = IBAN;
         }
 
-        [HttpGet("all")]
+        [HttpGet]
         [Authorize]
         public async Task<ActionResult<CreditResponseModel>> GetWalletInfo()
         {
