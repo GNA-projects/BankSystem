@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService;
@@ -15,7 +16,7 @@ namespace VitoshaBank.Services.DepositService
 {
     public class DepositService : ControllerBase, IDepositService
     {
-        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<DepositResponseModel>> GetDepositInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -25,7 +26,8 @@ namespace VitoshaBank.Services.DepositService
 
                 if (userAuthenticate == null)
                 {
-                    return NotFound();
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
                 }
                 else
                 {
@@ -37,12 +39,19 @@ namespace VitoshaBank.Services.DepositService
                     depositResponseModel.IBAN = depositExists.Iban;
                     depositResponseModel.Amount = depositExists.Amount;
                     depositResponseModel.PaymentDate = depositExists.PaymentDate;
-                    return Ok(depositResponseModel);
+                    return StatusCode(200, depositResponseModel);
                 }
             }
-            return Ok("You don't have a deposit");
+            else
+            {
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
+            }
+
+            _messageModel.Message = "You don't have a deposit!";
+            return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateDividentService _dividentDepositService)
+        public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateDividentService _dividentDepositService, MessageModel _messageModel)
         {
             string role = "";
 
@@ -61,6 +70,11 @@ namespace VitoshaBank.Services.DepositService
                 {
                     depositExists = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
+                else
+                {
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
+                }
 
 
                 if (depositExists == null)
@@ -76,27 +90,32 @@ namespace VitoshaBank.Services.DepositService
                         _context.Add(deposits);
                         await _context.SaveChangesAsync();
 
-                        return Ok();
+                        _messageModel.Message = "Deposit created succesfully";
+                        return StatusCode(200, _messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
-                        return NotFound("User not found");
+                        _messageModel.Message = "User not found";
+                        return StatusCode(404, _messageModel);
                     }
                     else if (ValidateDeposits(deposits) == false)
                     {
-                        return BadRequest("Idiot don't put negative value!");
+                        _messageModel.Message = "Don't put negative value!";
+                        return StatusCode(400, _messageModel);
                     }
                 }
 
-                return BadRequest("User already has a deposit!");
+                _messageModel.Message = "User already has deposit!";
+                return StatusCode(400, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
             }
         }
 
-        public async Task<ActionResult<Users>> DeleteDeposit(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> DeleteDeposit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -118,21 +137,25 @@ namespace VitoshaBank.Services.DepositService
 
                 if (user == null)
                 {
-                    return NotFound("Idiot no such user is found!");
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
                 else if (depositsExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a deposits!");
+                    _messageModel.Message = "User doesn't have a deposit";
+                    return StatusCode(400, _messageModel);
                 }
 
                 _context.Deposits.Remove(depositsExists);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                _messageModel.Message = $"Succsesfully deleted {user.Username} deposit!";
+                return StatusCode(200, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
             }
         }
         private bool ValidateDeposits(Deposits deposit)

@@ -49,14 +49,14 @@ namespace VitoshaBank.Controllers
 
         [HttpPost("create")]
         [Authorize]
-        public async Task<ActionResult> CreateBankAccount(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
             return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService, _messageModel);
         }
         [HttpPut("deposit")]
         [Authorize]
-        public async Task<ActionResult> DepositInBankAcc(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> DepositInBankAcc(BankAccountRequestModel requestModel)
         {
             //amount = 0.50M;
             var currentUser = HttpContext.User;
@@ -66,7 +66,7 @@ namespace VitoshaBank.Controllers
 
         [HttpPut("purchase")]
         [Authorize]
-        public async Task<ActionResult> PurchaseWithWallet(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> Purchase(BankAccountRequestModel requestModel)
         {
             
             var currentUser = HttpContext.User;
@@ -76,7 +76,7 @@ namespace VitoshaBank.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<ActionResult<Users>> DeleteBankAccount(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> DeleteBankAccount(BankAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
             return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context, _messageModel);

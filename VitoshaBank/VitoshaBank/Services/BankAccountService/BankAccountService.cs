@@ -43,14 +43,14 @@ namespace VitoshaBank.Services.BankAccountService
             }
             else
             {
-                messageModel.Message = "Invalid token!";
-                return StatusCode(401, messageModel);
+                messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, messageModel);
             }
 
             messageModel.Message = "You don't have a bank account!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
         {
             string role = "";
 
@@ -80,7 +80,7 @@ namespace VitoshaBank.Services.BankAccountService
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
-                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card);
+                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, messageModel);
                         messageModel.Message = "Bank Account created succesfully";
                         return StatusCode(201, messageModel);
                     }
@@ -104,7 +104,7 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
         }
-        public async Task<ActionResult> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
            
@@ -118,12 +118,13 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    return NotFound("No such user exists");
+                    messageModel.Message = "User not found!";
+                    return StatusCode(404, messageModel);
                 }
 
                 if (bankAccounts != null)
                 {
-                    if (ValidateDepositAmountBankAccount(amount,bankAccounts,_context))
+                    if (ValidateDepositAmountBankAccount(amount))
                     {
                         bankAccount.Amount = bankAccount.Amount + amount;
                         await _context.SaveChangesAsync();
@@ -142,7 +143,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -156,12 +157,13 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    return NotFound("No such user exists");
+                    messageModel.Message = "User not found!";
+                    return StatusCode(404, messageModel);
                 }
 
                 if (bankAccounts != null)
                 {
-                    if (ValidateDepositAmountBankAccount(amount, bankAccounts, _context))
+                    if (ValidateDepositAmountBankAccount(amount) && ValidateBankAccount(bankAccounts, amount))
                     {
                         bankAccount.Amount = bankAccount.Amount - amount;
                         //Transaction transaction = new transactiom"
@@ -169,8 +171,17 @@ namespace VitoshaBank.Services.BankAccountService
                         messageModel.Message = "Money paied succesfully!";
                         return StatusCode(200, messageModel);
                     }
-                    messageModel.Message = "Invalid payment amount!";
-                    return StatusCode(400, messageModel);
+                    else if (ValidateDepositAmountBankAccount(amount) == false)
+                    {
+                        messageModel.Message = "Invalid payment amount!";
+                        return StatusCode(400, messageModel);
+                    }
+                    else if (ValidateBankAccount(bankAccounts, amount) == false)
+                    {
+                        messageModel.Message = "You don't have enough money in bank account!";
+                        return StatusCode(406, messageModel);
+                    }
+                    
                 }
                 else
                 {
@@ -181,7 +192,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult<Users>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
         {
             string role = "";
 
@@ -242,13 +253,26 @@ namespace VitoshaBank.Services.BankAccountService
             }
             return true;
         }
-        private bool ValidateDepositAmountBankAccount( decimal amount, BankAccounts bankAccounts, BankSystemContext context)
+        private bool ValidateDepositAmountBankAccount(decimal amount)
         {
-            if (amount>0)
+            if (amount > 0)
             {
                 return true;
             }
+
             return false;
+        }
+
+        private bool ValidateBankAccount(BankAccounts bankAccount, decimal amount)
+        {
+            if (bankAccount != null && bankAccount.Amount > amount)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         private bool ValidateUser(Users user)
         {

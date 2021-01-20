@@ -8,10 +8,10 @@ namespace VitoshaBank.Controllers
     public class AuthController : ControllerBase
     {
        [HttpGet]
-       [Authorize(Roles = "Admin")]
+       [Authorize]
         public ActionResult AuthMe()
         {
-            return Ok();
+            return StatusCode(200);
         }
     }
 }

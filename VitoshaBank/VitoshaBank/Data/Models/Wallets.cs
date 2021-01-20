@@ -8,7 +8,7 @@ namespace VitoshaBank.Data.Models
         public int Id { get; set; }
         public string Iban { get; set; }
         public int UserId { get; set; }
-        public decimal Amount { get; set; }
+        public decimal Amount { get; set; } = 0.00M;
         public string CardNumber { get; set; }
         public string Cvv { get; set; }
         public DateTime CardExipirationDate { get; set; }

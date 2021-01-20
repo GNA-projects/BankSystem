@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -14,7 +15,7 @@ namespace VitoshaBank.Services.WalletService
 {
     public class WalletsService : ControllerBase, IWalletsService
     {
-        public async Task<ActionResult<WalletResponseModel>> GetWalletInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<WalletResponseModel>> GetWalletInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -24,7 +25,8 @@ namespace VitoshaBank.Services.WalletService
 
                 if (userAuthenticate == null)
                 {
-                    return NotFound();
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
                 else
                 {
@@ -35,17 +37,19 @@ namespace VitoshaBank.Services.WalletService
                 {
                     walletResponseModel.IBAN = walletExists.Iban;
                     walletResponseModel.Amount = walletExists.Amount;
-                    return Ok(walletResponseModel);
+                    return StatusCode(200, walletResponseModel);
                 }
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
             }
 
-            return Ok("You don't have a wallet");
+            _messageModel.Message = "You don't have a debit card!!";
+            return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -75,27 +79,32 @@ namespace VitoshaBank.Services.WalletService
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 
-                        return Ok();
+                        _messageModel.Message = "Wallet created succesfully!";
+                        return StatusCode(200, _messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
-                        return NotFound("Idiot no such user is found!");
+                        _messageModel.Message = "User not found!";
+                        return StatusCode(404, _messageModel);
                     }
                     else if (ValidateWallet(wallet) == false)
                     {
-                        return BadRequest("Idiot don't put negative value!");
+                        _messageModel.Message = "Don't put negative value!";
+                        return StatusCode(400, _messageModel);
                     }
                 }
-
-                return BadRequest("User already has a wallet!");
+               
+                _messageModel.Message = "User already has a wallet!";
+                return StatusCode(400, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
         }
 
-        public async Task<ActionResult> DepositMoney(Wallets wallet, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> DepositMoney(Wallets wallet, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
@@ -109,24 +118,27 @@ namespace VitoshaBank.Services.WalletService
                 }
                 else
                 {
-                    return NotFound("No such user exists");
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
 
                 if (walletExists != null)
                 {
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(walletExists, amount, bankAccounts,_context);
+                    return await ValidateDepositAmountAndBankAccount(walletExists, amount, bankAccounts,_context, _messageModel);
                 }
                 else
                 {
-                    return Ok("You don't have a wallet with such IBAN");
+                    _messageModel.Message = "Wallet not found";
+                    return StatusCode(404, _messageModel);
                 }
             }
 
-            return Unauthorized();
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
         }
 
-        public async Task<ActionResult> SimulatePurchase(Wallets wallet, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(Wallets wallet, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
@@ -139,22 +151,24 @@ namespace VitoshaBank.Services.WalletService
                 }
                 else
                 {
-                    return NotFound("No such user exists");
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
 
                 if (walletExists != null)
                 {
-                    return await ValidatePurchaseAmountAndBankAccount(walletExists, product, amount, _context);
+                    return await ValidatePurchaseAmountAndBankAccount(walletExists, product, amount, _context, _messageModel);
                 }
                 else
                 {
-                    return Ok("You don't have a wallet with such IBAN");
+                    _messageModel.Message = "Wallet not found";
+                    return StatusCode(404, _messageModel);
                 }
             }
-
-            return Unauthorized();
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
         }
-        public async Task<ActionResult<Users>> DeleteWallet(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> DeleteWallet(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -176,24 +190,27 @@ namespace VitoshaBank.Services.WalletService
 
                 if (user == null)
                 {
-                    return NotFound("Idiot no such user is found!");
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
                 }
                 else if (walletExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a wallet!");
+                    _messageModel.Message = "User doesn't have a wallet";
+                    return StatusCode(400, _messageModel);
                 }
 
                 _context.Wallets.Remove(walletExists);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                _messageModel.Message = "Wallet deleted succesfully!";
+                return StatusCode(200, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
         }
-
 
         private bool ValidateWallet(Wallets wallet)
         {
@@ -213,15 +230,17 @@ namespace VitoshaBank.Services.WalletService
             return false;
         }
 
-        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context)
+        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context, MessageModel _messageModel)
         {
             if (amount < 0)
             {
-                return BadRequest("Smart...Don't put negative amount!");
+                _messageModel.Message = "Don't put negative amount!";
+                return StatusCode(400, _messageModel);
             }
             else if (amount == 0)
             {
-                return BadRequest("Put amount more than 0.00lv");
+                _messageModel.Message = "Put amount more than 0.00lv";
+                return StatusCode(400, _messageModel);
             }
             else
             {
@@ -233,27 +252,31 @@ namespace VitoshaBank.Services.WalletService
                 }
                 else
                 {
-                    return StatusCode(406, "You don't have enough money in bank account!!!");
+                    _messageModel.Message = "You don't have enough money in bank account!";
+                    return StatusCode(406, _messageModel);
                 }
             }
-
-            return Ok($"Succesfully deposited {amount} leva.");
+            _messageModel.Message = $"Succesfully deposited {amount} leva.";
+            return StatusCode(200, _messageModel);
         }
-        private async Task<ActionResult> ValidatePurchaseAmountAndBankAccount(Wallets walletExists, string product, decimal amount, BankSystemContext _context)
+        private async Task<ActionResult> ValidatePurchaseAmountAndBankAccount(Wallets walletExists, string product, decimal amount, BankSystemContext _context, MessageModel _messageModel)
         {
             if (amount < 0)
             {
-                return BadRequest("Smart...Don't put negative amount!");
+                _messageModel.Message = "Don't put negative amount!";
+                return StatusCode(400, _messageModel);
             }
             else if (amount == 0)
             {
-                return BadRequest("Put amount more than 0.00lv");
+                _messageModel.Message = "Put amount more than 0.00lv";
+                return StatusCode(400, _messageModel);
             }
             else
             {
                 if (walletExists.Amount < amount)
                 {
-                    return StatusCode(406, "You don't have enough money for this purchase!!!");
+                    _messageModel.Message = "You don't have enough money in bank account!";
+                    return StatusCode(406, _messageModel);
                 }
                 else
                 {
@@ -262,7 +285,8 @@ namespace VitoshaBank.Services.WalletService
                 }
             }
 
-            return Ok($"Succesfully purchased {product} that cost {amount} leva.");
+            _messageModel.Message = $"Succesfully deposited {amount} leva.";
+            return StatusCode(200, _messageModel);
         }
     }
 }

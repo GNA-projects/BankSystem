@@ -7,7 +7,7 @@ namespace VitoshaBank.Data.ResponseModels
 {
     public class DebitCardResponseModel
     {
-        public string IBAN { get; set; }
+        public string CardNumber { get; set; }
         public decimal Amount { get; set; }
     }
 }

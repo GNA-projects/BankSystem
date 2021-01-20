@@ -68,7 +68,7 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult<BankSystemContext>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel responseMessage)
+        public async Task<ActionResult<MessageModel>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -136,7 +136,7 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
+        public async Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
             responseMessage.Message = "You are not authorized to do such actions!";
             ActionResult response = StatusCode(403, responseMessage);
@@ -153,7 +153,7 @@ namespace VitoshaBank.Services.UserService
             return response;
         }
 
-        public async Task<ActionResult> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel responseMessage)
+        public async Task<ActionResult<MessageModel>> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel responseMessage)
         {
             var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == username);
 
@@ -184,7 +184,7 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult<Users>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
+        public async Task<ActionResult<MessageModel>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
