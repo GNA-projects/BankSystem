@@ -46,7 +46,7 @@ namespace VitoshaBank.Services.WalletService
                 return StatusCode(403, _messageModel);
             }
 
-            _messageModel.Message = "You don't have a debit card!!";
+            _messageModel.Message = "You don't have a wallet!";
             return StatusCode(400, _messageModel);
         }
         public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
@@ -250,10 +250,15 @@ namespace VitoshaBank.Services.WalletService
                     bankAccount.Amount = bankAccount.Amount - amount;
                     await _context.SaveChangesAsync();
                 }
-                else
+                else if (bankAccount.Amount < amount)
                 {
                     _messageModel.Message = "You don't have enough money in bank account!";
                     return StatusCode(406, _messageModel);
+                }
+                else if (bankAccount == null)
+                {
+                    _messageModel.Message = "You don't have a bank account";
+                    return StatusCode(400, _messageModel);
                 }
             }
             _messageModel.Message = $"Succesfully deposited {amount} leva.";
@@ -275,7 +280,7 @@ namespace VitoshaBank.Services.WalletService
             {
                 if (walletExists.Amount < amount)
                 {
-                    _messageModel.Message = "You don't have enough money in bank account!";
+                    _messageModel.Message = "You don't have enough money in wallet!";
                     return StatusCode(406, _messageModel);
                 }
                 else
@@ -285,7 +290,7 @@ namespace VitoshaBank.Services.WalletService
                 }
             }
 
-            _messageModel.Message = $"Succesfully deposited {amount} leva.";
+            _messageModel.Message = $"Succesfully purhcased {product}.";
             return StatusCode(200, _messageModel);
         }
     }

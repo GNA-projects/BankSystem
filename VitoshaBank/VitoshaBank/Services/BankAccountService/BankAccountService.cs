@@ -168,7 +168,7 @@ namespace VitoshaBank.Services.BankAccountService
                         bankAccount.Amount = bankAccount.Amount - amount;
                         //Transaction transaction = new transactiom"
                         await _context.SaveChangesAsync();
-                        messageModel.Message = "Money paied succesfully!";
+                        messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, messageModel);
                     }
                     else if (ValidateDepositAmountBankAccount(amount) == false)
@@ -207,10 +207,13 @@ namespace VitoshaBank.Services.BankAccountService
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 BankAccounts bankAccountExists = null;
                 Cards cardExists = null;
+                Credits creditExists = null;
+
                 if (user != null)
                 {
                     bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == user.Id);
                     cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccountExists.Id);
+                    creditExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == user.Id);
                 }
 
                 if (user == null)
@@ -228,6 +231,11 @@ namespace VitoshaBank.Services.BankAccountService
                     messageModel.Message = "No debit card found!";
                     return StatusCode(400, messageModel);
                 }
+                else if (creditExists != null)
+                {
+                    messageModel.Message = "You can't delete bank account if you have an existing credit!";
+                    return StatusCode(406, messageModel);
+                }
                 else
                 {
                     _context.Cards.Remove(cardExists);
@@ -236,7 +244,6 @@ namespace VitoshaBank.Services.BankAccountService
 
                     messageModel.Message = $"Succsesfully deleted {user.Username} bank account and debit card!";
                     return StatusCode(200, messageModel);
-
                 }
             }
             else
