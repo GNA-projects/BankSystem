@@ -15,6 +15,7 @@ namespace VitoshaBank.Data.Models
         public DateTime BirthDate { get; set; }
         public bool IsAdmin { get; set; }
         public string Email { get; set; }
+        public bool IsConfirmed { get; set; }
 
         public virtual Transactions LastTransaction { get; set; }
         public virtual BankAccounts BankAccounts { get; set; }

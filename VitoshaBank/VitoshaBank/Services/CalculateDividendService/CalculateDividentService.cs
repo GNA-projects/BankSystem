@@ -78,5 +78,15 @@ namespace VitoshaBank.Services.CalculateDividendService
                 return 0;
             }
         }
+
+        public decimal GetDividentAmount(decimal amount, decimal divident, int period)
+        {
+            
+                double doubleAmount = (double)(amount);
+                double coef = 1 + (double)(divident) / 100;
+                double depositAmount = doubleAmount * Math.Pow(coef, period);
+                return (decimal)(depositAmount)-amount;
+           
+        }
     }
 }

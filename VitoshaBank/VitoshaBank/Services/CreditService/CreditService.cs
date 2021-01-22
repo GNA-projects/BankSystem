@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CreditService.Interfaces;
@@ -14,7 +15,7 @@ namespace VitoshaBank.Services.CreditService
 {
     public class CreditService : ControllerBase, ICreditService
     {
-        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -24,7 +25,8 @@ namespace VitoshaBank.Services.CreditService
 
                 if (userAuthenticate == null)
                 {
-                    return NotFound();
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
                 }
                 else
                 {
@@ -37,13 +39,14 @@ namespace VitoshaBank.Services.CreditService
                     creditResponseModel.Amount = creditsExists.Amount;
                     creditResponseModel.CreditAmount = creditsExists.CreditAmount;
                     creditResponseModel.Instalment = creditsExists.Instalment;
-
-                    return Ok(creditResponseModel);
+                    
+                    return StatusCode(200,creditResponseModel);
                 }
             }
-            return Ok("You don't have a credit");
+            _messageModel.Message = "You don't have a credit";  
+            return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestDepositService)
+        public async Task<ActionResult> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestService, MessageModel _messageModel)
         {
             string role = "";
 
@@ -72,31 +75,33 @@ namespace VitoshaBank.Services.CreditService
                         //credits.Amount = 1000;
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
                         credits.PaymentDate = DateTime.Now.AddMonths(1);
-                        credits.CreditAmount = 2500;
-                        credits.Instalment = 250;
-                        //create method
-                        credits.Interest = 2.4m;
-                        //create method
+                        credits.CreditAmount = _interestService.CalculateCreditAmount(credits.Amount);
+                        credits.Interest = 7.5m;
+                        credits.Instalment = _interestService.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
+                        credits.CreditAmountLeft = credits.CreditAmount;
                         _context.Add(credits);
                         await _context.SaveChangesAsync();
-
-                        return Ok();
+                        _messageModel.Message = "Credit created successfully!";
+                        return StatusCode(200, _messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
-                        return NotFound("User not found");
+                        _messageModel.Message = "User not found!";
+                        return StatusCode(404, _messageModel);
                     }
                     else if (ValidateCredit(credits) == false)
                     {
-                        return BadRequest("Idiot don't put negative value!");
+                        _messageModel.Message = "Invalid parameteres!";
+                        return StatusCode(400, _messageModel);
                     }
                 }
-
-                return BadRequest("User already has a credit!");
+                _messageModel.Message = "User already has a credit!";
+                return StatusCode(400, _messageModel);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
         }
         public async Task<ActionResult<Users>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context)

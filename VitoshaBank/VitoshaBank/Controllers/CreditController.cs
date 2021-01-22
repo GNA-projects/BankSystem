@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
@@ -25,23 +26,27 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Credits> _logger;
         private readonly ICreditService _creditService;
         private readonly IIBANGeneratorService _IBAN;
-        private readonly ICalculateInterestService _interestService; 
+        private readonly ICalculateInterestService _interestService;
+        private readonly MessageModel _messageModel;
+        
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, MessageModel _messageModel, ICalculateInterestService interestService)
         {
             _context = context;
             _logger = logger;
             _creditService = creditService;
             _IBAN = IBAN;
+            _interestService = interestService;
+            _messageModel = new MessageModel();
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<CreditResponseModel>> GetWalletInfo()
+        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo()
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _creditService.GetCreditInfo(currentUser, username, _context);
+            return await _creditService.GetCreditInfo(currentUser, username, _context,  _messageModel);
         }
 
         [HttpPost("create")]
@@ -49,7 +54,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult> CreateCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, _IBAN, _context, _interestService);
+            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, _IBAN, _context, _interestService,  _messageModel);
         }
 
         [HttpDelete("delete")]
@@ -57,7 +62,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<Users>> DeleteCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.DeleteCredit(currentUser, requestModel.Username, _context);
+            return await _creditService.DeleteCredit(currentUser, requestModel.Username, _context,  _messageModel);
         }
     }
 

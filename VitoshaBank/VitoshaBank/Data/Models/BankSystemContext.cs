@@ -153,6 +153,10 @@ namespace VitoshaBank.Data.Models
                     .HasColumnName("credit_amount")
                     .HasColumnType("decimal(10,6)");
 
+                entity.Property(e => e.CreditAmountLeft)
+                    .HasColumnName("credit_amount_left")
+                    .HasColumnType("decimal(10,6)");
+
                 entity.Property(e => e.Iban)
                     .IsRequired()
                     .HasColumnName("IBAN")

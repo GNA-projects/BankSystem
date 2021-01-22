@@ -8,20 +8,19 @@ namespace VitoshaBank.Services.CalculateInterestService
 {
     public class CalculateInterestService : ICalculateInterestService
     {
-        double interest = 8.5;
+        public double interest = 7.5;
         int period = 12;
         public decimal CalculateCreditAmount(decimal amount)
         {
-
             double doubleAmount = (double)(amount);
-            double coef = 1 + (interest * period) / 100;
-            double creditAmount = doubleAmount * coef;
+            double coef = 1 + interest / 100;
+            double creditAmount = doubleAmount * Math.Pow(coef, period);
             return (decimal)(creditAmount);
 
         }
-        public decimal CalculateInstalment(decimal CreditAmount, double interest, int period)
+        public decimal CalculateInstalment(decimal CreditAmount, decimal interest, int period)
         {
-            double coef = 1 + interest / 100;
+            double coef = 1 + (double)(interest) / 100;
             double a = Math.Pow(coef, period) * (coef - 1);
             double b = Math.Pow(coef, period) - 1;
             double instalment = (double)(CreditAmount) * (a / b);
