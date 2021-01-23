@@ -26,17 +26,15 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Credits> _logger;
         private readonly ICreditService _creditService;
         private readonly IIBANGeneratorService _IBAN;
-        private readonly ICalculateInterestService _interestService;
         private readonly MessageModel _messageModel;
         
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, MessageModel _messageModel, ICalculateInterestService interestService)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, MessageModel _messageModel)
         {
             _context = context;
             _logger = logger;
             _creditService = creditService;
             _IBAN = IBAN;
-            _interestService = interestService;
             _messageModel = new MessageModel();
         }
 
@@ -54,7 +52,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, _IBAN, _context, _interestService,  _messageModel);
+            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, requestModel.Period, _IBAN, _context,  _messageModel);
         }
 
         [HttpDelete("delete")]
@@ -63,6 +61,14 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             return await _creditService.DeleteCredit(currentUser, requestModel.Username, _context,  _messageModel);
+        }
+        [HttpPut("purchase")]
+        [Authorize]
+
+        public async Task<ActionResult<MessageModel>> Purchase(CreditRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            return await _creditService.SimulatePurchase(requestModel.Credit, requestModel.Product, currentUser, requestModel.Username, requestModel.Amount, _context, _messageModel);
         }
     }
 

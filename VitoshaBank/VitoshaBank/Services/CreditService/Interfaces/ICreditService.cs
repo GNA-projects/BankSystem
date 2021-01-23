@@ -16,6 +16,6 @@ namespace VitoshaBank.Services.CreditService.Interfaces
         public Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits,int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<MessageModel>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel);
-
+        public Task<ActionResult<MessageModel>> SimulatePurchase(Credits credit, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel);
     }
 }

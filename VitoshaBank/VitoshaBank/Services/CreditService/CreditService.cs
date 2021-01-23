@@ -40,15 +40,14 @@ namespace VitoshaBank.Services.CreditService
                     creditResponseModel.Amount = creditsExists.Amount;
                     creditResponseModel.CreditAmount = creditsExists.CreditAmount;
                     creditResponseModel.Instalment = creditsExists.Instalment;
-                    
-                    return StatusCode(200,creditResponseModel);
+
+                    return StatusCode(200, creditResponseModel);
                 }
             }
-            _messageModel.Message = "You don't have a credit";  
+            _messageModel.Message = "You don't have a credit";
             return StatusCode(400, _messageModel);
         }
-
-        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits,int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
 
         {
             string role = "";
@@ -76,7 +75,6 @@ namespace VitoshaBank.Services.CreditService
                     {
                         credits.UserId = userAuthenticate.Id;
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
-                        credits.PaymentDate = DateTime.Now.AddMonths(1);
                         credits.CreditAmount = CalculateInterest.CalculateCreditAmount(credits.Amount, period, credits.Interest);
                         credits.Instalment = CalculateInterest.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
                         credits.CreditAmountLeft = credits.CreditAmount;
@@ -104,6 +102,55 @@ namespace VitoshaBank.Services.CreditService
                 _messageModel.Message = "You are not autorized to do such actions!";
                 return StatusCode(403, _messageModel);
             }
+        }
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(Credits credit, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
+        {
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            Credits creditExists = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    creditExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.Iban == credit.Iban);
+                }
+                else
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+
+                if (creditExists != null)
+                {
+                    if (ValidateCreditAmount(amount, credit) && ValidateCredit(creditExists))
+                    {
+                        credit.Amount = credit.Amount - amount;
+                        //Transaction transaction = new transactiom"
+                        await _context.SaveChangesAsync();
+                        _messageModel.Message = $"Succesfully purhcased {product}.";
+                        return StatusCode(200, _messageModel);
+                    }
+                    else if (ValidateCreditAmount(amount, credit) == false)
+                    {
+                        _messageModel.Message = "Invalid payment amount!";
+                        return StatusCode(400, _messageModel);
+                    }
+                    else if (ValidateCredit(creditExists) == false)
+                    {
+                        _messageModel.Message = "You don't have enough money in bank account!";
+                        return StatusCode(406, _messageModel);
+                    }
+
+                }
+                else
+                {
+                    _messageModel.Message = "Credit not found";
+                    return StatusCode(404, _messageModel);
+                }
+            }
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+
         }
         public async Task<ActionResult<MessageModel>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
@@ -148,7 +195,14 @@ namespace VitoshaBank.Services.CreditService
                 return StatusCode(403, _messageModel);
             }
         }
-        
+        private bool ValidateCreditAmount(decimal amount, Credits credit)
+        {
+            if (credit.Amount < amount)
+            {
+                return false;
+            }
+            return true;
+        }
         private bool ValidateCredit(Credits credits)
         {
             if (credits.Amount < 0)

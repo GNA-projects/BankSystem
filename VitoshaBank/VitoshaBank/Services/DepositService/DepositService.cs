@@ -9,7 +9,6 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService;
-using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
 namespace VitoshaBank.Services.DepositService
@@ -51,7 +50,7 @@ namespace VitoshaBank.Services.DepositService
             _messageModel.Message = "You don't have a deposit!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateDividentService _dividentDepositService, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -86,7 +85,7 @@ namespace VitoshaBank.Services.DepositService
                         deposits.Iban = _IBAN.GenerateIBANInVitoshaBank("Deposit", _context);
                         deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
                         //deposits.Amount = 45;
-                        deposits.Divident = _dividentDepositService.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
+                        deposits.Divident = CalculateDivident.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
                         _context.Add(deposits);
                         await _context.SaveChangesAsync();
 

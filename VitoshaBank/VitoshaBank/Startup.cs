@@ -13,7 +13,7 @@ using VitoshaBank.Services;
 using VitoshaBank.Services.BankAccountService;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.CalculateDividendService;
-using VitoshaBank.Services.CalculateDividendService.Interfaces;
+
 using VitoshaBank.Services.CalculateInterestService;
 using VitoshaBank.Services.CreditService;
 using VitoshaBank.Services.CreditService.Interfaces;

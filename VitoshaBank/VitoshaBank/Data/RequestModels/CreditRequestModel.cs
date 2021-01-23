@@ -9,7 +9,9 @@ namespace VitoshaBank.Data.RequestModels
     public class CreditRequestModel
     {
         public Credits Credit { get; set; }
-
+        public int Period { get; set; }
         public string Username { get; set; }
+        public string Product { get; set; }
+        public decimal Amount { get;  set; }
     }
 }

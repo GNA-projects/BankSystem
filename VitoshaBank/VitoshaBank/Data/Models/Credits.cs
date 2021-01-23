@@ -13,7 +13,7 @@ namespace VitoshaBank.Data.Models
         public decimal Interest { get; set; } = defaultInterest;
         public decimal Instalment { get; set; }
         public decimal CreditAmount { get; set; }
-        public DateTime PaymentDate { get; set; }
+        public DateTime PaymentDate { get; set; } = DateTime.Now.AddMonths(1);
         public decimal CreditAmountLeft { get; set; }
         public virtual Users User { get; set; }
     }

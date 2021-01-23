@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VitoshaBank.Services.CalculateDividendService
 {
-    public static class CalculateDividentService
+    public static class CalculateDivident
     {
         public static decimal GetDividentPercent(decimal Amount, int termOfPayment)
         {

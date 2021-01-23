@@ -11,7 +11,6 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
-using VitoshaBank.Services.CalculateDividendService.Interfaces;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
@@ -25,14 +24,13 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Deposits> _logger;
         private readonly IDepositService _depositService;
         private readonly IIBANGeneratorService _IBAN;
-        private readonly ICalculateDividentService _dividentService;
+        
         private readonly MessageModel _messageModel;
-        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN, ICalculateDividentService dividentDepositService)
+        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN)
         {
             _context = context;
             _logger = logger;
             _depositService = depositService;
-            _dividentService = dividentDepositService;
             _IBAN = IBAN;
             _messageModel = new MessageModel();
         }
@@ -51,7 +49,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateDeposit(DepositRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _context, _dividentService, _messageModel);
+            return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _context, _messageModel);
         }
 
         [HttpDelete("delete")]
