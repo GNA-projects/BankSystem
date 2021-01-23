@@ -173,7 +173,7 @@ namespace VitoshaBank.Services.DebitCardService
                         messageModel.Message = "DebitCard is expired";
                         return StatusCode(406, messageModel);
                     }
-                    await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context, messageModel);
+                    //await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context,_t messageModel);
                 }
                 else if(bankAccounts == null)
                 {

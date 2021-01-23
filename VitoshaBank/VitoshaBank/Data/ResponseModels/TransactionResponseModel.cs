@@ -9,6 +9,7 @@ namespace VitoshaBank.Data.ResponseModels
     {
         public string senderInfo { get; set; }
         public string reciverInfo { get; set; }
+        public bool IsIBAN { get; set; }
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
     }

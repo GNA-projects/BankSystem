@@ -14,6 +14,7 @@ using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
@@ -26,15 +27,17 @@ namespace VitoshaBank.Controllers
         private readonly IBankAccountService _bankAccountService;
         private readonly IDebitCardService _debitCardService;
         private readonly IIBANGeneratorService _IBAN;
+        private readonly ITransactionService _transactionService;
         private readonly MessageModel _messageModel;
 
-        public BankAccountController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService)
+        public BankAccountController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService)
         {
             _context = context;
             _logger = logger;
             _bankAccountService = bankAccountService;
             _debitCardService = debitCardService;
             _IBAN = IBAN;
+            _transactionService = transactionService;
             _messageModel = new MessageModel();
         }
 
@@ -71,7 +74,7 @@ namespace VitoshaBank.Controllers
             
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _bankAccountService.SimulatePurchase(requestModel.BankAccount, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context,_messageModel);
+            return await _bankAccountService.SimulatePurchase(requestModel.BankAccount, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
         [HttpDelete("delete")]

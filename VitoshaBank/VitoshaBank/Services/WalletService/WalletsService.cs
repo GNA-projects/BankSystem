@@ -103,7 +103,6 @@ namespace VitoshaBank.Services.WalletService
                 return StatusCode(403, _messageModel);
             }
         }
-
         public async Task<ActionResult<MessageModel>> DepositMoney(Wallets wallet, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -137,7 +136,6 @@ namespace VitoshaBank.Services.WalletService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
-
         public async Task<ActionResult<MessageModel>> SimulatePurchase(Wallets wallet, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);

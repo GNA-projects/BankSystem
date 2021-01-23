@@ -9,6 +9,7 @@ using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.BankAccountService.Interfaces
 {
@@ -17,7 +18,7 @@ namespace VitoshaBank.Services.BankAccountService.Interfaces
 
         public Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel);
-        public Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, MessageModel messageModel);
+        public Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel messageModel);
         public  Task<ActionResult<MessageModel>> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel);
 

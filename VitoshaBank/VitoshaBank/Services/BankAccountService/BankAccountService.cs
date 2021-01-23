@@ -11,6 +11,7 @@ using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Data.MessageModels;
 using System;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.BankAccountService
 {
@@ -143,7 +144,8 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, MessageModel messageModel)
+
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -157,40 +159,43 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    messageModel.Message = "User not found!";
-                    return StatusCode(404, messageModel);
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
 
                 if (bankAccounts != null)
                 {
                     if (ValidateDepositAmountBankAccount(amount) && ValidateBankAccount(bankAccounts, amount))
                     {
-                        bankAccount.Amount = bankAccount.Amount - amount;
-                        //Transaction transaction = new transactiom"
+                        bankAccounts.Amount = bankAccounts.Amount - amount;
+                        Transactions transactions = new Transactions();
+                        transactions.SenderAccountInfo = bankAccount.Iban;
+                        transactions.RecieverAccountInfo = reciever;
+                        await _transaction.CreateTransaction(currentUser, amount, transactions, "BankAccount", reciever, $"Purchasing {product}", _context, _messageModel);
                         await _context.SaveChangesAsync();
-                        messageModel.Message = $"Succesfully purhcased {product}.";
-                        return StatusCode(200, messageModel);
+                        _messageModel.Message = $"Succesfully purhcased {product}.";
+                        return StatusCode(200, _messageModel);
                     }
                     else if (ValidateDepositAmountBankAccount(amount) == false)
                     {
-                        messageModel.Message = "Invalid payment amount!";
-                        return StatusCode(400, messageModel);
+                        _messageModel.Message = "Invalid payment amount!";
+                        return StatusCode(400, _messageModel);
                     }
                     else if (ValidateBankAccount(bankAccounts, amount) == false)
                     {
-                        messageModel.Message = "You don't have enough money in bank account!";
-                        return StatusCode(406, messageModel);
+                        _messageModel.Message = "You don't have enough money in bank account!";
+                        return StatusCode(406, _messageModel);
                     }
                     
                 }
                 else
                 {
-                    messageModel.Message = "BankAccount not found";
-                    return StatusCode(404, messageModel);
+                    _messageModel.Message = "BankAccount not found";
+                    return StatusCode(404, _messageModel);
                 }
             }
-            messageModel.Message = "You are not autorized to do such actions!";
-            return StatusCode(403, messageModel);
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
         }
         public async Task<ActionResult<MessageModel>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
         {

@@ -113,6 +113,78 @@ namespace VitoshaBank.Services.DepositService
                 return StatusCode(403, _messageModel);
             }
         }
+        public async Task<ActionResult<MessageModel>> DepositMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
+        {
+
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            Deposits depositsExists = null;
+            BankAccounts bankAccounts = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    depositsExists = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.Iban == deposit.Iban);
+                }
+                else
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+
+                if (depositsExists != null)
+                {
+                    bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
+                    return await ValidateDepositAmountAndBankAccount(depositsExists, amount, bankAccounts, _context, _messageModel);
+                }
+                else
+                {
+                    _messageModel.Message = "Deposit not found";
+                    return StatusCode(404, _messageModel);
+                }
+            }
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
+
+        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Deposits depositsExists, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, MessageModel _messageModel)
+        {
+            if (amount < 0)
+            {
+                _messageModel.Message = "Don't put negative amount!";
+                return StatusCode(400, _messageModel);
+            }
+            else if (amount == 0)
+            {
+                _messageModel.Message = "Put amount more than 0.00lv";
+                return StatusCode(400, _messageModel);
+            }
+            else
+            {
+                if (bankAccounts != null && bankAccounts.Amount > amount)
+                {
+                    depositsExists.Amount = depositsExists.Amount + amount;
+                    depositsExists.PaymentDate = DateTime.Now.AddMonths(6);
+                    bankAccounts.Amount = bankAccounts.Amount - amount;
+                    //Transaction transaction = new Transaction();
+                    await _context.SaveChangesAsync();
+                    
+                }
+                else if (bankAccounts.Amount < amount)
+                {
+                    _messageModel.Message = "You don't have enough money in bank account!";
+                    return StatusCode(406, _messageModel);
+                }
+                else if (bankAccounts == null)
+                {
+                    _messageModel.Message = "You don't have a bank account";
+                    return StatusCode(400, _messageModel);
+                }
+            }
+            _messageModel.Message = $"Succesfully deposited {amount} leva.";
+            return StatusCode(200, _messageModel);
+        }
 
         public async Task<ActionResult<MessageModel>> DeleteDeposit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
