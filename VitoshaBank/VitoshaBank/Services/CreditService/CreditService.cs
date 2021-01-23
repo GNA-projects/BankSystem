@@ -46,7 +46,7 @@ namespace VitoshaBank.Services.CreditService
             _messageModel.Message = "You don't have a credit";  
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestService, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestService, MessageModel _messageModel)
         {
             string role = "";
 
@@ -104,7 +104,7 @@ namespace VitoshaBank.Services.CreditService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<Users>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context)
+        public async Task<ActionResult<MessageModel>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -126,21 +126,25 @@ namespace VitoshaBank.Services.CreditService
 
                 if (user == null)
                 {
-                    return NotFound("Idiot no such user is found!");
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
                 }
                 else if (creditsExists == null)
                 {
-                    return BadRequest("Dumbass, user doesn't have a deposits!");
+                    _messageModel.Message = "User deosn't have a credit!";
+                    return StatusCode(400, _messageModel);
                 }
 
                 _context.Credits.Remove(creditsExists);
                 await _context.SaveChangesAsync();
 
-                return Ok();
+                _messageModel.Message = "Credit deleted successfully!";
+                return StatusCode(200);
             }
             else
             {
-                return Unauthorized();
+                _messageModel.Message = "You are not autorized to do such actions!";
+                return StatusCode(403, _messageModel);
             }
         }
         
