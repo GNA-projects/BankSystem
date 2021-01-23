@@ -13,8 +13,9 @@ namespace VitoshaBank.Services.CreditService.Interfaces
 {
    public  interface ICreditService
     {
-        public Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestDepositService, MessageModel _messageModel);
+        public Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits,int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<MessageModel>> DeleteCredit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel);
+
     }
 }

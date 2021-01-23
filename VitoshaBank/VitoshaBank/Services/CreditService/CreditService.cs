@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
+using VitoshaBank.Services.CalculateInterestService;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 
@@ -46,7 +47,9 @@ namespace VitoshaBank.Services.CreditService
             _messageModel.Message = "You don't have a credit";  
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, IIBANGeneratorService _IBAN, BankSystemContext _context, ICalculateInterestService _interestService, MessageModel _messageModel)
+
+        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits,int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
+
         {
             string role = "";
 
@@ -72,12 +75,10 @@ namespace VitoshaBank.Services.CreditService
                     if (ValidateUser(userAuthenticate) && ValidateCredit(credits))
                     {
                         credits.UserId = userAuthenticate.Id;
-                        //credits.Amount = 1000;
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
                         credits.PaymentDate = DateTime.Now.AddMonths(1);
-                        credits.CreditAmount = _interestService.CalculateCreditAmount(credits.Amount);
-                        credits.Interest = 7.5m;
-                        credits.Instalment = _interestService.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
+                        credits.CreditAmount = CalculateInterest.CalculateCreditAmount(credits.Amount, period, credits.Interest);
+                        credits.Instalment = CalculateInterest.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
                         credits.CreditAmountLeft = credits.CreditAmount;
                         _context.Add(credits);
                         await _context.SaveChangesAsync();

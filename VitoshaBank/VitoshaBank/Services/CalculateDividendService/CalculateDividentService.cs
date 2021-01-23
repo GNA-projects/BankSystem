@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VitoshaBank.Services.CalculateDividendService.Interfaces;
+
 
 namespace VitoshaBank.Services.CalculateDividendService
 {
-    public class CalculateDividentService : ICalculateDividentService
+    public static class CalculateDividentService
     {
-        public decimal GetDividentPercent(decimal Amount, int termOfPayment)
+        public static decimal GetDividentPercent(decimal Amount, int termOfPayment)
         {
             decimal dividendProcent = 0;
             if (termOfPayment == 1)
@@ -79,14 +79,12 @@ namespace VitoshaBank.Services.CalculateDividendService
             }
         }
 
-        public decimal GetDividentAmount(decimal amount, decimal divident, int period)
-        {
-            
+        public static decimal GetDividentAmount(decimal amount, decimal divident, int period)
+        {    
                 double doubleAmount = (double)(amount);
                 double coef = 1 + (double)(divident) / 100;
                 double depositAmount = doubleAmount * Math.Pow(coef, period);
                 return (decimal)(depositAmount)-amount;
-           
         }
     }
 }
