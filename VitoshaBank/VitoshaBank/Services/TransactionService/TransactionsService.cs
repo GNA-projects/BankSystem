@@ -152,7 +152,7 @@ namespace VitoshaBank.Services.TransactionService
                     }
                     else if (recieverType == "Deposit")
                     {
-                        recieverAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == reciever.reciverInfo);
+                        recieverAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
                     }
                     else
                     {

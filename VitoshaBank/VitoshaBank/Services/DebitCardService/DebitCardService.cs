@@ -11,6 +11,7 @@ using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.DebitCardService
 {
@@ -101,7 +102,7 @@ namespace VitoshaBank.Services.DebitCardService
             }
         }
 
-        public async Task<ActionResult<MessageModel>> DepositMoney(string cardNumber, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(string cardNumber, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -128,7 +129,7 @@ namespace VitoshaBank.Services.DebitCardService
                         messageModel.Message = "DebitCard is expired";
                         return StatusCode(406, messageModel);
                     }
-                    //await _bankaccService.DepositMoney(bankAccounts, currentUser, username, amount, _context, messageModel);
+                    await _bankaccService.DepositMoney(bankAccounts, currentUser, username, amount, _context,_transactionService, messageModel);
                 }
                 else if (bankAccounts == null)
                 {
@@ -146,7 +147,7 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -173,7 +174,7 @@ namespace VitoshaBank.Services.DebitCardService
                         messageModel.Message = "DebitCard is expired";
                         return StatusCode(406, messageModel);
                     }
-                    //await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context,_t messageModel);
+                    await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context,_transactionService, messageModel);
                 }
                 else if(bankAccounts == null)
                 {
