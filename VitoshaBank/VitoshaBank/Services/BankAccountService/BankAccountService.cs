@@ -200,6 +200,64 @@ namespace VitoshaBank.Services.BankAccountService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
+
+        public async Task<ActionResult<MessageModel>> Withdraw(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        {
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+            BankAccounts bankAccounts = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+                else
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+
+                if (bankAccounts != null)
+                {
+                    if (ValidateDepositAmountBankAccount(amount) && ValidateBankAccount(bankAccounts, amount) && ValidateMinAmount(bankAccount, amount))
+                    {
+                        bankAccounts.Amount = bankAccounts.Amount - amount;
+                        Transactions transactions = new Transactions();
+                        transactions.SenderAccountInfo = bankAccount.Iban;
+                        transactions.RecieverAccountInfo = reciever;
+                        await _transaction.CreateTransaction(currentUser, amount, transactions, "BankAccount", reciever, $"Withdrawing {amount} lv", _context, _messageModel);
+                        await _context.SaveChangesAsync();
+                        _messageModel.Message = $"Succesfully withdrawed {amount} lv.";
+                        return StatusCode(200, _messageModel);
+                    }
+                    else if (ValidateDepositAmountBankAccount(amount) == false)
+                    {
+                        _messageModel.Message = "Invalid payment amount!";
+                        return StatusCode(400, _messageModel);
+                    }
+                    else if (ValidateBankAccount(bankAccounts, amount) == false)
+                    {
+                        _messageModel.Message = "You don't have enough money in bank account!";
+                        return StatusCode(406, _messageModel);
+                    }
+                    else if (ValidateMinAmount(bankAccounts, amount) == false)
+                    {
+                        _messageModel.Message = "Min amount is 10 lv!";
+                        return StatusCode(406, _messageModel);
+                    }
+
+                }
+                else
+                {
+                    _messageModel.Message = "BankAccount not found";
+                    return StatusCode(404, _messageModel);
+                }
+            }
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
         public async Task<ActionResult<MessageModel>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
         {
             string role = "";
@@ -271,6 +329,16 @@ namespace VitoshaBank.Services.BankAccountService
         private bool ValidateDepositAmountBankAccount(decimal amount)
         {
             if (amount > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ValidateMinAmount(BankAccounts bankAccounts, decimal amount)
+        {
+            if (amount >= 10 && amount <= bankAccounts.Amount)
             {
                 return true;
             }

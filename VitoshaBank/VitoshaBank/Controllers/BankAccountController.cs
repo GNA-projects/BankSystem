@@ -77,6 +77,15 @@ namespace VitoshaBank.Controllers
             return await _bankAccountService.SimulatePurchase(requestModel.BankAccount, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
+        [HttpPut("withdraw")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> Withdraw(BankAccountRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _bankAccountService.Withdraw(requestModel.BankAccount, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+        }
+
         [HttpDelete("delete")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> DeleteBankAccount(BankAccountRequestModel requestModel)

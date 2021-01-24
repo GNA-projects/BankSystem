@@ -65,7 +65,16 @@ namespace VitoshaBank.Controllers
 
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, _bankaccService, requestModel.Product, currentUser, requestModel.Username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, _bankaccService, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+        }
+
+        [HttpPut("withdraw")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> Withdraw(DebitCardRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _debitCardService.Withdraw(requestModel.Card.CardNumber, _bankaccService, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
         [HttpDelete("delete")]

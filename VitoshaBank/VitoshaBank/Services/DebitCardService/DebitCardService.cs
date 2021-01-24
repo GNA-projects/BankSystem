@@ -191,6 +191,51 @@ namespace VitoshaBank.Services.DebitCardService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
+
+        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        {
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+            BankAccounts bankAccounts = null;
+            Cards cards = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber);
+                }
+                else
+                {
+                    messageModel.Message = "User not found!";
+                    return StatusCode(404, messageModel);
+                }
+
+                if (bankAccounts != null && cards != null)
+                {
+                    if (cards.CardExiprationDate < DateTime.Now)
+                    {
+                        messageModel.Message = "DebitCard is expired";
+                        return StatusCode(406, messageModel);
+                    }
+                    await _bankaccService.Withdraw(bankAccounts, currentUser, username, amount, reciever, _context, _transactionService, messageModel);
+                }
+                else if (bankAccounts == null)
+                {
+                    messageModel.Message = "BankAccount not found";
+                    return StatusCode(404, messageModel);
+                }
+                else if (cards == null)
+                {
+                    messageModel.Message = "DebitCard not found";
+                    return StatusCode(404, messageModel);
+                }
+            }
+
+            messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, messageModel);
+        }
         public async Task<ActionResult<MessageModel>> DeleteDebitCard(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
