@@ -10,6 +10,7 @@ using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.DepositService
 {
@@ -113,7 +114,7 @@ namespace VitoshaBank.Services.DepositService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> DepositMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
 
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -135,7 +136,7 @@ namespace VitoshaBank.Services.DepositService
                 if (depositsExists != null)
                 {
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(depositsExists, amount, bankAccounts, _context, _messageModel);
+                    return await ValidateDepositAmountAndBankAccount(depositsExists,currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
                 }
                 else
                 {
@@ -148,7 +149,7 @@ namespace VitoshaBank.Services.DepositService
             return StatusCode(403, _messageModel);
         }
 
-        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Deposits depositsExists, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, MessageModel _messageModel)
+        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
             if (amount < 0)
             {
@@ -167,8 +168,11 @@ namespace VitoshaBank.Services.DepositService
                     depositsExists.Amount = depositsExists.Amount + amount;
                     depositsExists.PaymentDate = DateTime.Now.AddMonths(6);
                     bankAccounts.Amount = bankAccounts.Amount - amount;
-                    //Transaction transaction = new Transaction();
+                    Transactions transaction = new Transactions();
+                    transaction.RecieverAccountInfo = depositsExists.Iban;
+                    transaction.SenderAccountInfo = "User in Bank office";
                     await _context.SaveChangesAsync();
+                    await _transactionService.CreateTransaction(currentUser, amount, transaction, transaction.SenderAccountInfo, "Deposit", "Deposit", _context, _messageModel);
                     
                 }
                 else if (bankAccounts.Amount < amount)

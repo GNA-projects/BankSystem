@@ -13,6 +13,7 @@ using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
@@ -24,15 +25,16 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Deposits> _logger;
         private readonly IDepositService _depositService;
         private readonly IIBANGeneratorService _IBAN;
-        
+        private readonly ITransactionService _transactionService;
         private readonly MessageModel _messageModel;
-        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN)
+        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN,ITransactionService transactionService)
         {
             _context = context;
             _logger = logger;
             _depositService = depositService;
             _IBAN = IBAN;
             _messageModel = new MessageModel();
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -51,6 +53,14 @@ namespace VitoshaBank.Controllers
             var currentUser = HttpContext.User;
             return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _context, _messageModel);
         }
+        [HttpPut("deposit")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> DepositMoney(DepositRequestModel requestModel)
+        {
+            //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
+            var currentUser = HttpContext.User;
+            return await _depositService.DepositMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
+        } 
 
         [HttpDelete("delete")]
         [Authorize]

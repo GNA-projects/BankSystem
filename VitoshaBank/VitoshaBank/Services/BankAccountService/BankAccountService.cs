@@ -105,10 +105,10 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-           
+
             BankAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
@@ -127,8 +127,12 @@ namespace VitoshaBank.Services.BankAccountService
                 {
                     if (ValidateDepositAmountBankAccount(amount))
                     {
-                        bankAccount.Amount = bankAccount.Amount + amount;
+                        bankAccounts.Amount = bankAccounts.Amount + amount;
                         await _context.SaveChangesAsync();
+                        Transactions transactions = new Transactions();
+                        transactions.RecieverAccountInfo = bankAccounts.Iban;
+                        transactions.SenderAccountInfo = "User in Bank";
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "UserinBank", "BankAccount", "Depositing money from bank office", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -144,8 +148,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount,string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -186,7 +189,7 @@ namespace VitoshaBank.Services.BankAccountService
                         _messageModel.Message = "You don't have enough money in bank account!";
                         return StatusCode(406, _messageModel);
                     }
-                    
+
                 }
                 else
                 {
@@ -274,7 +277,6 @@ namespace VitoshaBank.Services.BankAccountService
 
             return false;
         }
-
         private bool ValidateBankAccount(BankAccounts bankAccount, decimal amount)
         {
             if (bankAccount != null && bankAccount.Amount > amount)
@@ -295,5 +297,5 @@ namespace VitoshaBank.Services.BankAccountService
             return false;
         }
     }
-} 
+}
 

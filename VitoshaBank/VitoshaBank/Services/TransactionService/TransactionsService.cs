@@ -150,6 +150,10 @@ namespace VitoshaBank.Services.TransactionService
                     {
                         recieverAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
                     }
+                    else if (recieverType == "Deposit")
+                    {
+                        recieverAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == reciever.reciverInfo);
+                    }
                     else
                     {
                         _messageModel.Message = "Invalid arguments!";
