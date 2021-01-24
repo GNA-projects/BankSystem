@@ -29,7 +29,7 @@ namespace VitoshaBank.Controllers
         private readonly MessageModel _messageModel;
         
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, MessageModel _messageModel)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN)
         {
             _context = context;
             _logger = logger;

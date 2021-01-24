@@ -43,9 +43,12 @@ namespace VitoshaBank.Services.CreditService
 
                     return StatusCode(200, creditResponseModel);
                 }
+                _messageModel.Message = "You don't have a credit";
+                return StatusCode(400, _messageModel);
             }
-            _messageModel.Message = "You don't have a credit";
-            return StatusCode(400, _messageModel);
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
         }
         public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
 
