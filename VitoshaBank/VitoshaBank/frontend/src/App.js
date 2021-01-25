@@ -1,39 +1,29 @@
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-import Admin from "./components/Admin";
-import AdminUserCreate from "./components/Admin/CreateUserForm";
-import AdminUserDelete from "./components/Admin/DeleteUserForm";
-import AdminAccountCreate from "./components/Admin/CreateAccountForm";
-
-import TopMenu from "./components/TopMenu";
+import { Route, Switch } from "react-router-dom";
 import Home from "./components/Home";
-import Ebanking from "./components/Ebanking";
-import AllActivity from "./components/Ebanking//Activity/AllActivity";
-import Login from "./components/Login";
-import Logout from "./components/Logout";
-import About from "./components/About";
+import { PrivateRoute,AdminRoute } from "./Auth";
+
+import Layout from "./components/Layout";
+
+import Login from "./components/UserAuth/Login";
+import Logout from "./components/UserAuth/Logout";
+
+import Ebanking from './components/Ebanking'
+
+import Admin from './components/Admin'
+
 
 function App() {
-  return (
-    <div>
-      <Router>
-        <TopMenu></TopMenu>
-        <Switch>
-          <Route exact path="/" component={Home}></Route>
-          <Route exact path="/ebanking" component={Ebanking}></Route>
-          <Route path="/ebanking/activity" component={AllActivity}></Route>
-          <Route path="/login" component={Login}></Route>
-          <Route path="/logout" component={Logout}></Route>
-          <Route path="/about" component={About}></Route>
-
-          <Route exact path="/admin" component={Admin}></Route>
-          <Route path="/admin/create/user" component={AdminUserCreate}></Route>
-          <Route path="/admin/create/account" component={AdminAccountCreate}></Route>
-          <Route path="/admin/delete/user" component={AdminUserDelete}></Route>
-        </Switch>
-      </Router>
-    </div>
-  );
+	return (
+		<Layout>
+			<Switch>
+				<PrivateRoute exact path="/" component={Home} />
+				<Route exact path="/login" component={Login} />
+				<PrivateRoute exact path="/logout" component={Logout} />
+				<PrivateRoute exact path="/ebanking" component={Ebanking} />
+				<AdminRoute exact path="/admin" component={Admin}/>
+			</Switch>
+		</Layout>
+	);
 }
 
 export default App;

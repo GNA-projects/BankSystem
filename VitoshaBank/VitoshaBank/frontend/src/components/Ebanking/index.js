@@ -1,22 +1,14 @@
 import React from "react";
-import Balance from "./Balance";
-import Activity from "./Activity";
+import { Banking } from "./style";
 
-import { Redirect } from "react-router-dom";
-import { Body, HeadingGreet } from "./style";
 
 export default function Ebanking() {
-  return sessionStorage["jwt"] ? (
-    <div>
-      <Body>
-        <HeadingGreet>Hi, Sam!</HeadingGreet>
-        <Balance />
-        <Balance />
-        <Balance />
-        <Activity />
-      </Body>
-    </div>
-  ) : (
-    <Redirect to='/login'></Redirect>
-  );
+	return (
+		<Banking>
+			<Banking.Debit />
+			<Banking.Deposit />
+			<Banking.Wallet />
+			<Banking.Credit />
+		</Banking>
+	);
 }

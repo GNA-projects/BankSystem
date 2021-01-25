@@ -1,5 +1,9 @@
 import axios from "axios";
 
+const config = {
+  headers: { Authorization: "Bearer " + sessionStorage["jwt"] },
+};
+
 export const loginUser = (username, password) => {
   axios
     .post("api/users/login", {
@@ -14,13 +18,4 @@ export const loginUser = (username, password) => {
         sessionStorage.removeItem("jwt");
       }
     );
-};
-export const logoutUser = () => {
-  sessionStorage.removeItem("jwt");
-};
-export const devLogin = () => {
-  sessionStorage["jwt"] = "123";
-};
-export const checkIfLogged = () => {
-  return sessionStorage["jwt"] ? "V" : "X";
 };

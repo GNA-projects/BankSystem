@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Logout() {
+export default function DeleteUser() {
     return (
         <div>
-            <p>Logout</p>
+            delete user
         </div>
     )
 }
