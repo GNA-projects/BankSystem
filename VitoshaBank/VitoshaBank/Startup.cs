@@ -10,12 +10,30 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Services;
+using VitoshaBank.Services.BankAccountService;
+using VitoshaBank.Services.BankAccountService.Interfaces;
+using VitoshaBank.Services.CalculateDividendService;
+
+using VitoshaBank.Services.CalculateInterestService;
+using VitoshaBank.Services.CreditService;
+using VitoshaBank.Services.CreditService.Interfaces;
+using VitoshaBank.Services.DebitCardService;
+using VitoshaBank.Services.DebitCardService.Interfaces;
+using VitoshaBank.Services.DepositService;
+using VitoshaBank.Services.IBANGeneratorService;
+using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
+using VitoshaBank.Services.Interfaces.WalletService;
+using VitoshaBank.Services.TransactionService;
+using VitoshaBank.Services.TransactionService.Interfaces;
+using VitoshaBank.Services.UserService;
+using VitoshaBank.Services.WalletService;
 
 namespace VitoshaBank
 {
     public class Startup
-	{
+    {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,7 +46,15 @@ namespace VitoshaBank
         {
 
             services.AddScoped<IUsersService, UsersService>();
+            services.AddScoped<IWalletsService, WalletsService>();
+            services.AddScoped<IDepositService, DepositService>();
+            services.AddScoped<IBankAccountService, BankAccountService>();
+            services.AddScoped<IDebitCardService, DebitCardService>();
             services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
+            services.AddScoped<IIBANGeneratorService, IBANGeneratorService>();
+            services.AddScoped<ICreditService, CreditService>();
+            
+            services.AddScoped<ITransactionService, TransactionsService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -42,9 +68,12 @@ namespace VitoshaBank
                     };
                 });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                                .AddNewtonsoftJson(options =>
+                                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                                    );
 
-			services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
+            services.AddDbContext<BankSystemContext>(options => options.UseMySQL(Configuration.GetConnectionString("BankConnection")));
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {

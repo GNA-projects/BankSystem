@@ -11,7 +11,7 @@ namespace VitoshaBank.Controllers
        [Authorize]
         public ActionResult AuthMe()
         {
-            return Ok();
+            return StatusCode(200);
         }
     }
 }
