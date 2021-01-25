@@ -11,6 +11,7 @@ using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateInterestService;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.CreditService
 {
@@ -106,7 +107,7 @@ namespace VitoshaBank.Services.CreditService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(Credits credit, string product, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(Credits credit, string product, string reciever, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Credits creditExists = null;
@@ -125,10 +126,13 @@ namespace VitoshaBank.Services.CreditService
 
                 if (creditExists != null)
                 {
-                    if (ValidateCreditAmount(amount, credit) && ValidateCredit(creditExists))
+                    if (ValidateCreditAmount(amount, creditExists) && ValidateCredit(creditExists))
                     {
-                        credit.Amount = credit.Amount - amount;
-                        //Transaction transaction = new transactiom"
+                        creditExists.Amount = creditExists.Amount - amount;
+                        Transactions transaction = new Transactions();
+                        transaction.SenderAccountInfo = creditExists.Iban;
+                        transaction.RecieverAccountInfo = reciever;
+                        await _transactionService.CreateTransaction(currentUser, amount, transaction, "Credit", reciever, $"Purchasing {product}", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, _messageModel);
@@ -155,10 +159,9 @@ namespace VitoshaBank.Services.CreditService
             return StatusCode(403, _messageModel);
 
         }
-
-        public async Task<ActionResult<MessageModel>> DepositMoney(Credits credit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(Credits credit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
-            //Transactions = new transactions();
+            
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Credits creditsExists = null;
             BankAccounts bankAccounts = null;
@@ -178,7 +181,7 @@ namespace VitoshaBank.Services.CreditService
                 if (creditsExists != null)
                 {
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(creditsExists, amount, bankAccounts, _context, _messageModel);
+                    return await ValidateDepositAmountAndBankAccount(creditsExists,currentUser, amount, bankAccounts, _context,_transaction, _messageModel);
                 }
                 else
                 {
@@ -187,6 +190,63 @@ namespace VitoshaBank.Services.CreditService
                 }
             }
 
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
+        public async Task<ActionResult<MessageModel>> Withdraw(Credits credit, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        {
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+            Credits creditExists = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    creditExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+                else
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+
+                if (creditExists != null)
+                {
+                    if (ValidateDepositAmountBankAccount(amount) && ValidateCredit(creditExists) && ValidateMinAmount(creditExists, amount))
+                    {
+                        creditExists.Amount = creditExists.Amount - amount;
+                        Transactions transactions = new Transactions();
+                        transactions.SenderAccountInfo = credit.Iban;
+                        transactions.RecieverAccountInfo = reciever;
+                        await _transaction.CreateTransaction(currentUser, amount, transactions, "Credit", reciever, $"Withdrawing {amount} lv", _context, _messageModel);
+                        await _context.SaveChangesAsync();
+                        _messageModel.Message = $"Succesfully withdrawed {amount} lv.";
+                        return StatusCode(200, _messageModel);
+                    }
+                    else if (ValidateDepositAmountBankAccount(amount) == false)
+                    {
+                        _messageModel.Message = "Invalid payment amount!";
+                        return StatusCode(400, _messageModel);
+                    }
+                    else if (ValidateCredit(creditExists) == false)
+                    {
+                        _messageModel.Message = "You don't have enough money in bank account!";
+                        return StatusCode(406, _messageModel);
+                    }
+                    else if (ValidateMinAmount(creditExists, amount) == false)
+                    {
+                        _messageModel.Message = "Min amount is 10 lv!";
+                        return StatusCode(406, _messageModel);
+                    }
+
+                }
+                else
+                {
+                    _messageModel.Message = "BankAccount not found";
+                    return StatusCode(404, _messageModel);
+                }
+            }
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
@@ -233,6 +293,22 @@ namespace VitoshaBank.Services.CreditService
                 return StatusCode(403, _messageModel);
             }
         }
+        private bool ValidateMinAmount(Credits credit, decimal amount)
+        {
+            if (amount<=credit.Amount)
+            {
+                return true;
+            }
+            return false;
+        }
+        private bool ValidateDepositAmountBankAccount(decimal amount)
+        {
+            if (amount >= 10)
+            {
+                return true;
+            }
+            return false;
+        }
         private bool ValidateCreditAmount(decimal amount, Credits credit)
         {
             if (credit.Amount < amount)
@@ -257,7 +333,7 @@ namespace VitoshaBank.Services.CreditService
             }
             return false;
         }
-        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Credits creditExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context, MessageModel _messageModel)
+        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Credits creditExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             if (amount < 0)
             {
@@ -275,6 +351,10 @@ namespace VitoshaBank.Services.CreditService
                 {
                     creditExists.Amount = creditExists.Amount + amount;
                     bankAccount.Amount = bankAccount.Amount - amount;
+                    Transactions transaction = new Transactions();
+                    transaction.SenderAccountInfo = bankAccount.Iban;
+                    transaction.RecieverAccountInfo = creditExists.Iban;
+                    await _transaction.CreateTransaction(currentUser, amount, transaction, "BankAccount", "Credit", $"Depositing {amount}lv from BankAccount", _context, _messageModel);
                     await _context.SaveChangesAsync();
                 }
                 else if (bankAccount.Amount < amount)

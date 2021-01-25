@@ -52,7 +52,6 @@ namespace VitoshaBank.Controllers
         [Authorize]
         public async Task<ActionResult<MessageModel>> Deposit(DebitCardRequestModel requestModel)
         {
-            //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _debitCardService.DepositMoney(requestModel.Card.CardNumber, currentUser, _bankaccService, username, requestModel.Amount, _context,_transactionService, _messageModel);

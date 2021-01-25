@@ -15,6 +15,7 @@ using VitoshaBank.Services.CreditService;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
@@ -27,15 +28,17 @@ namespace VitoshaBank.Controllers
         private readonly ICreditService _creditService;
         private readonly IIBANGeneratorService _IBAN;
         private readonly MessageModel _messageModel;
+        private readonly ITransactionService _transactionService;
         
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, ITransactionService transactionService)
         {
             _context = context;
             _logger = logger;
             _creditService = creditService;
             _IBAN = IBAN;
             _messageModel = new MessageModel();
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -69,7 +72,8 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> Purchase(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.SimulatePurchase(requestModel.Credit, requestModel.Product, currentUser, requestModel.Username, requestModel.Amount, _context, _messageModel);
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _creditService.SimulatePurchase(requestModel.Credit, requestModel.Product, requestModel.Reciever, currentUser, username, requestModel.Amount, _context,_transactionService, _messageModel);
         }
 
         [HttpPut("deposit")]
@@ -79,7 +83,15 @@ namespace VitoshaBank.Controllers
             //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _creditService.DepositMoney(requestModel.Credit, currentUser, username, requestModel.Amount, _context, _messageModel);
+            return await _creditService.DepositMoney(requestModel.Credit, currentUser, username, requestModel.Amount, _context, _transactionService, _messageModel);
+        }
+        [HttpPut("withdraw")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> Withdraw(CreditRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _creditService.Withdraw(requestModel.Credit, currentUser, username, requestModel.Amount, "User in ATM", _context, _transactionService, _messageModel);
         }
 
     }
