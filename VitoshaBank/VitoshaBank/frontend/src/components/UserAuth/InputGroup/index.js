@@ -6,7 +6,7 @@ export default function InputGroup(props) {
 			<Group.Heading>{props.heading}</Group.Heading>
 			<Group.Input
 				type={props.type}
-				onClick={props.onClick}
+				onChange={props.onChange}
 				value={props.value}
 			></Group.Input>
 		</Group>

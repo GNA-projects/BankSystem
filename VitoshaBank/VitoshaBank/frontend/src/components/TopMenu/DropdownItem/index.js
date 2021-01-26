@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Item } from "./style";
 
 import { faPiggyBank } from "@fortawesome/free-solid-svg-icons";
-import { faUserNinja } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,7 +17,7 @@ export default function DropdownItem(props) {
 				setIcon(faHome);
 				break;
 			case props.about:
-				setIcon(faUserNinja);
+				setIcon(faUser);
 				break;
 			case props.bank:
 				setIcon(faPiggyBank);

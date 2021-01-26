@@ -23,13 +23,13 @@ export default function TopMenu() {
 			</Navigation>
 
 			<Dropdown active={dropDown}>
-				<Dropdown.Item onClick={() => toPath("")} home heading="Home" />
+				<Dropdown.Item onClick={() => toPath("account")} about heading="My Account" />
 				<Dropdown.Item
 					onClick={() => toPath("ebanking")}
 					bank
 					heading="Ebanking"
 				/>
-				<Dropdown.Item onClick={() => toPath("about")} about heading="About" />
+				<Dropdown.Item onClick={() => toPath("")} home heading="Home" />
 				<Dropdown.Item
 					onClick={() => toPath("logout")}
 					logout

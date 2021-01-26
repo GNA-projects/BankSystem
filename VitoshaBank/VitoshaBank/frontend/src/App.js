@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import { PrivateRoute,AdminRoute } from "./Auth";
 
 import Layout from "./components/Layout";
+import MyAccount from "./components/MyAccount";
 
 import Login from "./components/UserAuth/Login";
 import Logout from "./components/UserAuth/Logout";
@@ -17,6 +18,7 @@ function App() {
 		<Layout>
 			<Switch>
 				<PrivateRoute exact path="/" component={Home} />
+				<PrivateRoute exact path="/account" component={MyAccount} />
 				<Route exact path="/login" component={Login} />
 				<PrivateRoute exact path="/logout" component={Logout} />
 				<PrivateRoute exact path="/ebanking" component={Ebanking} />

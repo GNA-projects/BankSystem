@@ -1,21 +1,33 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { AuthContext, devLogin } from "../../../Auth";
+import { AuthContext } from "../../../Auth";
+import { loginUser } from "../../../Api/user";
 import { Form } from "../style";
 
 export default function Login() {
 	const { setLogged } = useContext(AuthContext);
+	const [username, setUsername] = useState();
+	const [password, setPassword] = useState();
 	const history = useHistory();
-	const login = () => {
+	const login = async () => {
+		await loginUser(username, password, setLogged);
+		console.log("ask to redirect");
 		history.push("/ebanking");
-		devLogin();
-		setLogged(true);
 	};
 	return (
 		<Form>
 			<Form.Icon />
-			<Form.Input heading="username" />
-			<Form.Input heading="password" type="password" />
+			<Form.Input
+				heading="username"
+				value={username}
+				onChange={(e) => setUsername(e.target.value)}
+			/>
+			<Form.Input
+				heading="password"
+				type="password"
+				value={password}
+				onChange={(e) => setPassword(e.target.value)}
+			/>
 			<Form.Submit onClick={login} text="Login" />
 		</Form>
 	);

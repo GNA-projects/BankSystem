@@ -1,10 +1,10 @@
 import React from "react";
-import { Credit, Debit, Deposit, Wallet } from "./Account";
+import { Credit, BAccount, Deposit, Wallet } from "./Account";
 
 export const Banking = (props) => (
 	<React.Fragment>{props.children}</React.Fragment>
 );
-Banking.Debit = Debit;
+Banking.BAccount = BAccount;
 Banking.Deposit = Deposit;
 Banking.Wallet = Wallet;
 Banking.Credit = Credit;

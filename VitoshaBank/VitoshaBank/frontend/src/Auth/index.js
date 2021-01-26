@@ -11,10 +11,6 @@ export const devLogin = () => {
 	sessionStorage["jwt"] = "123";
 };
 
-export const loginUser = () => {
-	sessionStorage["jwt"] = "123";
-};
-
 export const checkJwt = () => {
 	return sessionStorage["jwt"] ? true : false;
 };
