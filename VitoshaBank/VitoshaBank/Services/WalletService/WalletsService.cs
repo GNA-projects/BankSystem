@@ -36,7 +36,7 @@ namespace VitoshaBank.Services.WalletService
                 if (walletExists != null)
                 {
                     walletResponseModel.IBAN = walletExists.Iban;
-                    walletResponseModel.Amount = walletExists.Amount;
+                    walletResponseModel.Amount = Math.Round(walletExists.Amount,2);
                     return StatusCode(200, walletResponseModel);
                 }
             }

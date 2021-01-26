@@ -38,9 +38,9 @@ namespace VitoshaBank.Services.CreditService
                 if (creditsExists != null)
                 {
                     creditResponseModel.IBAN = creditsExists.Iban;
-                    creditResponseModel.Amount = creditsExists.Amount;
-                    creditResponseModel.CreditAmount = creditsExists.CreditAmount;
-                    creditResponseModel.Instalment = creditsExists.Instalment;
+                    creditResponseModel.Amount = Math.Round(creditsExists.Amount);
+                    creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount,2);
+                    creditResponseModel.Instalment = Math.Round(creditsExists.Instalment,2);
 
                     return StatusCode(200, creditResponseModel);
                 }
