@@ -31,50 +31,52 @@ export const loginUser = async (username, password, setLogged) => {
 export const getBankAccount = async (setAmount, setIban) => {
 	await axios.get("api/bankaccount/", config).then(
 		(res) => {
-			console.log(res.data)
-			setAmount(res.data.amount)
-			setIban(res.data.iban)
+			console.log(res.data);
+			setAmount(res.data.amount);
+			setIban(res.data.iban);
 		},
 		(error) => {
-			console.log(error)
+			console.log(error.response.data.message);
+			setIban(error.response.data.message);
 		}
 	);
 };
 export const getDeposit = async (setAmount, setIban) => {
 	await axios.get("api/deposit/", config).then(
 		(res) => {
-			console.log(res.data)
-			setAmount(res.data.amount)
-			setIban(res.data.iban)
+			console.log(res.data);
+			setAmount(res.data.amount);
+			setIban(res.data.iban);
 		},
 		(error) => {
-			console.log(error)
+			console.log(error.response.data.message);
+			setIban(error.response.data.message);
 		}
 	);
 };
 export const getCredit = async (setAmount, setIban) => {
 	await axios.get("api/credit/", config).then(
 		(res) => {
-			console.log(res.data)
-			setAmount(res.data.amount)
-			setIban(res.data.iban)
+			console.log(res.data);
+			setAmount(res.data.amount);
+			setIban(res.data.iban);
 		},
 		(error) => {
-			console.log(error)
+			console.log(error.response.data.message);
+			setIban(error.response.data.message);
 		}
 	);
 };
 export const getWallet = async (setAmount, setIban) => {
 	await axios.get("api/wallet/", config).then(
 		(res) => {
-			console.log(res.data)
-			setAmount(res.data.amount)
-			setIban(res.data.iban)
+			console.log(res.data);
+			setAmount(res.data.amount);
+			setIban(res.data.iban);
 		},
 		(error) => {
-			console.log(error)
+			console.log(error.response.data.message);
+			setIban(error.response.data.message);
 		}
 	);
 };
-
-
