@@ -38,7 +38,7 @@ namespace VitoshaBank.Services.BankAccountService
                 if (bankAccountExists != null)
                 {
                     bankAccountResponseModel.IBAN = bankAccountExists.Iban;
-                    bankAccountResponseModel.Amount = bankAccountExists.Amount;
+                    bankAccountResponseModel.Amount = Math.Round(bankAccountExists.Amount,2);
                     return StatusCode(200, bankAccountResponseModel);
                 }
             }
