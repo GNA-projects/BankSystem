@@ -37,7 +37,7 @@ namespace VitoshaBank.Services.DepositService
                 if (depositExists != null)
                 {
                     depositResponseModel.IBAN = depositExists.Iban;
-                    depositResponseModel.Amount = depositExists.Amount;
+                    depositResponseModel.Amount = Math.Round(depositExists.Amount,2);
                     depositResponseModel.PaymentDate = depositExists.PaymentDate;
                     return StatusCode(200, depositResponseModel);
                 }

@@ -17,7 +17,7 @@ using VitoshaBank.Services.Interfaces.WalletService;
 namespace VitoshaBank.Controllers
 {
     [ApiController]
-    [Route("api/wallets")]
+    [Route("api/wallet")]
     public class WalletsController : ControllerBase
     {
         private readonly BankSystemContext _context;
