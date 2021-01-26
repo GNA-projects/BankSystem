@@ -43,7 +43,7 @@ namespace VitoshaBank.Controllers
             return await _userService.GetAllUsers(currentUser, _context, _responseMessage);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{username}")]
         [Authorize]
         public async Task<ActionResult<Users>> GetUser(int id)
         {
