@@ -50,14 +50,8 @@ namespace VitoshaBank.Controllers
             return await _bankAccountService.GetBankAccountInfo(currentUser, username, _context, _messageModel);
         }
 
-        [HttpPost("create")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> CreateBankAccount(BankAccountRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount,_IBAN, _context, _debitCardService, _messageModel);
-        }
-        [HttpPut("deposit")]
+
+        [HttpPut("fromdeposit")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> DepositInBankAcc(BankAccountRequestModel requestModel)
         {
@@ -86,12 +80,6 @@ namespace VitoshaBank.Controllers
             return await _bankAccountService.Withdraw(requestModel.BankAccount, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
-        [HttpDelete("delete")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> DeleteBankAccount(BankAccountRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context, _messageModel);
-        }
+
     }
 }

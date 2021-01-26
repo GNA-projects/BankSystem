@@ -110,12 +110,14 @@ namespace VitoshaBank.Services.BankAccountService
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
             BankAccounts bankAccounts = null;
+            Deposits depositsExist = null; 
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    depositsExist = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -128,6 +130,7 @@ namespace VitoshaBank.Services.BankAccountService
                     if (ValidateDepositAmountBankAccount(amount))
                     {
                         bankAccounts.Amount = bankAccounts.Amount + amount;
+                        depositsExist.Amount = depositsExist.Amount - amount;
                         await _context.SaveChangesAsync();
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccounts.Iban;
@@ -200,7 +203,55 @@ namespace VitoshaBank.Services.BankAccountService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
+        public async Task<ActionResult<MessageModel>> AddMoney(BankAccounts bankAccount,ClaimsPrincipal currentUser,string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        {
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
+            BankAccounts bankAccountExists = null;
+            string role = "";
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+            if (role == "Admin")
+            {
+                
+                if (userAuthenticate != null)
+                {
+                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+                else
+                {
+                    messageModel.Message = "User not found!";
+                    return StatusCode(404, messageModel);
+                }
+
+                if (bankAccountExists != null)
+                {
+                    if (ValidateDepositAmountBankAccount(amount))
+                    {
+                        bankAccountExists.Amount = bankAccountExists.Amount + amount;
+                        await _context.SaveChangesAsync();
+                        Transactions transactions = new Transactions();
+                        transactions.RecieverAccountInfo = bankAccountExists.Iban;
+                        transactions.SenderAccountInfo = "User in Bank";
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "UserinBank", "BankAccount", "Depositing money from bank office", _context, messageModel);
+                        messageModel.Message = "Money deposited succesfully!";
+                        return StatusCode(200, messageModel);
+                    }
+                    messageModel.Message = "Invalid deposit amount!";
+                    return StatusCode(400, messageModel);
+                }
+                else
+                {
+                    messageModel.Message = "BankAccount not found";
+                    return StatusCode(404, messageModel);
+                }
+            }
+            messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, messageModel);
+        }
         public async Task<ActionResult<MessageModel>> Withdraw(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
