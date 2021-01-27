@@ -38,7 +38,7 @@ namespace VitoshaBank.Services.BankAccountService
                 if (bankAccountExists != null)
                 {
                     bankAccountResponseModel.IBAN = bankAccountExists.Iban;
-                    bankAccountResponseModel.Amount = Math.Round(bankAccountExists.Amount,2);
+                    bankAccountResponseModel.Amount = Math.Round(bankAccountExists.Amount, 2);
                     return StatusCode(200, bankAccountResponseModel);
                 }
             }
@@ -110,7 +110,7 @@ namespace VitoshaBank.Services.BankAccountService
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
             BankAccounts bankAccounts = null;
-            Deposits depositsExist = null; 
+            Deposits depositsExist = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -125,7 +125,7 @@ namespace VitoshaBank.Services.BankAccountService
                     return StatusCode(404, messageModel);
                 }
 
-                if (bankAccounts != null)
+                if (bankAccounts != null && depositsExist != null)
                 {
                     if (ValidateDepositAmountBankAccount(amount))
                     {
@@ -134,8 +134,8 @@ namespace VitoshaBank.Services.BankAccountService
                         await _context.SaveChangesAsync();
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccounts.Iban;
-                        transactions.SenderAccountInfo = "User in Bank";
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "UserinBank", "BankAccount", "Depositing money from bank office", _context, messageModel);
+                        transactions.SenderAccountInfo = depositsExist.Iban;
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, $"{userAuthenticate.FirstName} {userAuthenticate.LastName}", "BankAccount", "Depositing money Deposit Account to Bank Account", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -203,7 +203,7 @@ namespace VitoshaBank.Services.BankAccountService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> AddMoney(BankAccounts bankAccount,ClaimsPrincipal currentUser,string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -216,7 +216,7 @@ namespace VitoshaBank.Services.BankAccountService
             }
             if (role == "Admin")
             {
-                
+
                 if (userAuthenticate != null)
                 {
                     bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
@@ -236,7 +236,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccountExists.Iban;
                         transactions.SenderAccountInfo = "User in Bank";
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "UserinBank", "BankAccount", "Depositing money from bank office", _context, messageModel);
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, $"{userAuthenticate.FirstName} {userAuthenticate.LastName}", "BankAccount", "Depositing money in Bank Account", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -338,30 +338,28 @@ namespace VitoshaBank.Services.BankAccountService
                     messageModel.Message = "User not found!";
                     return StatusCode(404, messageModel);
                 }
-                else if (bankAccountExists == null)
+                if (bankAccountExists == null)
                 {
                     messageModel.Message = "User doesn't have a bank account!";
                     return StatusCode(400, messageModel);
                 }
-                else if (cardExists == null)
+                if (cardExists != null)
                 {
-                    messageModel.Message = "No debit card found!";
-                    return StatusCode(400, messageModel);
+                    _context.Cards.Remove(cardExists);
                 }
-                else if (creditExists != null)
+                if (creditExists != null)
                 {
                     messageModel.Message = "You can't delete bank account if you have an existing credit!";
                     return StatusCode(406, messageModel);
                 }
-                else
-                {
-                    _context.Cards.Remove(cardExists);
-                    _context.BankAccounts.Remove(bankAccountExists);
-                    await _context.SaveChangesAsync();
 
-                    messageModel.Message = $"Succsesfully deleted {user.Username} bank account and debit card!";
-                    return StatusCode(200, messageModel);
-                }
+                
+                _context.BankAccounts.Remove(bankAccountExists);
+                await _context.SaveChangesAsync();
+
+                messageModel.Message = $"Succsesfully deleted {user.Username} bank account and debit card!";
+                return StatusCode(200, messageModel);
+
             }
             else
             {
@@ -386,7 +384,6 @@ namespace VitoshaBank.Services.BankAccountService
 
             return false;
         }
-
         private bool ValidateMinAmount(BankAccounts bankAccounts, decimal amount)
         {
             if (amount >= 10 && amount <= bankAccounts.Amount)

@@ -43,14 +43,6 @@ namespace VitoshaBank.Controllers
             return await _walletService.GetWalletInfo(currentUser, username, _context, _messageModel);
         }
 
-        [HttpPost("create")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> CreateWallet(WalletRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _context, _messageModel);
-        }
-
         [HttpPut("deposit")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> DepositInWallet(WalletRequestModel requestModel)
@@ -71,12 +63,6 @@ namespace VitoshaBank.Controllers
             return await _walletService.SimulatePurchase(requestModel.Wallet, requestModel.Product, currentUser, username, requestModel.Amount, _context, _messageModel);
         }
 
-        [HttpDelete("delete")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> DeleteWallet(WalletRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _walletService.DeleteWallet(currentUser, requestModel.Username, _context, _messageModel);
-        }
+
     }
 }

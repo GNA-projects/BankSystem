@@ -285,7 +285,7 @@ namespace VitoshaBank.Services.CreditService
                 await _context.SaveChangesAsync();
 
                 _messageModel.Message = "Credit deleted successfully!";
-                return StatusCode(200);
+                return StatusCode(200, _messageModel);
             }
             else
             {

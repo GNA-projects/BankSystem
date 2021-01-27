@@ -76,12 +76,6 @@ namespace VitoshaBank.Controllers
             return await _debitCardService.Withdraw(requestModel.Card.CardNumber, _bankaccService, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
-        [HttpDelete("delete")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> DeleteDebitCard(DebitCardRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _debitCardService.DeleteDebitCard(currentUser, requestModel.Username, _context, _messageModel);
-        }
+
     }
 }

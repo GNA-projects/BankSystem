@@ -50,22 +50,6 @@ namespace VitoshaBank.Controllers
             return await _creditService.GetCreditInfo(currentUser, username, _context,  _messageModel);
         }
 
-        [HttpPost("create")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> CreateCredit(CreditRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, requestModel.Period, _IBAN, _context,  _messageModel);
-        }
-
-        [HttpDelete("delete")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> DeleteCredit(CreditRequestModel requestModel)
-        {
-            var currentUser = HttpContext.User;
-            return await _creditService.DeleteCredit(currentUser, requestModel.Username, _context,  _messageModel);
-        }
-
         [HttpPut("purchase")]
         [Authorize]
 

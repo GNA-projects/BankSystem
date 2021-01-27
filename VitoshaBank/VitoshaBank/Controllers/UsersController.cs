@@ -43,13 +43,6 @@ namespace VitoshaBank.Controllers
             return await _userService.GetAllUsers(currentUser, _context, _responseMessage);
         }
 
-        [HttpGet("{username}")]
-        [Authorize]
-        public async Task<ActionResult<Users>> GetUser(int id)
-        {
-            var currentUser = HttpContext.User;
-            return await _userService.GetUser(currentUser, id, _context, _responseMessage);
-        }
 
         [HttpPost("create")]
         [Authorize]
@@ -75,13 +68,5 @@ namespace VitoshaBank.Controllers
             return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt, _responseMessage);
         }
         
-        [HttpDelete("delete")]
-        [Authorize]
-        public async Task<ActionResult<MessageModel>> DeleteUser(UserRequestModel requestModel)
-        {
-            //username = "";
-            var currentUser = HttpContext.User;
-            return await _userService.DeleteUser(currentUser, requestModel.Username, _context, _responseMessage);
-        }
     }
 }

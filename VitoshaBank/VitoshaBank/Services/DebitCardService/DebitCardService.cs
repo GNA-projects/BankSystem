@@ -41,6 +41,14 @@ namespace VitoshaBank.Services.DebitCardService
                 if (debitCardExists != null)
                 {
                     debitCardResponseModel.CardNumber = debitCardExists.CardNumber;
+                    if (debitCardResponseModel.CardNumber.StartsWith('5'))
+                    {
+                        debitCardResponseModel.CardBrand = "Master Card";
+                    }
+                    else
+                    {
+                        debitCardResponseModel.CardBrand = "Visa";
+                    }
 
                     return StatusCode(200, debitCardResponseModel);
                 }
@@ -67,19 +75,21 @@ namespace VitoshaBank.Services.DebitCardService
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 Cards cardExists = null;
+                BankAccounts bankAccountExists = null;
 
                 if (userAuthenticate != null)
                 {
                     cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == bankAccount.Iban);
                 }
 
 
-                if (cardExists == null)
+                if (cardExists == null && bankAccountExists != null)
                 {
                     if (ValidateUser(userAuthenticate))
                     {
                         card.UserId = userAuthenticate.Id;
-                        card.BankAccountId = bankAccount.Id;
+                        card.BankAccountId = bankAccountExists.Id;
                         _context.Add(card);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = "DebitCard created succesfully!";
