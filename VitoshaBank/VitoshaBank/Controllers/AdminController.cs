@@ -78,10 +78,10 @@ namespace VitoshaBank.Controllers
         }
         [HttpGet("get/user/{username}")]
         [Authorize]
-        public async Task<ActionResult<Users>> GetUser(int id)
+        public async Task<ActionResult<Users>> GetUser(string username)
         {
             var currentUser = HttpContext.User;
-            return await _userService.GetUser(currentUser, id, _context, _messageModel);
+            return await _userService.GetUser(currentUser, username, _context, _messageModel);
         }
         [HttpDelete("delete/user")]
         [Authorize]

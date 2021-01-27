@@ -67,7 +67,7 @@ namespace VitoshaBank.Controllers
             //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _creditService.DepositMoney(requestModel.Credit, currentUser, username, requestModel.Amount, _context, _transactionService, _messageModel);
+            return await _creditService.AddMoney(requestModel.Credit, currentUser, username, requestModel.Amount, _context, _transactionService, _messageModel);
         }
         [HttpPut("withdraw")]
         [Authorize]

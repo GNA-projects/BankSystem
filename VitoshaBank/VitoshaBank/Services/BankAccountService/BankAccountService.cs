@@ -48,7 +48,7 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
 
-            messageModel.Message = "You don't have a bank account!";
+            messageModel.Message = "You don't have a Bank Account!";
             return StatusCode(400, messageModel);
         }
         public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
@@ -96,7 +96,7 @@ namespace VitoshaBank.Services.BankAccountService
                         return StatusCode(400, messageModel);
                     }
                 }
-                messageModel.Message = "BankAccount already exists!";
+                messageModel.Message = "User already has a Bank Account!";
                 return StatusCode(400, messageModel);
             }
             else
@@ -135,7 +135,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccounts.Iban;
                         transactions.SenderAccountInfo = depositsExist.Iban;
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, $"{userAuthenticate.FirstName} {userAuthenticate.LastName}", "BankAccount", "Depositing money Deposit Account to Bank Account", _context, messageModel);
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "Depositing money Deposit Account - Bank Account", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -144,7 +144,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    messageModel.Message = "BankAccount not found";
+                    messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
             }
@@ -177,7 +177,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = bankAccount.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(currentUser, amount, transactions, "BankAccount", reciever, $"Purchasing {product}", _context, _messageModel);
+                        await _transaction.CreateTransaction(currentUser, amount, transactions, $"Purchasing {product} with Bank Account", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, _messageModel);
@@ -196,7 +196,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    _messageModel.Message = "BankAccount not found";
+                    _messageModel.Message = "Bank Account not found";
                     return StatusCode(404, _messageModel);
                 }
             }
@@ -234,10 +234,10 @@ namespace VitoshaBank.Services.BankAccountService
                         bankAccountExists.Amount = bankAccountExists.Amount + amount;
                         await _context.SaveChangesAsync();
                         Transactions transactions = new Transactions();
+                        transactions.SenderAccountInfo = $"User {userAuthenticate.FirstName} {userAuthenticate.LastName}";
                         transactions.RecieverAccountInfo = bankAccountExists.Iban;
-                        transactions.SenderAccountInfo = "User in Bank";
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, $"{userAuthenticate.FirstName} {userAuthenticate.LastName}", "BankAccount", "Depositing money in Bank Account", _context, messageModel);
-                        messageModel.Message = "Money deposited succesfully!";
+                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "Depositing money in Bank Account", _context, messageModel);
+                        messageModel.Message = $"Succesfully deposited {amount} leva in Bank Account.";
                         return StatusCode(200, messageModel);
                     }
                     messageModel.Message = "Invalid deposit amount!";
@@ -245,7 +245,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    messageModel.Message = "BankAccount not found";
+                    messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
             }
@@ -278,9 +278,9 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = bankAccount.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(currentUser, amount, transactions, "BankAccount", reciever, $"Withdrawing {amount} lv", _context, _messageModel);
+                        await _transaction.CreateTransaction(currentUser, amount, transactions, $"Withdrawing {amount} leva", _context, _messageModel);
                         await _context.SaveChangesAsync();
-                        _messageModel.Message = $"Succesfully withdrawed {amount} lv.";
+                        _messageModel.Message = $"Succesfully withdrawed {amount} leva.";
                         return StatusCode(200, _messageModel);
                     }
                     else if (ValidateDepositAmountBankAccount(amount) == false)
@@ -295,7 +295,7 @@ namespace VitoshaBank.Services.BankAccountService
                     }
                     else if (ValidateMinAmount(bankAccounts, amount) == false)
                     {
-                        _messageModel.Message = "Min amount is 10 lv!";
+                        _messageModel.Message = "Min amount is 10 leva!";
                         return StatusCode(406, _messageModel);
                     }
 
@@ -357,7 +357,7 @@ namespace VitoshaBank.Services.BankAccountService
                 _context.BankAccounts.Remove(bankAccountExists);
                 await _context.SaveChangesAsync();
 
-                messageModel.Message = $"Succsesfully deleted {user.Username} bank account and debit card!";
+                messageModel.Message = $"Succsesfully deleted {user.Username} Bank Account and Debit Card!";
                 return StatusCode(200, messageModel);
 
             }

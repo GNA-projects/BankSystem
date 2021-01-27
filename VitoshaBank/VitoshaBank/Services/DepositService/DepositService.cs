@@ -48,7 +48,7 @@ namespace VitoshaBank.Services.DepositService
                 return StatusCode(403, _messageModel);
             }
 
-            _messageModel.Message = "You don't have a deposit!";
+            _messageModel.Message = "You don't have a Deposit!";
             return StatusCode(400, _messageModel);
         }
         public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
@@ -100,12 +100,12 @@ namespace VitoshaBank.Services.DepositService
                     }
                     else if (ValidateDeposits(deposits) == false)
                     {
-                        _messageModel.Message = "Don't put negative value!";
+                        _messageModel.Message = "Invalid payment amount!";
                         return StatusCode(400, _messageModel);
                     }
                 }
 
-                _messageModel.Message = "User already has deposit!";
+                _messageModel.Message = "User already has Deposit!";
                 return StatusCode(400, _messageModel);
             }
             else
@@ -114,7 +114,7 @@ namespace VitoshaBank.Services.DepositService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> DepositMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
 
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -136,7 +136,7 @@ namespace VitoshaBank.Services.DepositService
                 if (depositsExists != null)
                 {
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(depositsExists,currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
+                    return await ValidateDepositAmountAndBankAccount(userAuthenticate, depositsExists,currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
                 }
                 else
                 {
@@ -149,11 +149,11 @@ namespace VitoshaBank.Services.DepositService
             return StatusCode(403, _messageModel);
         }
 
-        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Users userAuthenticate, Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
             if (amount < 0)
             {
-                _messageModel.Message = "Don't put negative amount!";
+                _messageModel.Message = "Invalid payment amount!";
                 return StatusCode(400, _messageModel);
             }
             else if (amount == 0)
@@ -169,20 +169,20 @@ namespace VitoshaBank.Services.DepositService
                     depositsExists.PaymentDate = DateTime.Now.AddMonths(6);
                     bankAccounts.Amount = bankAccounts.Amount - amount;
                     Transactions transaction = new Transactions();
+                    transaction.SenderAccountInfo = $"User {userAuthenticate.FirstName} {userAuthenticate.LastName}";
                     transaction.RecieverAccountInfo = depositsExists.Iban;
-                    transaction.SenderAccountInfo = "User in Bank office";
                     await _context.SaveChangesAsync();
-                    await _transactionService.CreateTransaction(currentUser, amount, transaction, transaction.SenderAccountInfo, "Deposit", "Deposit", _context, _messageModel);
+                    await _transactionService.CreateTransaction(currentUser, amount, transaction, "Added money - Bank Account - Deposit account", _context, _messageModel);
                     
                 }
                 else if (bankAccounts.Amount < amount)
                 {
-                    _messageModel.Message = "You don't have enough money in bank account!";
+                    _messageModel.Message = "You don't have enough money in Bank Account!";
                     return StatusCode(406, _messageModel);
                 }
                 else if (bankAccounts == null)
                 {
-                    _messageModel.Message = "You don't have a bank account";
+                    _messageModel.Message = "You don't have a Bank Account";
                     return StatusCode(400, _messageModel);
                 }
             }
@@ -217,14 +217,14 @@ namespace VitoshaBank.Services.DepositService
                 }
                 else if (depositsExists == null)
                 {
-                    _messageModel.Message = "User doesn't have a deposit";
+                    _messageModel.Message = "User doesn't have a Deposit";
                     return StatusCode(400, _messageModel);
                 }
 
                 _context.Deposits.Remove(depositsExists);
                 await _context.SaveChangesAsync();
 
-                _messageModel.Message = $"Succsesfully deleted {user.Username} deposit!";
+                _messageModel.Message = $"Succsesfully deleted {user.Username} Deposit!";
                 return StatusCode(200, _messageModel);
             }
             else

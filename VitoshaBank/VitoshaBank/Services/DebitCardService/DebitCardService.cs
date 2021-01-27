@@ -58,7 +58,7 @@ namespace VitoshaBank.Services.DebitCardService
                 _messageModel.Message = "You are not authorized to do such actions";
                 return StatusCode(403, _messageModel);
             }
-            _messageModel.Message = "You don't have a debit card!!";
+            _messageModel.Message = "You don't have a Debit Card!!";
             return StatusCode(400, _messageModel);
         }
         public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card, MessageModel _messageModel)
@@ -92,7 +92,7 @@ namespace VitoshaBank.Services.DebitCardService
                         card.BankAccountId = bankAccountExists.Id;
                         _context.Add(card);
                         await _context.SaveChangesAsync();
-                        _messageModel.Message = "DebitCard created succesfully!";
+                        _messageModel.Message = "Debit Card created succesfully!";
                         return StatusCode(200, _messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
@@ -102,7 +102,7 @@ namespace VitoshaBank.Services.DebitCardService
                     }
                 }
 
-                _messageModel.Message = "User already has a DebitCard!";
+                _messageModel.Message = "User already has a Debit Card!";
                 return StatusCode(400, _messageModel);
             }
             else
@@ -112,7 +112,7 @@ namespace VitoshaBank.Services.DebitCardService
             }
         }
 
-        public async Task<ActionResult<MessageModel>> DepositMoney(string cardNumber, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -124,7 +124,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
                 }
                 else
                 {
@@ -136,19 +136,19 @@ namespace VitoshaBank.Services.DebitCardService
                 {
                     if (cards.CardExiprationDate < DateTime.Now)
                     {
-                        messageModel.Message = "DebitCard is expired";
+                        messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
-                    await _bankaccService.DepositMoney(bankAccounts, currentUser, username, amount, _context,_transactionService, messageModel);
+                    await _bankaccService.AddMoney(bankAccounts, currentUser, username, amount, _context,_transactionService, messageModel);
                 }
                 else if (bankAccounts == null)
                 {
-                    messageModel.Message = "BankAccount not found";
+                    messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
                 else if (cards == null)
                 {
-                    messageModel.Message = "DebitCard not found";
+                    messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);
                 }
                 
@@ -157,7 +157,7 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber,string CVV, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -169,7 +169,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
                 }
                 else
                 {
@@ -181,19 +181,19 @@ namespace VitoshaBank.Services.DebitCardService
                 {
                     if (cards.CardExiprationDate < DateTime.Now)
                     {
-                        messageModel.Message = "DebitCard is expired";
+                        messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
                     await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context,_transactionService, messageModel);
                 }
                 else if(bankAccounts == null)
                 {
-                    messageModel.Message = "BankAccount not found";
+                    messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
                 else if (cards == null)
                 {
-                    messageModel.Message = "DebitCard not found";
+                    messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);
                 }
             }
@@ -202,7 +202,7 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -214,7 +214,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
                 }
                 else
                 {
@@ -226,19 +226,19 @@ namespace VitoshaBank.Services.DebitCardService
                 {
                     if (cards.CardExiprationDate < DateTime.Now)
                     {
-                        messageModel.Message = "DebitCard is expired";
+                        messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
                     await _bankaccService.Withdraw(bankAccounts, currentUser, username, amount, reciever, _context, _transactionService, messageModel);
                 }
                 else if (bankAccounts == null)
                 {
-                    messageModel.Message = "BankAccount not found";
+                    messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
                 else if (cards == null)
                 {
-                    messageModel.Message = "DebitCard not found";
+                    messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);
                 }
             }
@@ -273,14 +273,14 @@ namespace VitoshaBank.Services.DebitCardService
                 }
                 else if (cardExists == null)
                 {
-                    _messageModel.Message = "User doesn't have a DebitCard!";
+                    _messageModel.Message = "User doesn't have a Debit Card!";
                     return StatusCode(400, _messageModel);
                 }
 
                 _context.Cards.Remove(cardExists);
                 await _context.SaveChangesAsync();
 
-                _messageModel.Message = "DebitCard deleted succesfully!";
+                _messageModel.Message = $"Succsesfully deleted {user.Username} Debit Card!";
                 return StatusCode(200, _messageModel);
             }
             else

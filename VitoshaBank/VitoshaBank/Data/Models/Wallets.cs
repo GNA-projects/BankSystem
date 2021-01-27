@@ -13,7 +13,7 @@ namespace VitoshaBank.Data.Models
         public decimal Amount { get; set; } = defaultAmount;
         public string CardNumber { get; set; } = GenerateCardInfo.GenerateNumber(15);
         public string Cvv { get; set; } = GenerateCardInfo.GenerateCVV(3);
-        public DateTime CardExipirationDate { get; set; }
+        public DateTime CardExipirationDate { get; set; } = DateTime.Now.AddMonths(60);
 
         public virtual Users User { get; set; }
     }

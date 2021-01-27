@@ -53,7 +53,7 @@ namespace VitoshaBank.Controllers
         {
             //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
             var currentUser = HttpContext.User;
-            return await _depositService.DepositMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
+            return await _depositService.AddMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
         } 
 
 

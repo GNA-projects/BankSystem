@@ -15,29 +15,29 @@ namespace VitoshaBank.Services.TransactionService
 {
     public class TransactionsService : ControllerBase, ITransactionService
     {
-        public async Task<ActionResult> CreateTransaction(ClaimsPrincipal currentUser, decimal amount, Transactions transaction, string senderType, string recieverType, string reason, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult> CreateTransaction(ClaimsPrincipal currentUser, decimal amount, Transactions transaction, string reason, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
-                object senderAcc = null;
-                object recieverAcc = null;
                 TransactionResponseModel sender = new TransactionResponseModel();
                 TransactionResponseModel reciever = new TransactionResponseModel();
                 if (transaction.SenderAccountInfo.Contains("BG18VITB") && transaction.SenderAccountInfo.Length == 23)
                 {
                     sender.IsIBAN = true;
                     sender.SenderInfo = transaction.SenderAccountInfo;
+                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
+
                     if (transaction.RecieverAccountInfo.Contains("BG18VITB") && transaction.RecieverAccountInfo.Length == 23)
                     {
                         reciever.IsIBAN = true;
+                        reciever.ReciverInfo = transaction.RecieverAccountInfo;
                     }
-
                 }
                 else if (transaction.RecieverAccountInfo.Contains("BG18VITB") && transaction.RecieverAccountInfo.Length == 23)
                 {
                     reciever.IsIBAN = true;
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
                     sender.SenderInfo = transaction.SenderAccountInfo;
+                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
                 }
                 else
                 {
@@ -47,64 +47,7 @@ namespace VitoshaBank.Services.TransactionService
                 //bad request
                 if (sender.IsIBAN && reciever.IsIBAN)
                 {
-                    //Bank Transfer
-                    if (senderType == "BankAccount")
-                    {
-                        senderAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == sender.SenderInfo);
-                        if (recieverType == "BankAccount")
-                        {
-                            recieverAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                        }
-                        else if (recieverType == "Deposit")
-                        {
-                            recieverAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                        }
-                        else if (recieverType == "Wallet")
-                        {
-                            recieverAcc = await _context.Wallets.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                        }
-                        else if (recieverType == "Credit")
-                        {
-                            recieverAcc = await _context.Credits.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                        }
-                        else
-                        {
-                            //invalid
-                        }
-                        reciever.ReciverInfo = transaction.RecieverAccountInfo;
-                        transaction.Reason = reason;
-                        transaction.SenderAccountInfo = sender.SenderInfo;
-                        transaction.RecieverAccountInfo = reciever.ReciverInfo;
-                        transaction.Date = DateTime.Now;
-                        transaction.TransactionAmount = amount;
-                        _context.Add(transaction);
-                        await _context.SaveChangesAsync();
-                        _messageModel.Message = "Money send successfully!";
-                        return StatusCode(200, _messageModel);
-                    }
-                    else if (senderType == "Deposit")
-                    {
-                        senderAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == sender.SenderInfo);
-                        if (recieverType == "BankAccount")
-                        {
-                            recieverAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                        }
-                        else
-                        {
-                            _messageModel.Message = "Invalid arguments!";
-                            return StatusCode(400, _messageModel);
-                        }
-                    }
-                    else
-                    {
-                        _messageModel.Message = "Invalid arguments!";
-                        return StatusCode(400, _messageModel);
-                    }
-
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
                     transaction.Reason = reason;
-                    transaction.SenderAccountInfo = sender.SenderInfo;
-                    transaction.RecieverAccountInfo = reciever.ReciverInfo;
                     transaction.Date = DateTime.Now;
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
@@ -114,28 +57,7 @@ namespace VitoshaBank.Services.TransactionService
                 }
                 else if (sender.IsIBAN && !reciever.IsIBAN)
                 {
-                    //Purchase
-                    if (senderType == "BankAccount")
-                    {
-                        senderAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == sender.SenderInfo);
-                    }
-                    else if (senderType == "Wallet")
-                    {
-                        senderAcc = await _context.Wallets.FirstOrDefaultAsync(x => x.Iban == sender.SenderInfo);
-                    }
-                    else if (senderType == "Credit")
-                    {
-                        senderAcc = await _context.Credits.FirstOrDefaultAsync(x => x.Iban == sender.SenderInfo);
-                    }
-                    else
-                    {
-                        _messageModel.Message = "Invalid arguments!";
-                        return StatusCode(400, _messageModel);
-                    }
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
                     transaction.Reason = reason;
-                    transaction.SenderAccountInfo = sender.SenderInfo;
-                    transaction.RecieverAccountInfo = reciever.ReciverInfo;
                     transaction.Date = DateTime.Now;
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
@@ -145,24 +67,7 @@ namespace VitoshaBank.Services.TransactionService
                 }
                 else if (!sender.IsIBAN && reciever.IsIBAN)
                 {
-                    //zaplata
-                    if (recieverType == "BankAccount")
-                    {
-                        recieverAcc = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                    }
-                    else if (recieverType == "Deposit")
-                    {
-                        recieverAcc = await _context.Deposits.FirstOrDefaultAsync(x => x.Iban == reciever.ReciverInfo);
-                    }
-                    else
-                    {
-                        _messageModel.Message = "Invalid arguments!";
-                        return StatusCode(400, _messageModel);
-                    }
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
                     transaction.Reason = reason;
-                    transaction.SenderAccountInfo = sender.SenderInfo;
-                    transaction.RecieverAccountInfo = reciever.ReciverInfo;
                     transaction.Date = DateTime.Now;
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
@@ -171,10 +76,12 @@ namespace VitoshaBank.Services.TransactionService
                     return StatusCode(200, _messageModel);
                 }
             }
+
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
 
         }
+
         public async Task<ActionResult<GetTransactionsResponseModel>> GetTransactionInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))

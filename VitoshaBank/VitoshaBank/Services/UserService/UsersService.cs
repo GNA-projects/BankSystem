@@ -39,7 +39,7 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
-        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, int id, BankSystemContext _context, MessageModel responseMessage)
+        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
 
@@ -51,7 +51,7 @@ namespace VitoshaBank.Services.UserService
 
             if (role == "Admin")
             {
-                var user = await _context.Users.FindAsync(id);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
                 if (user == null)
                 {

@@ -13,6 +13,7 @@ using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces.WalletService;
+using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
@@ -24,13 +25,15 @@ namespace VitoshaBank.Controllers
         private readonly ILogger<Wallets> _logger;
         private readonly IWalletsService _walletService;
         private readonly IIBANGeneratorService _IBAN;
+        private readonly ITransactionService _transaction;
         private readonly MessageModel _messageModel;
-        public WalletsController(BankSystemContext context, ILogger<Wallets> logger, IWalletsService walletService, IIBANGeneratorService IBAN)
+        public WalletsController(BankSystemContext context, ILogger<Wallets> logger, IWalletsService walletService, IIBANGeneratorService IBAN, ITransactionService transaction)
         {
             _context = context;
             _logger = logger;
             _walletService = walletService;
             _IBAN = IBAN;
+            _transaction = transaction;
             _messageModel = new MessageModel();
         }
 
@@ -50,7 +53,7 @@ namespace VitoshaBank.Controllers
             //amount = 0.50M;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.DepositMoney(requestModel.Wallet, currentUser, username, requestModel.Amount, _context, _messageModel);
+            return await _walletService.AddMoney(requestModel.Wallet, currentUser, username, requestModel.Amount, _context, _transaction, _messageModel);
         }
 
         [HttpPut("purchase")]
@@ -60,7 +63,7 @@ namespace VitoshaBank.Controllers
             //amount = 10000;
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _walletService.SimulatePurchase(requestModel.Wallet, requestModel.Product, currentUser, username, requestModel.Amount, _context, _messageModel);
+            return await _walletService.SimulatePurchase(requestModel.Wallet, requestModel.Product, requestModel.Reciever, currentUser, username, requestModel.Amount, _context, _transaction, _messageModel);
         }
 
 
