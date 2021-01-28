@@ -54,6 +54,15 @@ namespace VitoshaBank.Controllers
 
         }
 
+
+        [HttpPost("create")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> CreateUser(UserRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context, _messageModel);
+        }
+
         [HttpPost("create/bankaccount")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> CreateBankAccount(BankAccountRequestModel requestModel)
