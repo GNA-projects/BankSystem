@@ -55,7 +55,7 @@ namespace VitoshaBank.Controllers
         }
 
 
-        [HttpPost("create")]
+        [HttpPost("create/user")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> CreateUser(UserRequestModel requestModel)
         {
