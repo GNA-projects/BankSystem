@@ -11,6 +11,10 @@ import Logout from "./components/UserAuth/Logout";
 import Ebanking from './components/Ebanking'
 
 import Admin from './components/Admin'
+import CreateUser from './components/Admin/User/Create'
+import BankAccount from './components/Admin/Account/Create/BankAccount'
+import Credit from './components/Admin/Account/Create/Credit'
+import DebitCard from './components/Admin/Account/Create/DebitCard'
 
 
 function App() {
@@ -23,6 +27,10 @@ function App() {
 				<PrivateRoute exact path="/logout" component={Logout} />
 				<PrivateRoute exact path="/ebanking" component={Ebanking} />
 				<AdminRoute exact path="/admin" component={Admin}/>
+				<AdminRoute exact path="/admin/create/user" component={CreateUser}/>
+				<AdminRoute exact path="/admin/create/baccount" component={BankAccount}/>
+				<AdminRoute exact path="/admin/create/credit" component={Credit}/>
+				<AdminRoute exact path="/admin/create/debit" component={DebitCard}/>
 			</Switch>
 		</Layout>
 	);

@@ -4,32 +4,26 @@ const config = {
 	headers: { Authorization: "Bearer " + sessionStorage["jwt"] },
 };
 
-export const loginUser = async (username, password, setLogged) => {
-	await axios
+export const loginUser = (username, password) => {
+	return axios
 		.post("api/users/login", {
 			user: {
 				username: username,
 				password: password,
 			},
 		})
-		.then(
-			(res) => {
-				sessionStorage["jwt"] = res.data.message;
-				console.log("add token");
-
-				setLogged(true);
-			},
-			(error) => {
-				sessionStorage.removeItem("jwt");
-				console.log(1);
-
-				setLogged(false);
-			}
-		);
+		.then((res) => {
+			sessionStorage["jwt"] = res.data.message;
+			return true;
+		})
+		.catch(() => {
+			sessionStorage.removeItem("jwt");
+			return false;
+		});
 };
 
-export const getBankAccount = async (setAmount, setIban) => {
-	await axios.get("api/bankaccount/", config).then(
+export const getBankAccount = (setAmount, setIban) => {
+	axios.get("api/bankaccount/", config).then(
 		(res) => {
 			console.log(res.data);
 			setAmount(res.data.amount);
@@ -41,8 +35,8 @@ export const getBankAccount = async (setAmount, setIban) => {
 		}
 	);
 };
-export const getDeposit = async (setAmount, setIban) => {
-	await axios.get("api/deposit/", config).then(
+export const getDeposit = (setAmount, setIban) => {
+	axios.get("api/deposit/", config).then(
 		(res) => {
 			console.log(res.data);
 			setAmount(res.data.amount);
@@ -54,8 +48,8 @@ export const getDeposit = async (setAmount, setIban) => {
 		}
 	);
 };
-export const getCredit = async (setAmount, setIban) => {
-	await axios.get("api/credit/", config).then(
+export const getCredit = (setAmount, setIban) => {
+	axios.get("api/credit/", config).then(
 		(res) => {
 			console.log(res.data);
 			setAmount(res.data.amount);
@@ -67,8 +61,8 @@ export const getCredit = async (setAmount, setIban) => {
 		}
 	);
 };
-export const getWallet = async (setAmount, setIban) => {
-	await axios.get("api/wallet/", config).then(
+export const getWallet = (setAmount, setIban) => {
+	axios.get("api/wallet/", config).then(
 		(res) => {
 			console.log(res.data);
 			setAmount(res.data.amount);

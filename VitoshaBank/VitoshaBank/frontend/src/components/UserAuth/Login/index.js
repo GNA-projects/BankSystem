@@ -10,8 +10,9 @@ export default function Login() {
 	const [password, setPassword] = useState();
 	const history = useHistory();
 	const login = async () => {
-		await loginUser(username, password, setLogged);
-		console.log("ask to redirect");
+		const logged = await loginUser(username, password);
+		setLogged(logged)
+		console.log(logged)
 		history.push("/ebanking");
 	};
 	return (

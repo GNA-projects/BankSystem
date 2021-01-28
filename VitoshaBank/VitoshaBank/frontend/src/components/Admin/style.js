@@ -1,13 +1,13 @@
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
+import { InputGroup, BUTTON } from "./InputGroup";
 
 const CONTAINER = styled.div``;
-const HEADING = styled.p``;
-const INPUT = styled.input``;
+
 const LINK = styled.button`
 	display: block;
 	margin: auto;
-    font-size: 16px;
+	font-size: 16px;
 	background-color: teal;
 	padding: 15px 20px;
 	color: white;
@@ -32,3 +32,9 @@ const Link = (props) => {
 	);
 };
 AdminPanel.Link = Link;
+
+export const AdminForm = (props) => (
+	<CONTAINER {...props}>{props.children}</CONTAINER>
+);
+AdminForm.Input = InputGroup;
+AdminForm.Button = BUTTON;

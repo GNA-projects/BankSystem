@@ -12,9 +12,9 @@ export function BAccount() {
 	const history = useHistory();
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
-	useEffect(async () => {
-		await getBankAccount(setAmount, setIban);
-	},[]);
+	useEffect(() => {
+		getBankAccount(setAmount, setIban);
+	}, []);
 	return (
 		<BankAccount onClick={() => history.push("/baccount")}>
 			<BankAccount.Heading>Bank Account</BankAccount.Heading>
@@ -27,9 +27,9 @@ export function Deposit() {
 	const history = useHistory();
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
-	useEffect(async () => {
-		await getDeposit(setAmount, setIban);
-	},[]);
+	useEffect(() => {
+		getDeposit(setAmount, setIban);
+	}, []);
 	return (
 		<BankAccount onClick={() => history.push("/deposit")}>
 			<BankAccount.Heading>Deposit Account</BankAccount.Heading>
@@ -42,9 +42,9 @@ export function Wallet() {
 	const history = useHistory();
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
-	useEffect(async () => {
-		await getWallet(setAmount, setIban);
-	},[]);
+	useEffect(() => {
+		getWallet(setAmount, setIban);
+	}, []);
 	return (
 		<BankAccount onClick={() => history.push("/wallet")}>
 			<BankAccount.Heading>Wallet Account</BankAccount.Heading>
@@ -57,9 +57,9 @@ export function Credit() {
 	const history = useHistory();
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
-	useEffect(async () => {
-		await getCredit(setAmount, setIban);
-	},[]);
+	useEffect(() => {
+		getCredit(setAmount, setIban);
+	}, []);
 	return (
 		<BankAccount onClick={() => history.push("/credit")}>
 			<BankAccount.Heading>Credit Account</BankAccount.Heading>
