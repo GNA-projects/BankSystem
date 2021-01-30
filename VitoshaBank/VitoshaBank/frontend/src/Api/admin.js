@@ -59,14 +59,13 @@ export const createCredit = (uname, amount, period) => {
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));
 };
-export const createDeposit = (uname, amount, period) => {
+export const createDeposit = (uname, period) => {
 	axios
 		.post(
 			"/api/admin/create/deposit",
 			{
 				Deposit: {
-					Amount: amount,
-					TermOfPayment: period
+					TermOfPayment: period,
 				},
 				Username: uname,
 			},

@@ -6,20 +6,15 @@ import { createDeposit } from "../../../../Api/admin";
 export default function CreateDeposit() {
 	const [uname, setUname] = useState();
 	const [period, setPeriod] = useState();
-	const [amount, setAmount] = useState();
 
 	const handleCreate = () => {
-		createDeposit(uname,amount,period);
+		createDeposit(uname, period);
 	};
 	return (
 		<AdminForm>
 			<AdminForm.Input
 				heading="Username"
 				values={{ value: uname, setValue: setUname }}
-			></AdminForm.Input>
-			<AdminForm.Input
-				heading="Amount"
-				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
 			<AdminForm.Input
 				heading="Term of Payment"
