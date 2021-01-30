@@ -12,7 +12,6 @@ export default function Login() {
 	const login = async () => {
 		const logged = await loginUser(username, password);
 		setLogged(logged)
-		console.log(logged)
 		history.push("/ebanking");
 	};
 	return (
