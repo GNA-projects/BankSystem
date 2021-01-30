@@ -14,7 +14,11 @@ import Admin from './components/Admin'
 import CreateUser from './components/Admin/User/Create'
 import BankAccount from './components/Admin/Account/Create/BankAccount'
 import Credit from './components/Admin/Account/Create/Credit'
+import Deposit from './components/Admin/Account/Create/Deposit'
+import Wallet from './components/Admin/Account/Create/Wallet'
 import DebitCard from './components/Admin/Account/Create/DebitCard'
+import DeleteUser from './components/Admin/User/Delete'
+import DeleteAccount from './components/Admin/Account/Delete'
 
 
 function App() {
@@ -30,7 +34,11 @@ function App() {
 				<AdminRoute exact path="/admin/create/user" component={CreateUser}/>
 				<AdminRoute exact path="/admin/create/baccount" component={BankAccount}/>
 				<AdminRoute exact path="/admin/create/credit" component={Credit}/>
+				<AdminRoute exact path="/admin/create/deposit" component={Deposit}/>
+				<AdminRoute exact path="/admin/create/wallet" component={Wallet}/>
 				<AdminRoute exact path="/admin/create/debit" component={DebitCard}/>
+				<AdminRoute exact path="/admin/delete/user" component={DeleteUser}/>
+				<AdminRoute exact path="/admin/delete/account" component={DeleteAccount}/>
 			</Switch>
 		</Layout>
 	);

@@ -8,7 +8,7 @@ const LINK = styled.button`
 	display: block;
 	margin: auto;
 	font-size: 16px;
-	background-color: teal;
+	background-color: ${props => props.red ? "red" : "teal"};
 	padding: 15px 20px;
 	color: white;
 	outline: none;
@@ -16,7 +16,7 @@ const LINK = styled.button`
 	border-radius: 20px;
 	margin-top: 20px;
 	&:hover {
-		background-color: darkcyan;
+		background-color: ${props => props.red ? "rebeccapurple" : "darkcyan"};
 	}
 `;
 

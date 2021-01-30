@@ -1,9 +1,21 @@
-import React from 'react'
+import React from "react";
+import { useState } from "react/cjs/react.development";
+import { AdminForm } from "../../style";
+import { deleteUser } from "../../../../Api/admin";
 
 export default function DeleteUser() {
-    return (
-        <div>
-            delete user
-        </div>
-    )
+	const [uname, setUname] = useState();
+
+	const handleDelete = () => {
+		deleteUser(uname)
+	};
+	return (
+		<AdminForm>
+			<AdminForm.Input
+				heading="Username"
+				values={{ value: uname, setValue: setUname }}
+			></AdminForm.Input>
+			<AdminForm.Button onClick={handleDelete}>Delete User</AdminForm.Button>
+		</AdminForm>
+	);
 }

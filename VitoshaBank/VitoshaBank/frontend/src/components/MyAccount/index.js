@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import { useState } from "react/cjs/react.development";
+import { changePass } from "../../Api/user";
 
 export default function MyAccount() {
-    return (
-        <div>
-            your account
-        </div>
-    )
+	const [pass, setPass] = useState();
+	return (
+		<div>
+			<h1>change pass</h1>
+			<input onChange={(e) => setPass(e.target.value)} value={pass}></input>
+			<button onClick={() => changePass(pass)}>cahnge</button>
+		</div>
+	);
 }

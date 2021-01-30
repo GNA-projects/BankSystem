@@ -1,13 +1,18 @@
 import axios from "axios";
 
-const config = {
-	headers: { Authorization: "Bearer " + sessionStorage["jwt"] },
+const getDelConfig = () => {
+	return { Authorization: "Bearer " + sessionStorage["jwt"] };
+};
+const getConfig = () => {
+	return {
+		headers: { Authorization: "Bearer " + sessionStorage["jwt"] },
+	};
 };
 
 export const createUser = (uname, fname, lname, password, mail, admin) => {
 	axios
 		.post(
-			"api/admin/create/user",
+			"/api/admin/create/user",
 			{
 				user: {
 					Username: uname, //must be > 5 symbols
@@ -18,10 +23,10 @@ export const createUser = (uname, fname, lname, password, mail, admin) => {
 					IsAdmin: admin,
 				},
 			},
-			config
+			getConfig()
 		)
-		.then((res) => console.log(res))
-		.catch((err) => console.log(err));
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
 };
 export const createBankAccount = (uname, amount) => {
 	axios
@@ -33,10 +38,10 @@ export const createBankAccount = (uname, amount) => {
 				},
 				Username: uname,
 			},
-			config
+			getConfig()
 		)
-		.then((res) => console.log(res))
-		.catch((err) => console.log(err));
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
 };
 export const createCredit = (uname, amount, period) => {
 	axios
@@ -49,10 +54,25 @@ export const createCredit = (uname, amount, period) => {
 				Username: uname,
 				Period: period,
 			},
-			config
+			getConfig()
 		)
-		.then((res) => console.log(res))
-		.catch((err) => console.log(err));
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
+export const createDeposit = (uname, period) => {
+	axios
+		.post(
+			"/api/admin/create/deposit",
+			{
+				Deposit: {
+					TermOfPayment: period,
+				},
+				Username: uname,
+			},
+			getConfig()
+		)
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
 };
 export const createDebitCard = (iban) => {
 	axios
@@ -63,8 +83,26 @@ export const createDebitCard = (iban) => {
 					IBAN: iban,
 				},
 			},
-			config
+			getConfig()
 		)
-		.then((res) => console.log(res))
-		.catch((err) => console.log(err));
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
+export const deleteUser = (uname) => {
+	axios
+		.delete("/api/admin/delete/user", {
+			data: { username: uname },
+			headers: getDelConfig(),
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
+export const deleteAccount = (uname, accountType) => {
+	axios
+		.delete(`/api/admin/delete/${accountType}`, {
+			data: { username: uname },
+			headers: getDelConfig(),
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
 };

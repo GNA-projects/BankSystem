@@ -10,7 +10,7 @@ export default function DropdownItem(props) {
 	const [icon, setIcon] = useState();
 	useEffect(() => {
 		evaluateIcon();
-	});
+	}, []);
 	const evaluateIcon = () => {
 		switch (true) {
 			case props.home:
