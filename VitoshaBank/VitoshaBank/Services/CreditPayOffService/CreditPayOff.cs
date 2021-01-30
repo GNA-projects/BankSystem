@@ -5,31 +5,33 @@ using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
+using VitoshaBank.Services.CreditPayOffService.Interfaces;
 
 namespace VitoshaBank.Services.CreditPayOffService
 {
-    public class CreditPayOff : ControllerBase
+    public class CreditPayOff : ControllerBase, ICreditPayOffService
     {
         public async Task<ActionResult<MessageModel>> GetCreditPayOff(Credits credit, MessageModel messageModel, BankSystemContext _context)
         {
-            if (DateTime.Now == credit.PaymentDate)
+            if (DateTime.Now >= credit.PaymentDate)
             {
                 if (credit.Instalment <= credit.Amount)
                 {
                     credit.Amount = credit.Amount - credit.Instalment;
                     credit.CreditAmountLeft = credit.CreditAmountLeft - credit.Instalment;
-                    credit.PaymentDate = DateTime.Now.AddMonths(1);
+                    credit.PaymentDate = credit.PaymentDate.AddMonths(1);
                     await _context.SaveChangesAsync();
                     messageModel.Message = "Credit instalment payed off successfully from Credit Account!";
                     return StatusCode(200, messageModel);
                 }
                 else
                 {
-                    if (credit.Instalment<=credit.User.BankAccounts.Amount)
+                    var bankAccount = _context.BankAccounts.FirstOrDefault(x => x.UserId == credit.UserId);
+                    if (credit.Instalment<= bankAccount.Amount)
                     {
-                        credit.User.BankAccounts.Amount = credit.User.BankAccounts.Amount - credit.Instalment;
+                        bankAccount.Amount = bankAccount.Amount - credit.Instalment;
                         credit.CreditAmountLeft = credit.CreditAmountLeft - credit.Instalment;
-                        credit.PaymentDate = DateTime.Now.AddMonths(1);
+                        credit.PaymentDate = credit.PaymentDate.AddMonths(1);
                         await _context.SaveChangesAsync();
                         messageModel.Message = "Credit instalment payed off successfully from Bank Account!";
                         return StatusCode(200, messageModel);

@@ -114,7 +114,7 @@ namespace VitoshaBank.Services.WalletService
             {
                 if (userAuthenticate != null)
                 {
-                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv);
+                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv && x.CardExipirationDate == wallet.CardExipirationDate);
                 }
                 else
                 {
@@ -152,7 +152,7 @@ namespace VitoshaBank.Services.WalletService
             {
                 if (userAuthenticate != null)
                 {
-                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv);
+                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv && x.CardExipirationDate == wallet.CardExipirationDate);
                 }
                 else
                 {

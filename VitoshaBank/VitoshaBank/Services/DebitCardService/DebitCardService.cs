@@ -112,7 +112,7 @@ namespace VitoshaBank.Services.DebitCardService
             }
         }
 
-        public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, DateTime expireDate, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -124,7 +124,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
                 }
                 else
                 {
@@ -157,7 +157,7 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber,string CVV, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber,string CVV,DateTime expireDate, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -169,7 +169,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
                 }
                 else
                 {
@@ -202,7 +202,7 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
@@ -214,7 +214,7 @@ namespace VitoshaBank.Services.DebitCardService
                 if (userAuthenticate != null)
                 {
                     bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV);
+                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
                 }
                 else
                 {
