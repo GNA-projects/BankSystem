@@ -10,6 +10,7 @@ using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
+using VitoshaBank.Services.GenerateCardInfoService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
@@ -90,6 +91,8 @@ namespace VitoshaBank.Services.DebitCardService
                     {
                         card.UserId = userAuthenticate.Id;
                         card.BankAccountId = bankAccountExists.Id;
+                        card.CardNumber = GenerateCardInfo.GenerateNumber(11);
+                        card.Cvv = GenerateCardInfo.GenerateCVV(3);
                         _context.Add(card);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = "Debit Card created succesfully!";

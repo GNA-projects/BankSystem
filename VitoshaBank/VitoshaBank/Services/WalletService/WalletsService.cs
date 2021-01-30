@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
+using VitoshaBank.Services.GenerateCardInfoService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces.WalletService;
 using VitoshaBank.Services.TransactionService.Interfaces;
@@ -86,6 +87,8 @@ namespace VitoshaBank.Services.WalletService
                     {
                         wallet.UserId = userAuthenticate.Id;
                         wallet.Iban = _IBAN.GenerateIBANInVitoshaBank("Wallet", _context);
+                        wallet.CardNumber = GenerateCardInfo.GenerateNumber(11);
+                        wallet.Cvv = GenerateCardInfo.GenerateCVV(3);
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 
