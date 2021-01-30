@@ -164,17 +164,17 @@ namespace VitoshaBank.Services.UserService
 
             if (user != null)
             {
-                if (user.IsConfirmed == true)
-                {
+               //if (user.IsConfirmed == true)
+                //{
                     var tokenString = GenerateJSONWebToken(user, _config);
                     responseMessage.Message = tokenString;
                     response = StatusCode(200, responseMessage);
-                }
-                else
-                {
-                    responseMessage.Message = "You need to verify your email";
-                    response = StatusCode(400, responseMessage);
-                }
+                //}
+                //else
+                //{
+                //    responseMessage.Message = "You need to verify your email";
+                //    response = StatusCode(400, responseMessage);
+                //}
             }
 
             return response;
