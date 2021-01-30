@@ -132,7 +132,7 @@ namespace VitoshaBank.Services.CreditService
                         Transactions transaction = new Transactions();
                         transaction.SenderAccountInfo = creditExists.Iban;
                         transaction.RecieverAccountInfo = reciever;
-                        await _transactionService.CreateTransaction(currentUser, amount, transaction, $"Purchasing {product}", _context, _messageModel);
+                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transaction, $"Purchasing {product}", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, _messageModel);
@@ -181,7 +181,7 @@ namespace VitoshaBank.Services.CreditService
                 if (creditsExists != null)
                 {
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndCredit(creditsExists,currentUser, amount, bankAccounts, _context,_transaction, _messageModel);
+                    return await ValidateDepositAmountAndCredit(userAuthenticate, creditsExists, currentUser, amount, bankAccounts, _context,_transaction, _messageModel);
                 }
                 else
                 {
@@ -219,7 +219,7 @@ namespace VitoshaBank.Services.CreditService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = credit.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(currentUser, amount, transactions, $"Withdrawing {amount} leva", _context, _messageModel);
+                        await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transactions, $"Withdrawing {amount} leva", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully withdrawed {amount} leva.";
                         return StatusCode(200, _messageModel);
@@ -333,7 +333,7 @@ namespace VitoshaBank.Services.CreditService
             }
             return false;
         }
-        private async Task<ActionResult> ValidateDepositAmountAndCredit(Credits creditExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        private async Task<ActionResult> ValidateDepositAmountAndCredit(Users userAuthenticate, Credits creditExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             if (amount < 0)
             {
@@ -354,7 +354,7 @@ namespace VitoshaBank.Services.CreditService
                     Transactions transaction = new Transactions();
                     transaction.SenderAccountInfo = bankAccount.Iban;
                     transaction.RecieverAccountInfo = creditExists.Iban;
-                    await _transaction.CreateTransaction(currentUser, amount, transaction, $"Depositing money in Credit Account", _context, _messageModel);
+                    await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transaction, $"Depositing money in Credit Account", _context, _messageModel);
                     await _context.SaveChangesAsync();
                 }
                 else if (bankAccount.Amount < amount)

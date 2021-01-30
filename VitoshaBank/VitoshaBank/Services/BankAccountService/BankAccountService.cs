@@ -135,7 +135,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccounts.Iban;
                         transactions.SenderAccountInfo = depositsExist.Iban;
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "Depositing money Deposit Account - Bank Account", _context, messageModel);
+                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money Deposit Account - Bank Account", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -177,7 +177,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = bankAccount.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(currentUser, amount, transactions, $"Purchasing {product} with Bank Account", _context, _messageModel);
+                        await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transactions, $"Purchasing {product} with Bank Account", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, _messageModel);
@@ -236,7 +236,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = $"User {userAuthenticate.FirstName} {userAuthenticate.LastName}";
                         transactions.RecieverAccountInfo = bankAccountExists.Iban;
-                        await _transactionService.CreateTransaction(currentUser, amount, transactions, "Depositing money in Bank Account", _context, messageModel);
+                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money in Bank Account", _context, messageModel);
                         messageModel.Message = $"Succesfully deposited {amount} leva in Bank Account.";
                         return StatusCode(200, messageModel);
                     }
@@ -278,7 +278,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = bankAccount.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(currentUser, amount, transactions, $"Withdrawing {amount} leva", _context, _messageModel);
+                        await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transactions, $"Withdrawing {amount} leva", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully withdrawed {amount} leva.";
                         return StatusCode(200, _messageModel);

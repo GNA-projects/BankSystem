@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VitoshaBank.Services.GenerateCardInfoService;
 
 namespace VitoshaBank.Data.Models
 {
@@ -8,10 +9,10 @@ namespace VitoshaBank.Data.Models
         public int Id { get; set; }
         public string Iban { get; set; }
         public int UserId { get; set; }
-        public decimal Amount { get; set; }
-        public string CardNumber { get; set; }
-        public string Cvv { get; set; }
-        public DateTime CardExipirationDate { get; set; }
+        public decimal Amount { get; set; } 
+        public string CardNumber { get; set; } = GenerateCardInfo.GenerateNumber(15);
+        public string Cvv { get; set; } = GenerateCardInfo.GenerateCVV(3);
+        public DateTime CardExipirationDate { get; set; } = DateTime.Now.AddMonths(60);
 
         public virtual Users User { get; set; }
     }

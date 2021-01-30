@@ -75,6 +75,7 @@ namespace VitoshaBank.Services.UserService
         public async Task<ActionResult<MessageModel>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
+            List<Transactions> userTransaction = new List<Transactions>();
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -122,21 +123,19 @@ namespace VitoshaBank.Services.UserService
                 }
                 var vanillaPassword = user.Password;
                 user.Password = _BCrypt.HashPassword(user.Password);
-                user.RegisterDate = DateTime.Now;
-                user.BirthDate = DateTime.Now;
                 user.ActivationCode = Guid.NewGuid().ToString();
-                //if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
-                //{
-                //    responseMessage.Message = "User cannot be less than 18 years old";
-                //    return StatusCode(400, responseMessage);
-                //}
+                if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
+                {
+                    responseMessage.Message = "User cannot be less than 18 years old";
+                    return StatusCode(400, responseMessage);
+                }
                 _context.Add(user);
                 int i = await _context.SaveChangesAsync();
 
                 if (i > 0)
                 {
-                   
-                    SendVerificationLinkEmail(user.Email, user.ActivationCode, user.Username, user.FirstName, user.LastName, vanillaPassword);
+
+                    SendVerificationLinkEmail(user.Email, user.ActivationCode, user.Username, vanillaPassword);
                     responseMessage.Message = $"User {user.Username} created succesfully!";
                     return StatusCode(201, responseMessage);
 
@@ -157,6 +156,7 @@ namespace VitoshaBank.Services.UserService
 
         public async Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
+
             responseMessage.Message = "You are not authorized to do such actions!";
             ActionResult response = StatusCode(403, responseMessage);
 
@@ -164,11 +164,11 @@ namespace VitoshaBank.Services.UserService
 
             if (user != null)
             {
-               //if (user.IsConfirmed == true)
+                //if (user.IsConfirmed == true)
                 //{
-                    var tokenString = GenerateJSONWebToken(user, _config);
-                    responseMessage.Message = tokenString;
-                    response = StatusCode(200, responseMessage);
+                var tokenString = GenerateJSONWebToken(user, _config);
+                responseMessage.Message = tokenString;
+                response = StatusCode(200, responseMessage);
                 //}
                 //else
                 //{
@@ -182,7 +182,7 @@ namespace VitoshaBank.Services.UserService
 
         public async Task<ActionResult<MessageModel>> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel responseMessage)
         {
-            var userAuthenticate = _context.Users.FirstOrDefault(x => x.Username == username);
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
             if (userAuthenticate != null)
             {
@@ -241,6 +241,25 @@ namespace VitoshaBank.Services.UserService
                 return StatusCode(403, responseMessage);
             }
         }
+        public async Task<ActionResult> VerifyAccount(string activationCode, BankSystemContext _context, MessageModel _messageModel)
+        {
+            var value = _context.Users.Where(a => a.ActivationCode == activationCode).FirstOrDefault();
+            if (value != null)
+            {
+                value.IsConfirmed = true;
+                await _context.SaveChangesAsync();
+                _messageModel.Message = "Dear user, Your email successfully activated now you can able to login";
+                return StatusCode(200, _messageModel);
+            }
+            else
+            {
+                _messageModel.Message = "Dear user, Your email is not activated";
+                return StatusCode(400, _messageModel);
+            }
+
+        }
+
+        
         private async Task<Users> AuthenticateUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
         {
             var userAuthenticateUsername = await _context.Users.FirstOrDefaultAsync(x => x.Username == userLogin.Username);
@@ -251,7 +270,7 @@ namespace VitoshaBank.Services.UserService
             }
             else if (userAuthenticateEmail == null)
             {
-                if ((userLogin.Username == userAuthenticateUsername.Username && _BCrypt.Authenticate(userLogin, userAuthenticateUsername) == true))
+                if ((userLogin.Username == userAuthenticateUsername.Username && _BCrypt.AuthenticateUser(userLogin, userAuthenticateUsername) == true))
                 {
                     return userAuthenticateUsername;
                 }
@@ -259,7 +278,7 @@ namespace VitoshaBank.Services.UserService
             }
             else if (userAuthenticateUsername == null)
             {
-                if ((userLogin.Email == userAuthenticateEmail.Email && _BCrypt.Authenticate(userLogin, userAuthenticateEmail) == true))
+                if ((userLogin.Email == userAuthenticateEmail.Email && _BCrypt.AuthenticateUser(userLogin, userAuthenticateEmail) == true))
                 {
                     return userAuthenticateEmail;
                 }
@@ -297,7 +316,7 @@ namespace VitoshaBank.Services.UserService
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private void SendVerificationLinkEmail(string email, string activationcode, string username, string firstname, string lastname, string password)
+        private void SendVerificationLinkEmail(string email, string activationcode, string username, string password)
         {
             var varifyUrl = "https" + "://" + "localhost" + ":" + "44377" + "/api/users/activateaccount/" + activationcode;
             var fromMail = new MailAddress("noreplyvitoshabank@gmail.com", $"Welcome to Vitosha Bank");
@@ -325,24 +344,6 @@ namespace VitoshaBank.Services.UserService
                 IsBodyHtml = true
             })
                 smtp.Send(message);
-        }
-
-        public async Task<ActionResult> VerifyAccount(string activationCode, BankSystemContext _context, MessageModel _messageModel)
-        {
-            var value = _context.Users.Where(a => a.ActivationCode == activationCode).FirstOrDefault();
-            if (value != null)
-            {
-                value.IsConfirmed = true;
-                await _context.SaveChangesAsync();
-                _messageModel.Message = "Dear user, Your email successfully activated now you can able to login";
-                return StatusCode(200, _messageModel);
-            }
-            else
-            {
-                _messageModel.Message = "Dear user, Your email is not activated";
-                return StatusCode(400, _messageModel);
-            }
-
         }
     }
 }

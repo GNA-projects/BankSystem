@@ -172,7 +172,7 @@ namespace VitoshaBank.Services.DepositService
                     transaction.SenderAccountInfo = $"User {userAuthenticate.FirstName} {userAuthenticate.LastName}";
                     transaction.RecieverAccountInfo = depositsExists.Iban;
                     await _context.SaveChangesAsync();
-                    await _transactionService.CreateTransaction(currentUser, amount, transaction, "Added money - Bank Account - Deposit account", _context, _messageModel);
+                    await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transaction, "Added money - Bank Account - Deposit account", _context, _messageModel);
                     
                 }
                 else if (bankAccounts.Amount < amount)

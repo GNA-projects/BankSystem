@@ -10,6 +10,7 @@ using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.GenerateCardInfoService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 using VitoshaBank.Services.Interfaces.WalletService;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
@@ -38,7 +39,7 @@ namespace VitoshaBank.Services.WalletService
                 if (walletExists != null)
                 {
                     walletResponseModel.IBAN = walletExists.Iban;
-                    walletResponseModel.Amount = Math.Round(walletExists.Amount,2);
+                    walletResponseModel.Amount = Math.Round(walletExists.Amount, 2);
                     walletResponseModel.CardNumber = walletExists.CardNumber;
                     if (walletResponseModel.CardNumber.StartsWith('5'))
                     {
@@ -60,7 +61,7 @@ namespace VitoshaBank.Services.WalletService
             _messageModel.Message = "You don't have a wallet!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -88,7 +89,7 @@ namespace VitoshaBank.Services.WalletService
                         wallet.UserId = userAuthenticate.Id;
                         wallet.Iban = _IBAN.GenerateIBANInVitoshaBank("Wallet", _context);
                         wallet.CardNumber = GenerateCardInfo.GenerateNumber(11);
-                        wallet.Cvv = GenerateCardInfo.GenerateCVV(3);
+                        wallet.Cvv = _BCrypt.HashPassword(GenerateCardInfo.GenerateCVV(3));
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 
@@ -106,7 +107,7 @@ namespace VitoshaBank.Services.WalletService
                         return StatusCode(400, _messageModel);
                     }
                 }
-               
+
                 _messageModel.Message = "User already has a wallet!";
                 return StatusCode(400, _messageModel);
             }
@@ -116,7 +117,7 @@ namespace VitoshaBank.Services.WalletService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> AddMoney(Wallets wallet, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transation,  MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(Wallets wallet, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
@@ -143,7 +144,7 @@ namespace VitoshaBank.Services.WalletService
                     }
 
                     bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(currentUser, walletExists, amount, bankAccounts,_context, _transation, _messageModel);
+                    return await ValidateDepositAmountAndBankAccount(userAuthenticate, currentUser, walletExists, amount, bankAccounts, _context, _transation, _messageModel);
                 }
                 else
                 {
@@ -155,7 +156,7 @@ namespace VitoshaBank.Services.WalletService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(Wallets wallet, string product, string reciever, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(Wallets wallet, string product, string reciever, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transation, IBCryptPasswordHasherService _BCrypt, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
@@ -164,29 +165,30 @@ namespace VitoshaBank.Services.WalletService
             {
                 if (userAuthenticate != null)
                 {
-                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv && x.CardExipirationDate == wallet.CardExipirationDate);
+                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    
+                    if (wallet.CardNumber == walletExists.CardNumber && wallet.CardExipirationDate == walletExists.CardExipirationDate && _BCrypt.AuthenticateWalletCVV(wallet, walletExists))
+                    {
+                        if (walletExists.CardExipirationDate < DateTime.Now)
+                        {
+                            _messageModel.Message = "Wallet Card is expired";
+                            return StatusCode(406, _messageModel);
+                        }
+
+                        return await ValidatePurchaseAmountAndBankAccount(userAuthenticate, currentUser, walletExists, product, reciever, amount, _context, _transation, _messageModel);
+                    }
+                    else
+                    {
+                        _messageModel.Message = "Wallet not found";
+                        return StatusCode(404, _messageModel);
+                    }
                 }
                 else
                 {
                     _messageModel.Message = "User not found!";
                     return StatusCode(404, _messageModel);
                 }
-
-                if (walletExists != null)
-                {
-                    if (walletExists.CardExipirationDate < DateTime.Now)
-                    {
-                        _messageModel.Message = "Wallet Card is expired";
-                        return StatusCode(406, _messageModel);
-                    }
-
-                    return await ValidatePurchaseAmountAndBankAccount(currentUser, walletExists, product, reciever, amount, _context, _transation, _messageModel);
-                }
-                else
-                {
-                    _messageModel.Message = "Wallet not found";
-                    return StatusCode(404, _messageModel);
-                }
+                
             }
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
@@ -253,7 +255,7 @@ namespace VitoshaBank.Services.WalletService
             return false;
         }
 
-        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(ClaimsPrincipal currentUser, Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
+        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Users userAuthenticate, ClaimsPrincipal currentUser, Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
         {
             if (amount < 0)
             {
@@ -274,8 +276,8 @@ namespace VitoshaBank.Services.WalletService
                     Transactions transaction = new Transactions();
                     transaction.SenderAccountInfo = bankAccount.Iban;
                     transaction.RecieverAccountInfo = walletExists.Iban;
-                    
-                    await _transation.CreateTransaction(currentUser, amount, transaction, "Depositing money in Wallet", _context, _messageModel);
+
+                    await _transation.CreateTransaction(userAuthenticate, currentUser, amount, transaction, "Depositing money in Wallet", _context, _messageModel);
                     await _context.SaveChangesAsync();
                 }
                 else if (bankAccount.Amount < amount)
@@ -292,7 +294,7 @@ namespace VitoshaBank.Services.WalletService
             _messageModel.Message = $"Succesfully deposited {amount} leva in Wallet.";
             return StatusCode(200, _messageModel);
         }
-        private async Task<ActionResult> ValidatePurchaseAmountAndBankAccount(ClaimsPrincipal currentUser, Wallets walletExists, string product, string reciever, decimal amount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
+        private async Task<ActionResult> ValidatePurchaseAmountAndBankAccount(Users userAuthenticate, ClaimsPrincipal currentUser, Wallets walletExists, string product, string reciever, decimal amount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
         {
             if (amount < 0)
             {
@@ -317,7 +319,7 @@ namespace VitoshaBank.Services.WalletService
                     walletExists.Amount = walletExists.Amount - amount;
                     transaction.SenderAccountInfo = walletExists.Iban;
                     transaction.RecieverAccountInfo = reciever;
-                    await _transation.CreateTransaction(currentUser, amount, transaction, $"Purchasing {product} with Wallet", _context, _messageModel);
+                    await _transation.CreateTransaction(userAuthenticate, currentUser, amount, transaction, $"Purchasing {product} with Wallet", _context, _messageModel);
                     await _context.SaveChangesAsync();
                 }
             }

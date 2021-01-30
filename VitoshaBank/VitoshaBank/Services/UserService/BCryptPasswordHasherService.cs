@@ -19,7 +19,7 @@ namespace VitoshaBank.Services.UserService
             return BCrypt.Net.BCrypt.HashPassword(advancedHashedPassword, salt);
         }
 
-        public bool Authenticate(Users user, Users userDB)
+        public bool AuthenticateUser(Users user, Users userDB)
         {
             // check user found and verify password
             if (!BCrypt.Net.BCrypt.Verify(user.Password + "NeverGonnaLetYouDown", userDB.Password))
@@ -34,5 +34,19 @@ namespace VitoshaBank.Services.UserService
             }
         }
 
+        public bool AuthenticateWalletCVV(Wallets wallets, Wallets walletsDB)
+        {
+            // check user found and verify password
+            if (!BCrypt.Net.BCrypt.Verify(wallets.Cvv + "NeverGonnaLetYouDown", walletsDB.Cvv))
+            {
+                // authentication failed
+                return false;
+            }
+            else
+            {
+                // authentication successful
+                return true;
+            }
+        }
     }
 }

@@ -159,7 +159,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateWallet(WalletRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _context, _messageModel);
+            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _BCrypt, _context, _messageModel);
         }
         [HttpDelete("delete/wallet")]
         [Authorize]

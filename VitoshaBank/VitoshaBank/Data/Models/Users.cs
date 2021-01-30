@@ -10,7 +10,7 @@ namespace VitoshaBank.Data.Models
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime RegisterDate { get; set; }
+        public DateTime RegisterDate { get; set; } = DateTime.Now;
         public int? LastTransactionId { get; set; }
         public DateTime BirthDate { get; set; }
         public bool IsAdmin { get; set; }

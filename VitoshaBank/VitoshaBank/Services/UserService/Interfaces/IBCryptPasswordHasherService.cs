@@ -5,6 +5,7 @@ namespace VitoshaBank.Services.Interfaces.UserService
     public interface IBCryptPasswordHasherService
     {
         public string HashPassword(string password);
-        public bool Authenticate(Users user, Users userDB);
+        public bool AuthenticateUser(Users user, Users userDB);
+        public bool AuthenticateWalletCVV(Wallets wallets, Wallets walletsDB);
     }
 }

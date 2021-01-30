@@ -15,10 +15,12 @@ namespace VitoshaBank.Services.TransactionService
 {
     public class TransactionsService : ControllerBase, ITransactionService
     {
-        public async Task<ActionResult> CreateTransaction(ClaimsPrincipal currentUser, decimal amount, Transactions transaction, string reason, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult> CreateTransaction(Users user, ClaimsPrincipal currentUser, decimal amount, Transactions transaction, string reason, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
+                List<Transactions> transactions = new List<Transactions>();
+
                 TransactionResponseModel sender = new TransactionResponseModel();
                 TransactionResponseModel reciever = new TransactionResponseModel();
                 if (transaction.SenderAccountInfo.Contains("BG18VITB") && transaction.SenderAccountInfo.Length == 23)
@@ -52,6 +54,10 @@ namespace VitoshaBank.Services.TransactionService
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
                     await _context.SaveChangesAsync();
+                    transactions = _context.Transactions.ToList();
+                    user.LastTransactionId = transactions.Last().Id;
+                    await _context.SaveChangesAsync();
+
                     _messageModel.Message = "Money send successfully!";
                     return StatusCode(200, _messageModel);
                 }
@@ -62,6 +68,10 @@ namespace VitoshaBank.Services.TransactionService
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
                     await _context.SaveChangesAsync();
+                    transactions = _context.Transactions.ToList();
+                    user.LastTransactionId = transactions.Last().Id;
+                    await _context.SaveChangesAsync();
+
                     _messageModel.Message = "Purchase successfull!";
                     return StatusCode(200, _messageModel);
                 }
@@ -72,6 +82,10 @@ namespace VitoshaBank.Services.TransactionService
                     transaction.TransactionAmount = amount;
                     _context.Add(transaction);
                     await _context.SaveChangesAsync();
+                    transactions = _context.Transactions.ToList();
+                    user.LastTransactionId = transactions.Last().Id;
+                    await _context.SaveChangesAsync();
+
                     _messageModel.Message = "Money recieved successfully!";
                     return StatusCode(200, _messageModel);
                 }
