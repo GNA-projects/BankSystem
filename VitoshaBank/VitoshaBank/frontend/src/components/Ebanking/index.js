@@ -1,11 +1,11 @@
 import React from "react";
-import { Banking } from "./style";
+import Banking from "./Banking";
 
 
 export default function Ebanking() {
 	return (
 		<Banking>
-			<Banking.BAccount />
+			<Banking.BankAccount />
 			<Banking.Deposit />
 			<Banking.Wallet />
 			<Banking.Credit />

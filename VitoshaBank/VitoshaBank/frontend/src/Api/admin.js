@@ -26,6 +26,17 @@ export const createBankAccount = (uname, amount) => {
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));
 };
+export const createWallet = (uname, amount) => {
+	viaxios
+		.post("/api/admin/create/wallet", {
+			Wallet: {
+				Amount: amount,
+			},
+			username: uname,
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
 export const createCredit = (uname, amount, period) => {
 	viaxios
 		.post("/api/admin/create/credit", {
@@ -39,15 +50,13 @@ export const createCredit = (uname, amount, period) => {
 		.catch((err) => alert(err.response.data.message));
 };
 export const createDeposit = (uname, amount, period) => {
-	axios
-		.post(
-			"/api/admin/create/deposit",
-			{
-				Deposit: {
-					TermOfPayment: period,
-					Amount: amount,
-				},
-				Username: uname,
+	viaxios
+		.post("/api/admin/create/deposit", {
+			Deposit: {
+				TermOfPayment: period,
+				Amount: amount,
+			},
+			Username: uname,
 		})
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));

@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import { AdminForm } from "../../style";
+import AdminForm from "../../AdminForm";
+
 import { createDebitCard } from "../../../../Api/admin";
 
 export default function CreateDebitCard() {

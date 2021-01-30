@@ -1,13 +1,12 @@
-import React from "react";
-import { useState } from "react/cjs/react.development";
-import { AdminForm } from "../../style";
+import React, { useState } from "react";
+import AdminForm from "../../AdminForm";
 import { deleteUser } from "../../../../Api/admin";
 
 export default function DeleteUser() {
 	const [uname, setUname] = useState();
 
 	const handleDelete = () => {
-		deleteUser(uname)
+		deleteUser(uname);
 	};
 	return (
 		<AdminForm>

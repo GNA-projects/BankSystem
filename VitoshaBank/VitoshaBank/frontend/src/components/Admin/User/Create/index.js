@@ -1,6 +1,5 @@
-import React from "react";
-import { useState } from "react/cjs/react.development";
-import { AdminForm } from "../../style";
+import React, {useState} from "react";
+import AdminForm from "../../AdminForm";
 import { createUser } from "../../../../Api/admin";
 
 export default function CreateUser() {

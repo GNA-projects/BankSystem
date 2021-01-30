@@ -23,8 +23,8 @@ const INPUT = styled.input`
 	border-radius: 20px;
 `;
 
-export function InputGroup(props) {
-	const {value, setValue} = props.values
+export default function Input(props) {
+	const { value, setValue } = props.values;
 	return (
 		<GROUP>
 			<HEADING>{props.heading}</HEADING>
@@ -36,19 +36,3 @@ export function InputGroup(props) {
 		</GROUP>
 	);
 }
-
-export const BUTTON = styled.button`
-  display: block;
-  margin: auto;
-  font-size: 16px;
-  background-color: darkcyan;
-  padding: 15px 20px;
-  color: white;
-  outline: none;
-  border: 1px;
-  border-radius: 20px;
-  margin-top: 20px;
-  &:hover {
-    background-color: cyan;
-  }
-`;

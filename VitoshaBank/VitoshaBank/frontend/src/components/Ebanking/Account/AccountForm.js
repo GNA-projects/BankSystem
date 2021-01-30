@@ -20,8 +20,8 @@ const BALANCE = styled.div`
 	font-size: 30px;
 `;
 
-export const BankAccount = (props) => (
-	<BANK_ACCOUNT {...props}>{props.children}</BANK_ACCOUNT>
-);
-BankAccount.Heading = HEADING;
-BankAccount.Balance = (props) => <BALANCE>{props.children} BGN</BALANCE>;
+export default function AccountForm(props) {
+	return <BANK_ACCOUNT {...props}>{props.children}</BANK_ACCOUNT>;
+}
+AccountForm.Heading = HEADING;
+AccountForm.Balance = (props) => <BALANCE>{props.children} BGN</BALANCE>;

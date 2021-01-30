@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import { AdminForm } from "../../style";
+import AdminForm from "../../AdminForm";
 import { createBankAccount } from "../../../../Api/admin";
 
 export default function CreateBankAccount() {

@@ -1,19 +1,20 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import { AdminForm } from "../../style";
-import { createBankAccount } from "../../../../Api/admin";
+import AdminForm from "../../AdminForm";
+
+import { createWallet } from "../../../../Api/admin";
 
 export default function CreateWallet() {
 	const [uname, setUname] = useState();
 	const [amount, setAmount] = useState();
 
 	const handleCreate = () => {
-		createBankAccount(uname, amount);
+		createWallet(uname, amount);
 	};
 	return (
 		<AdminForm>
 			<AdminForm.Input
-				heading="Userna!!!!!!!!!!!!!!!!NOT DONEme"
+				heading="Username"
 				values={{ value: uname, setValue: setUname }}
 			></AdminForm.Input>
 			<AdminForm.Input
