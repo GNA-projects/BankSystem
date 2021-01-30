@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,16 +122,30 @@ namespace VitoshaBank.Services.UserService
                 }
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
-                if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
-                {
-                    responseMessage.Message = "User cannot be less than 18 years old";
-                    return StatusCode(400, responseMessage);
-                }
                 user.BirthDate = DateTime.Now;
+                user.ActivationCode = Guid.NewGuid().ToString();
+                //if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
+                //{
+                //    responseMessage.Message = "User cannot be less than 18 years old";
+                //    return StatusCode(400, responseMessage);
+                //}
                 _context.Add(user);
-                await _context.SaveChangesAsync();
-                responseMessage.Message = $"User {user.Username} created succesfully!";
-                return StatusCode(201, responseMessage);
+                int i = await _context.SaveChangesAsync();
+
+                if (i > 0)
+                {
+                   
+                    SendVerificationLinkEmail(user.Email, user.ActivationCode, user.Username, user.FirstName, user.LastName, user.Password);
+                    responseMessage.Message = $"User {user.Username} created succesfully!";
+                    return StatusCode(201, responseMessage);
+
+                }
+                else
+                {
+                    responseMessage.Message = "Registration failed";
+                    return StatusCode(406, responseMessage);
+                }
+
             }
             else
             {
@@ -145,9 +163,17 @@ namespace VitoshaBank.Services.UserService
 
             if (user != null)
             {
-                var tokenString = GenerateJSONWebToken(user, _config);
-                responseMessage.Message = tokenString;
-                response = StatusCode(200, responseMessage);
+                if (user.IsConfirmed == true)
+                {
+                    var tokenString = GenerateJSONWebToken(user, _config);
+                    responseMessage.Message = tokenString;
+                    response = StatusCode(200, responseMessage);
+                }
+                else
+                {
+                    responseMessage.Message = "You need to verify your email";
+                    response = StatusCode(400, responseMessage);
+                }
             }
 
             return response;
@@ -230,7 +256,7 @@ namespace VitoshaBank.Services.UserService
                 }
                 return null;
             }
-            else if( userAuthenticateUsername == null)
+            else if (userAuthenticateUsername == null)
             {
                 if ((userLogin.Email == userAuthenticateEmail.Email && _BCrypt.Authenticate(userLogin, userAuthenticateEmail) == true))
                 {
@@ -268,6 +294,54 @@ namespace VitoshaBank.Services.UserService
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private void SendVerificationLinkEmail(string email, string activationcode, string username, string firstname, string lastname, string password)
+        {
+            var varifyUrl = "https" + "://" + "localhost" + ":" + "44377" + "/api/users/activateaccount/" + activationcode;
+            var fromMail = new MailAddress("noreplyvitoshabank@gmail.com", $"Welcome to Vitosha Bank");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = "GNAjuxtapose123";
+            string subject = "Your account is successfully created";
+            string body = $"<br/><br/>We are excited to tell you that your account username is: {username}" +
+              $"<br/><br/> and your password is: {password}. Feel free to change your passowrd from the account menu after you log in. Please click on the below link to verify your account" +
+              " <br/><br/><a href='" + varifyUrl + "'>" + varifyUrl + "</a>";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
+        }
+
+        public async Task<ActionResult> VerifyAccount(string activationCode, BankSystemContext _context, MessageModel _messageModel)
+        {
+            var value = _context.Users.Where(a => a.ActivationCode == activationCode).FirstOrDefault();
+            if (value != null)
+            {
+                value.IsConfirmed = true;
+                await _context.SaveChangesAsync();
+                _messageModel.Message = "Dear user, Your email successfully activated now you can able to login";
+                return StatusCode(200, _messageModel);
+            }
+            else
+            {
+                _messageModel.Message = "Dear user, Your email is not activated";
+                return StatusCode(400, _messageModel);
+            }
+
         }
     }
 }
