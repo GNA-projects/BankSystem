@@ -120,6 +120,7 @@ namespace VitoshaBank.Services.UserService
                     responseMessage.Message = "Password cannot be less than 6 symbols";
                     return StatusCode(400, responseMessage);
                 }
+                var vanillaPassword = user.Password;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.RegisterDate = DateTime.Now;
                 user.BirthDate = DateTime.Now;
@@ -135,7 +136,7 @@ namespace VitoshaBank.Services.UserService
                 if (i > 0)
                 {
                    
-                    SendVerificationLinkEmail(user.Email, user.ActivationCode, user.Username, user.FirstName, user.LastName, user.Password);
+                    SendVerificationLinkEmail(user.Email, user.ActivationCode, user.Username, user.FirstName, user.LastName, vanillaPassword);
                     responseMessage.Message = $"User {user.Username} created succesfully!";
                     return StatusCode(201, responseMessage);
 
