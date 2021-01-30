@@ -54,7 +54,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.AddMoney(requestModel.Card.CardNumber, requestModel.Card.Cvv, currentUser, _bankaccService, username, requestModel.Amount, _context,_transactionService, _messageModel);
+            return await _debitCardService.AddMoney(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, currentUser, _bankaccService, username, requestModel.Amount, _context,_transactionService, _messageModel);
         }
 
         [HttpPut("purchase")]
@@ -64,7 +64,7 @@ namespace VitoshaBank.Controllers
 
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, requestModel.Card.Cvv, _bankaccService, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, _bankaccService, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
         [HttpPut("withdraw")]
@@ -73,7 +73,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.Withdraw(requestModel.Card.CardNumber, requestModel.Card.Cvv, _bankaccService, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+            return await _debitCardService.Withdraw(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, _bankaccService, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
 

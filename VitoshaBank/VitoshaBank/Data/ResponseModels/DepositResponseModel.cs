@@ -10,5 +10,6 @@ namespace VitoshaBank.Data.ResponseModels
         public string IBAN { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
+        public string Message { get; set; }
     }
 }
