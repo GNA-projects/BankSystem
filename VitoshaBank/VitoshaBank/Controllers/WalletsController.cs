@@ -50,7 +50,7 @@ namespace VitoshaBank.Controllers
         [Authorize]
         public async Task<ActionResult<MessageModel>> DepositInWallet(WalletRequestModel requestModel)
         {
-            //amount = 0.50M;
+            //Wallet(IBAN), Amount
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _walletService.AddMoney(requestModel.Wallet, currentUser, username, requestModel.Amount, _context, _transaction, _messageModel);

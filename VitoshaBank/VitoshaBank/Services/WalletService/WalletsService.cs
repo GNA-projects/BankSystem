@@ -38,6 +38,15 @@ namespace VitoshaBank.Services.WalletService
                 {
                     walletResponseModel.IBAN = walletExists.Iban;
                     walletResponseModel.Amount = Math.Round(walletExists.Amount,2);
+                    walletResponseModel.CardNumber = walletExists.CardNumber;
+                    if (walletResponseModel.CardNumber.StartsWith('5'))
+                    {
+                        walletResponseModel.CardBrand = "Master Card";
+                    }
+                    else
+                    {
+                        walletResponseModel.CardBrand = "Visa";
+                    }
                     return StatusCode(200, walletResponseModel);
                 }
             }
@@ -114,7 +123,7 @@ namespace VitoshaBank.Services.WalletService
             {
                 if (userAuthenticate != null)
                 {
-                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == wallet.CardNumber && x.Cvv == wallet.Cvv && x.CardExipirationDate == wallet.CardExipirationDate);
+                    walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.Iban == wallet.Iban);
                 }
                 else
                 {
