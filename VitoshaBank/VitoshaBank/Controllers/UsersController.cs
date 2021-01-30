@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
-using VitoshaBank.Data.ResponseModels;
-using VitoshaBank.Services.Interfaces;
 using VitoshaBank.Services.Interfaces.UserService;
 
 namespace VitoshaBank.Controllers
@@ -58,6 +56,11 @@ namespace VitoshaBank.Controllers
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _userService.ChangePassword(username, requestModel.User.Password, _context, _BCrypt, _responseMessage);
         }
-        
+
+        [HttpGet("activateaccount/{id}")]
+        public async Task<ActionResult<MessageModel>> VeryfiyUserAccount(string id)
+        {
+            return await _userService.VerifyAccount(id, _context, _responseMessage);
+        }
     }
 }

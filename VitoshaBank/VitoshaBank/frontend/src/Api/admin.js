@@ -38,13 +38,16 @@ export const createCredit = (uname, amount, period) => {
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));
 };
-export const createDeposit = (uname, period) => {
-	viaxios
-		.post("/api/admin/create/deposit", {
-			Deposit: {
-				TermOfPayment: period,
-			},
-			Username: uname,
+export const createDeposit = (uname, amount, period) => {
+	axios
+		.post(
+			"/api/admin/create/deposit",
+			{
+				Deposit: {
+					TermOfPayment: period,
+					Amount: amount,
+				},
+				Username: uname,
 		})
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));

@@ -46,7 +46,7 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.Iban)
                     .IsRequired()
@@ -147,15 +147,15 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.CreditAmount)
                     .HasColumnName("credit_amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.CreditAmountLeft)
                     .HasColumnName("credit_amount_left")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.Iban)
                     .IsRequired()
@@ -166,11 +166,11 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Instalment)
                     .HasColumnName("instalment")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.Interest)
                     .HasColumnName("interest")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.PaymentDate)
                     .HasColumnName("payment_date")
@@ -207,11 +207,11 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
-                    .HasColumnType("decimal(65,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.Divident)
                     .HasColumnName("divident")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.Iban)
                     .IsRequired()
@@ -320,7 +320,7 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.TransactionAmount)
                     .HasColumnName("transaction_amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
             });
 
             modelBuilder.Entity<Users>(entity =>
@@ -343,6 +343,13 @@ namespace VitoshaBank.Data.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.ActivationCode)
+                    .IsRequired()
+                    .HasColumnName("activationCode")
+                    .HasColumnType("varchar(64)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.BirthDate)
                     .HasColumnName("birth_date")
@@ -431,7 +438,7 @@ namespace VitoshaBank.Data.Models
 
                 entity.Property(e => e.Amount)
                     .HasColumnName("amount")
-                    .HasColumnType("decimal(10,6)");
+                    .HasColumnType("decimal(20,6)");
 
                 entity.Property(e => e.CardExipirationDate)
                     .HasColumnName("card_exipiration_date")
