@@ -153,6 +153,15 @@ namespace VitoshaBank.Services.UserService
                 return StatusCode(403, responseMessage);
             }
         }
+        public async Task<ActionResult<MessageModel>> GetUsername(string username,BankSystemContext _context, MessageModel messageModel)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            UserResponseModel responseModel = new UserResponseModel();
+            responseModel.FirstName = user.FirstName;
+            responseModel.LastName = user.LastName;
+            responseModel.Username = user.Username;
+            return StatusCode(200, responseModel);
+        }
 
         public async Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {

@@ -17,7 +17,7 @@ namespace VitoshaBank.Services.Interfaces.UserService
         public Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage);
        
         public Task<ActionResult<MessageModel>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage);
-        
+        public  Task<ActionResult<MessageModel>> GetUsername(string username,BankSystemContext _context, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel messageModel);
         
         public Task<ActionResult<MessageModel>> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel messageModel);

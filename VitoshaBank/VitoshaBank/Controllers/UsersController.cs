@@ -62,5 +62,16 @@ namespace VitoshaBank.Controllers
         {
             return await _userService.VerifyAccount(id, _context, _responseMessage);
         }
+        [HttpGet("username")]
+        [Authorize]
+        public async  Task<ActionResult<MessageModel>> GetUsername()
+        {
+            
+            var currentUser = HttpContext.User;
+            string  username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return  await _userService.GetUsername(username, _context, _responseMessage);
+        }        
+
+        
     }
 }
