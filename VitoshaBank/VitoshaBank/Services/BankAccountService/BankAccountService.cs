@@ -12,6 +12,7 @@ using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Data.MessageModels;
 using System;
 using VitoshaBank.Services.TransactionService.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 
 namespace VitoshaBank.Services.BankAccountService
 {
@@ -51,7 +52,7 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You don't have a Bank Account!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
         {
             string role = "";
 
@@ -81,7 +82,7 @@ namespace VitoshaBank.Services.BankAccountService
                         _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
-                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, messageModel);
+                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, _BCrypt, messageModel);
                         messageModel.Message = "Bank Account created succesfully";
                         return StatusCode(201, messageModel);
                     }

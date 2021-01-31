@@ -48,5 +48,20 @@ namespace VitoshaBank.Services.UserService
                 return true;
             }
         }
+
+        public bool AuthenticateDebitCardCVV(string CVV, Cards cardsDB)
+        {
+            // check user found and verify password
+            if (!BCrypt.Net.BCrypt.Verify(CVV + "NeverGonnaLetYouDown", cardsDB.Cvv))
+            {
+                // authentication failed
+                return false;
+            }
+            else
+            {
+                // authentication successful
+                return true;
+            }
+        }
     }
 }

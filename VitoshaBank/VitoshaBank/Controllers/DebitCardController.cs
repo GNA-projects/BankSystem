@@ -13,6 +13,7 @@ using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
@@ -26,8 +27,9 @@ namespace VitoshaBank.Controllers
         private readonly IDebitCardService _debitCardService;
         private readonly IBankAccountService _bankaccService;
         private readonly ITransactionService _transactionService;
+        private readonly IBCryptPasswordHasherService _BCrypt;
         private readonly MessageModel _messageModel;
-       
+
 
         public DebitCardController(BankSystemContext context, ILogger<Cards> logger, IDebitCardService debitCardService, IBankAccountService bankaccService, ITransactionService transactionService)
         {
@@ -54,7 +56,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.AddMoney(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, currentUser, _bankaccService, username, requestModel.Amount, _context,_transactionService, _messageModel);
+            return await _debitCardService.AddMoney(requestModel.Card.CardNumber, requestModel.Card.Cvv, requestModel.Card.CardExiprationDate, currentUser, _bankaccService, _BCrypt,username, requestModel.Amount, _context, _transactionService, _messageModel);
         }
 
         [HttpPut("purchase")]
@@ -64,7 +66,7 @@ namespace VitoshaBank.Controllers
 
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, _bankaccService, requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+            return await _debitCardService.SimulatePurchase(requestModel.Card.CardNumber, requestModel.Card.Cvv, requestModel.Card.CardExiprationDate, _bankaccService, _BCrypt,requestModel.Product, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
         [HttpPut("withdraw")]
@@ -73,7 +75,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _debitCardService.Withdraw(requestModel.Card.CardNumber, requestModel.Card.Cvv,requestModel.Card.CardExiprationDate, _bankaccService, currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
+            return await _debitCardService.Withdraw(requestModel.Card.CardNumber, requestModel.Card.Cvv, requestModel.Card.CardExiprationDate, _bankaccService, _BCrypt,currentUser, username, requestModel.Amount, requestModel.Reciever, _context, _transactionService, _messageModel);
         }
 
 

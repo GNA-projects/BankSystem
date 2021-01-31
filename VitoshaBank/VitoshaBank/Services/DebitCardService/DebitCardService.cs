@@ -12,6 +12,7 @@ using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
 using VitoshaBank.Services.GenerateCardInfoService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
+using VitoshaBank.Services.Interfaces.UserService;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Services.DebitCardService
@@ -62,7 +63,7 @@ namespace VitoshaBank.Services.DebitCardService
             _messageModel.Message = "You don't have a Debit Card!!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card, IBCryptPasswordHasherService _BCrypt, MessageModel _messageModel)
         {
             string role = "";
 
@@ -92,7 +93,8 @@ namespace VitoshaBank.Services.DebitCardService
                         card.UserId = userAuthenticate.Id;
                         card.BankAccountId = bankAccountExists.Id;
                         card.CardNumber = GenerateCardInfo.GenerateNumber(11);
-                        card.Cvv = GenerateCardInfo.GenerateCVV(3);
+                        var CVV = GenerateCardInfo.GenerateCVV(3);
+                        card.Cvv = _BCrypt.HashPassword(CVV);
                         _context.Add(card);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = "Debit Card created succesfully!";
@@ -115,19 +117,19 @@ namespace VitoshaBank.Services.DebitCardService
             }
         }
 
-        public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, DateTime expireDate, ClaimsPrincipal currentUser, IBankAccountService _bankaccService,string username, decimal amount, BankSystemContext _context,ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, DateTime expireDate, ClaimsPrincipal currentUser, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
-            Cards cards = null;
+            BankAccounts bankAccountsExists = null;
+            Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
+                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -135,44 +137,45 @@ namespace VitoshaBank.Services.DebitCardService
                     return StatusCode(404, messageModel);
                 }
 
-                if (bankAccounts != null && cards != null)
+                if (bankAccountsExists != null && cardsExists != null && (cardNumber == cardsExists.CardNumber && expireDate == cardsExists.CardExiprationDate && _BCrypt.AuthenticateDebitCardCVV(CVV, cardsExists)))
                 {
-                    if (cards.CardExiprationDate < DateTime.Now)
+                    if (cardsExists.CardExiprationDate < DateTime.Now)
                     {
                         messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
-                    await _bankaccService.AddMoney(bankAccounts, currentUser, username, amount, _context,_transactionService, messageModel);
+
+                    await _bankaccService.AddMoney(bankAccountsExists, currentUser, username, amount, _context, _transactionService, messageModel);
                 }
-                else if (bankAccounts == null)
+                else if (bankAccountsExists == null)
                 {
                     messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
-                else if (cards == null)
+                else if (cardsExists == null)
                 {
                     messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);
                 }
-                
+
             }
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber,string CVV,DateTime expireDate, IBankAccountService _bankaccService, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
-            Cards cards = null;
+            BankAccounts bankAccountsExists = null;
+            Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
+                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -180,21 +183,22 @@ namespace VitoshaBank.Services.DebitCardService
                     return StatusCode(404, messageModel);
                 }
 
-                if (bankAccounts != null && cards != null)
+                if (bankAccountsExists != null && cardsExists != null && (cardNumber == cardsExists.CardNumber && expireDate == cardsExists.CardExiprationDate && _BCrypt.AuthenticateDebitCardCVV(CVV, cardsExists)))
                 {
-                    if (cards.CardExiprationDate < DateTime.Now)
+                    if (cardsExists.CardExiprationDate < DateTime.Now)
                     {
                         messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
-                    await _bankaccService.SimulatePurchase(bankAccounts, product, currentUser, username, amount, reciever, _context,_transactionService, messageModel);
+
+                    await _bankaccService.SimulatePurchase(bankAccountsExists, product, currentUser, username, amount, reciever, _context, _transactionService, messageModel);
                 }
-                else if(bankAccounts == null)
+                else if (bankAccountsExists == null)
                 {
                     messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
-                else if (cards == null)
+                else if (cardsExists == null)
                 {
                     messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);
@@ -205,19 +209,19 @@ namespace VitoshaBank.Services.DebitCardService
             return StatusCode(403, messageModel);
         }
 
-        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
-            Cards cards = null;
+            BankAccounts bankAccountsExists = null;
+            Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    cards = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
+                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
                 }
                 else
                 {
@@ -225,21 +229,22 @@ namespace VitoshaBank.Services.DebitCardService
                     return StatusCode(404, messageModel);
                 }
 
-                if (bankAccounts != null && cards != null)
+                if (bankAccountsExists != null && cardsExists != null && (cardNumber == cardsExists.CardNumber && expireDate == cardsExists.CardExiprationDate && _BCrypt.AuthenticateDebitCardCVV(CVV, cardsExists)))
                 {
-                    if (cards.CardExiprationDate < DateTime.Now)
+                    if (cardsExists.CardExiprationDate < DateTime.Now)
                     {
                         messageModel.Message = "Debit Card is expired";
                         return StatusCode(406, messageModel);
                     }
-                    await _bankaccService.Withdraw(bankAccounts, currentUser, username, amount, reciever, _context, _transactionService, messageModel);
+
+                    await _bankaccService.Withdraw(bankAccountsExists, currentUser, username, amount, reciever, _context, _transactionService, messageModel);
                 }
-                else if (bankAccounts == null)
+                else if (bankAccountsExists == null)
                 {
                     messageModel.Message = "Bank Account not found";
                     return StatusCode(404, messageModel);
                 }
-                else if (cards == null)
+                else if (cardsExists == null)
                 {
                     messageModel.Message = "Debit Card not found";
                     return StatusCode(404, messageModel);

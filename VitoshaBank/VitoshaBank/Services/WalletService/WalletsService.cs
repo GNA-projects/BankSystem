@@ -89,7 +89,8 @@ namespace VitoshaBank.Services.WalletService
                         wallet.UserId = userAuthenticate.Id;
                         wallet.Iban = _IBAN.GenerateIBANInVitoshaBank("Wallet", _context);
                         wallet.CardNumber = GenerateCardInfo.GenerateNumber(11);
-                        wallet.Cvv = _BCrypt.HashPassword(GenerateCardInfo.GenerateCVV(3));
+                        var CVV = GenerateCardInfo.GenerateCVV(3);
+                        wallet.Cvv = _BCrypt.HashPassword(CVV);
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 
@@ -166,8 +167,7 @@ namespace VitoshaBank.Services.WalletService
                 if (userAuthenticate != null)
                 {
                     walletExists = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    
-                    if (wallet.CardNumber == walletExists.CardNumber && wallet.CardExipirationDate == walletExists.CardExipirationDate && _BCrypt.AuthenticateWalletCVV(wallet, walletExists))
+                    if (walletExists != null && (wallet.CardNumber == walletExists.CardNumber && wallet.CardExipirationDate == walletExists.CardExipirationDate && _BCrypt.AuthenticateWalletCVV(wallet, walletExists))) 
                     {
                         if (walletExists.CardExipirationDate < DateTime.Now)
                         {

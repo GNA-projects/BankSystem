@@ -10,8 +10,8 @@ namespace VitoshaBank.Data.Models
         public string Iban { get; set; }
         public int UserId { get; set; }
         public decimal Amount { get; set; } 
-        public string CardNumber { get; set; } = GenerateCardInfo.GenerateNumber(15);
-        public string Cvv { get; set; } = GenerateCardInfo.GenerateCVV(3);
+        public string CardNumber { get; set; } 
+        public string Cvv { get; set; }
         public DateTime CardExipirationDate { get; set; } = DateTime.Now.AddMonths(60);
 
         public virtual Users User { get; set; }

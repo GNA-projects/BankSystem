@@ -70,7 +70,7 @@ namespace VitoshaBank.Controllers
         {
             //need username, BankAccount(amount)
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount, _IBAN, _context, _debitCardService, _messageModel);
+            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount, _IBAN, _BCrypt, _context, _debitCardService, _messageModel);
         }
 
         [HttpPut("addmoney/bankaccount")]
@@ -127,7 +127,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateDebitcard(DebitCardRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _debitCardService.CreateDebitCard(currentUser, requestModel.Username, requestModel.BankAccount, _context, requestModel.Card, _messageModel);
+            return await _debitCardService.CreateDebitCard(currentUser, requestModel.Username, requestModel.BankAccount, _context, requestModel.Card, _BCrypt, _messageModel);
         }
         [HttpDelete("delete/debitcard")]
         [Authorize]

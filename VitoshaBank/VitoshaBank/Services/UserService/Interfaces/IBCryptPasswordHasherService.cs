@@ -7,5 +7,6 @@ namespace VitoshaBank.Services.Interfaces.UserService
         public string HashPassword(string password);
         public bool AuthenticateUser(Users user, Users userDB);
         public bool AuthenticateWalletCVV(Wallets wallets, Wallets walletsDB);
+        public bool AuthenticateDebitCardCVV(string CVV, Cards cardsDB);
     }
 }
