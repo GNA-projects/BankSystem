@@ -25,6 +25,8 @@ using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces;
 using VitoshaBank.Services.Interfaces.UserService;
 using VitoshaBank.Services.Interfaces.WalletService;
+using VitoshaBank.Services.SupportTicketsService;
+using VitoshaBank.Services.SupportTicketsService.Interfaces;
 using VitoshaBank.Services.TransactionService;
 using VitoshaBank.Services.TransactionService.Interfaces;
 using VitoshaBank.Services.UserService;
@@ -53,7 +55,7 @@ namespace VitoshaBank
             services.AddScoped<IBCryptPasswordHasherService, BCryptPasswordHasherService>();
             services.AddScoped<IIBANGeneratorService, IBANGeneratorService>();
             services.AddScoped<ICreditService, CreditService>();
-            
+            services.AddScoped<ISupportTicketService, SupportTicketService>();
             services.AddScoped<ITransactionService, TransactionsService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
