@@ -54,7 +54,15 @@ namespace VitoshaBank.Controllers
             //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
             var currentUser = HttpContext.User;
             return await _depositService.AddMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
-        } 
+        }
+        [HttpPut("withdraw")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> WithDrawMoney(DepositRequestModel requestModel)
+        {
+            //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
+            var currentUser = HttpContext.User;
+            return await _depositService.WithdrawMoney(requestModel.Deposit, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
+        }
 
 
     }

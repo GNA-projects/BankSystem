@@ -148,6 +148,47 @@ namespace VitoshaBank.Services.DepositService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
+        public async Task<ActionResult<MessageModel>> WithdrawMoney(Deposits deposit,  ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        {
+
+            var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            Deposits depositsExists = null;
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                if (userAuthenticate != null)
+                {
+                    depositsExists = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.Iban == deposit.Iban);
+                }
+                else
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+
+                if (depositsExists != null)
+                {
+                    depositsExists.Amount = depositsExists.Amount -amount;
+                    depositsExists.PaymentDate = DateTime.Now.AddMonths(depositsExists.TermOfPayment);
+                    await _context.SaveChangesAsync();
+                    
+                    Transactions transaction = new Transactions();
+                    transaction.SenderAccountInfo = depositsExists.Iban;
+                    transaction.RecieverAccountInfo = $"{userAuthenticate.FirstName} {userAuthenticate.LastName}";
+                    await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transaction, $"Withdrawing {amount}", _context, _messageModel);
+                    _messageModel.Message = "Money withdrawed successfully!";
+                    return StatusCode(200, _messageModel);
+                }
+                else
+                {
+                    _messageModel.Message = "Deposit not found";
+                    return StatusCode(404, _messageModel);
+                }
+            }
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
 
         private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Users userAuthenticate, Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {

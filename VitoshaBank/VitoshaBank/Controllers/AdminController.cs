@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
@@ -14,6 +15,7 @@ using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.Interfaces.UserService;
 using VitoshaBank.Services.Interfaces.WalletService;
+using VitoshaBank.Services.SupportTicketsService.Interfaces;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
@@ -34,9 +36,10 @@ namespace VitoshaBank.Controllers
         private readonly ICreditService _creditService;
         private readonly IDepositService _depositService;
         private readonly IWalletsService _walletService;
+        private readonly ISupportTicketService _ticketService;
         private readonly MessageModel _messageModel;
 
-        public AdminController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService, IBCryptPasswordHasherService bCrypt, IConfiguration config, IUsersService usersService, ICreditService creditService, IDepositService depositService, IWalletsService walletsService)
+        public AdminController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService, IBCryptPasswordHasherService bCrypt, IConfiguration config, IUsersService usersService, ICreditService creditService, IDepositService depositService, IWalletsService walletsService, ISupportTicketService ticketService)
         {
             _context = context;
             _logger = logger;
@@ -51,6 +54,7 @@ namespace VitoshaBank.Controllers
             _depositService = depositService;
             _config = config;
             _walletService = walletsService;
+            _ticketService = ticketService;
 
         }
 
@@ -168,6 +172,20 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             return await _walletService.DeleteWallet(currentUser, requestModel.Username, _context, _messageModel);
+        }
+        [HttpGet("get/supporttickets")]
+        [Authorize]
+        public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTickets(SupportTicketRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            return await _ticketService.GetAllTicketsInfo(currentUser, _context, _messageModel);
+        }
+        [HttpPut("respond/supporttickets")]
+        [Authorize]
+        public async Task<ActionResult<MessageModel>> RespondToTicket(SupportTicketRequestModel requestModel)
+        {
+            var currentUser = HttpContext.User;
+            return await _ticketService.GiveResponse(currentUser, requestModel.Ticket, _context, _messageModel);
         }
 
     }
