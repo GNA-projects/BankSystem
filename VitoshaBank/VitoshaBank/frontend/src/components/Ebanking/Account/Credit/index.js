@@ -8,7 +8,10 @@ export default function Credit() {
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
 	useEffect(() => {
-		getCredit(setAmount, setIban);
+		const interval = setInterval(() => {
+			getCredit(setAmount, setIban);
+		}, 1000);
+		return () => clearInterval(interval);
 	}, []);
 	return (
 		<AccountForm onClick={() => history.push("/credit")}>

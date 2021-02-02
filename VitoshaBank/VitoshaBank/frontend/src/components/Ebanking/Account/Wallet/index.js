@@ -8,7 +8,10 @@ export default function Wallet() {
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
 	useEffect(() => {
-		getWallet(setAmount, setIban);
+		const interval = setInterval(() => {
+			getWallet(setAmount, setIban);
+		}, 1000);
+		return () => clearInterval(interval);
 	}, []);
 	return (
 		<AccountForm onClick={() => history.push("/wallet")}>

@@ -8,7 +8,10 @@ export default function Deposit() {
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
 	useEffect(() => {
-		getDeposit(setAmount, setIban);
+		const interval = setInterval(() => {
+			getDeposit(setAmount, setIban);
+		}, 1000);
+		return () => clearInterval(interval);
 	}, []);
 	return (
 		<AccountForm onClick={() => history.push("/deposit")}>
