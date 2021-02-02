@@ -20,10 +20,10 @@ namespace VitoshaBank.Data.Models
 
         public virtual Transactions LastTransaction { get; set; }
         public virtual Cards Cards { get; set; }
-        public virtual ChargeAccounts Chargeaccounts { get; set; }
+        public virtual ChargeAccounts ChargeAccounts { get; set; }
         public virtual Credits Credits { get; set; }
         public virtual Deposits Deposits { get; set; }
-        public virtual SupportTickets Supporttickets { get; set; }
+        public virtual SupportTickets SupportTickets { get; set; }
         public virtual Wallets Wallets { get; set; }
     }
 }
