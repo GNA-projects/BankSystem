@@ -18,7 +18,7 @@ export default function DeleteAccount() {
 				values={{ value: uname, setValue: setUname }}
 			></AdminForm.Input>
 			<AdminForm.Input
-				heading="Account Type 'deposit', 'credit', 'bankaccount', 'wallet'"
+				heading="Account Type 'deposit', 'credit', 'charge', 'wallet'"
 				values={{ value: accountType, setValue: setAccountType }}
 			></AdminForm.Input>
 			<AdminForm.Button onClick={handleDelete}>Delete Bank Account</AdminForm.Button>

@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import AccountForm from "../AccountForm";
 import { getCharge } from "../../../../Api/user";
 
-export default function BankAccount() {
+export default function Charge() {
 	const history = useHistory();
 	const [amount, setAmount] = useState(0);
 	const [iban, setIban] = useState(0);
