@@ -1,16 +1,16 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import AdminForm from "../../AdminForm";
+import AdminForm from "../../../AdminForm";
 
-import { createCredit } from "../../../../Api/admin";
+import { createDeposit } from "../../../../../Api/admin";
 
-export default function CreateCredit() {
+export default function CreateDeposit() {
 	const [uname, setUname] = useState();
 	const [amount, setAmount] = useState();
 	const [period, setPeriod] = useState();
 
 	const handleCreate = () => {
-		createCredit(uname, amount, period);
+		createDeposit(uname, amount, period);
 	};
 	return (
 		<AdminForm>
@@ -23,10 +23,12 @@ export default function CreateCredit() {
 				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
 			<AdminForm.Input
-				heading="Period"
+				heading="Term of Payment"
 				values={{ value: period, setValue: setPeriod }}
 			></AdminForm.Input>
-			<AdminForm.Button onClick={handleCreate}>Create Credit</AdminForm.Button>
+			<AdminForm.Button onClick={handleCreate}>
+				Create Deposit Account
+			</AdminForm.Button>
 		</AdminForm>
 	);
 }

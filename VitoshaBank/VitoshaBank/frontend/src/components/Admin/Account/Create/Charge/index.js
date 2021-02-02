@@ -1,14 +1,14 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import AdminForm from "../../AdminForm";
-import { createBankAccount } from "../../../../Api/admin";
+import AdminForm from "../../../AdminForm";
+import { createCharge } from "../../../../../Api/admin";
 
-export default function CreateBankAccount() {
+export default function CreateCharge() {
 	const [uname, setUname] = useState();
 	const [amount, setAmount] = useState();
 
 	const handleCreate = () => {
-		createBankAccount(uname, amount);
+		createCharge(uname, amount);
 	};
 	return (
 		<AdminForm>
@@ -20,7 +20,7 @@ export default function CreateBankAccount() {
 				heading="Amount"
 				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
-			<AdminForm.Button onClick={handleCreate}>Create Bank Account</AdminForm.Button>
+			<AdminForm.Button onClick={handleCreate}>Create Charge Account</AdminForm.Button>
 		</AdminForm>
 	);
 }

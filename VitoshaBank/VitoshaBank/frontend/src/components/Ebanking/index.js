@@ -5,7 +5,7 @@ import Banking from "./Banking";
 export default function Ebanking() {
 	return (
 		<Banking>
-			<Banking.BankAccount />
+			<Banking.Charge />
 			<Banking.Deposit />
 			<Banking.Wallet />
 			<Banking.Credit />

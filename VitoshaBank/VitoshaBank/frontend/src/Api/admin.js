@@ -15,10 +15,10 @@ export const createUser = (uname, fname, lname, password, mail, admin) => {
         .then((res) => alert(res.data.message))
         .catch((err) => alert(err.response.data.message));
 };
-export const createBankAccount = (uname, amount) => {
+export const createCharge = (uname, amount) => {
     viaxios
-        .post("/api/admin/create/bankaccount", {
-            BankAccount: {
+        .post("/api/admin/create/charge", {
+            Charge: {
                 Amount: amount,
             },
             Username: uname,
@@ -64,7 +64,7 @@ export const createDeposit = (uname, amount, period) => {
 export const createDebitCard = (iban) => {
     viaxios
         .post("/api/admin/create/debitcard", {
-            BankAccount: {
+            Charge: {
                 IBAN: iban,
             },
         })

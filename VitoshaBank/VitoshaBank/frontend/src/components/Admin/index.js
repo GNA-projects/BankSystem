@@ -6,8 +6,8 @@ export default function Admin() {
 		<AdminPanel>
 			<AdminPanel.Link to="/admin/create/user" heading="Create User" />
 			<AdminPanel.Link
-				to="/admin/create/baccount"
-				heading="Create Bank Account"
+				to="/admin/create/charge"
+				heading="Create Charge Account"
 			/>
 			<AdminPanel.Link
 				to="/admin/create/credit"

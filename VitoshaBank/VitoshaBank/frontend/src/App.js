@@ -12,7 +12,7 @@ import Ebanking from './components/Ebanking'
 
 import Admin from './components/Admin'
 import CreateUser from './components/Admin/User/Create'
-import BankAccount from './components/Admin/Account/Create/BankAccount'
+import Charge from './components/Admin/Account/Create/Charge'
 import Credit from './components/Admin/Account/Create/Credit'
 import Deposit from './components/Admin/Account/Create/Deposit'
 import Wallet from './components/Admin/Account/Create/Wallet'
@@ -32,7 +32,7 @@ function App() {
 				<PrivateRoute exact path="/ebanking" component={Ebanking} />
 				<AdminRoute exact path="/admin" component={Admin}/>
 				<AdminRoute exact path="/admin/create/user" component={CreateUser}/>
-				<AdminRoute exact path="/admin/create/baccount" component={BankAccount}/>
+				<AdminRoute exact path="/admin/create/charge" component={Charge}/>
 				<AdminRoute exact path="/admin/create/credit" component={Credit}/>
 				<AdminRoute exact path="/admin/create/deposit" component={Deposit}/>
 				<AdminRoute exact path="/admin/create/wallet" component={Wallet}/>

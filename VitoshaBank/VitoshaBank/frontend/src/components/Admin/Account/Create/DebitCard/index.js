@@ -1,8 +1,8 @@
 import React from "react";
 import { useState } from "react/cjs/react.development";
-import AdminForm from "../../AdminForm";
+import AdminForm from "../../../AdminForm";
 
-import { createDebitCard } from "../../../../Api/admin";
+import { createDebitCard } from "../../../../../Api/admin";
 
 export default function CreateDebitCard() {
 	const [iban, setIban] = useState();

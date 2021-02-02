@@ -20,8 +20,8 @@ export const loginUser = (username, password) => {
 		});
 };
 
-export const getBankAccount = (setAmount, setIban) => {
-	viaxios.get("api/bankaccount/").then(
+export const getCharge = (setAmount, setIban) => {
+	viaxios.get("api/charge/").then(
 		(res) => {
 			console.log(res.data);
 			setAmount(res.data.amount);
