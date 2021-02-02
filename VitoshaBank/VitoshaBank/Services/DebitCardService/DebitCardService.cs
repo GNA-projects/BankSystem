@@ -25,7 +25,7 @@ namespace VitoshaBank.Services.DebitCardService
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                BankAccounts bankAccountExits = null;
+                ChargeAccounts bankAccountExits = null;
                 Cards debitCardExists = null;
                 DebitCardResponseModel debitCardResponseModel = new DebitCardResponseModel();
 
@@ -36,8 +36,8 @@ namespace VitoshaBank.Services.DebitCardService
                 }
                 else
                 {
-                    bankAccountExits = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    debitCardExists = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccountExits.Id);
+                    bankAccountExits = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    debitCardExists = await _context.Cards.FirstOrDefaultAsync(x => x.ChargeAccountId == bankAccountExits.Id);
                 }
 
                 if (debitCardExists != null)
@@ -63,7 +63,7 @@ namespace VitoshaBank.Services.DebitCardService
             _messageModel.Message = "You don't have a Debit Card!!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, BankSystemContext _context, Cards card, IBCryptPasswordHasherService _BCrypt, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, BankSystemContext _context, Cards card, IBCryptPasswordHasherService _BCrypt, MessageModel _messageModel)
         {
             string role = "";
 
@@ -77,12 +77,12 @@ namespace VitoshaBank.Services.DebitCardService
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 Cards cardExists = null;
-                BankAccounts bankAccountExists = null;
+                ChargeAccounts bankAccountExists = null;
 
                 if (userAuthenticate != null)
                 {
                     cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.Iban == bankAccount.Iban);
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.Iban == bankAccount.Iban);
                 }
 
 
@@ -91,7 +91,7 @@ namespace VitoshaBank.Services.DebitCardService
                     if (ValidateUser(userAuthenticate))
                     {
                         card.UserId = userAuthenticate.Id;
-                        card.BankAccountId = bankAccountExists.Id;
+                        card.ChargeAccountId = bankAccountExists.Id;
                         card.CardNumber = GenerateCardInfo.GenerateNumber(11);
                         var CVV = GenerateCardInfo.GenerateCVV(3);
                         card.Cvv = _BCrypt.HashPassword(CVV);
@@ -121,14 +121,14 @@ namespace VitoshaBank.Services.DebitCardService
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccountsExists = null;
+            ChargeAccounts bankAccountsExists = null;
             Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountsExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                     cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
@@ -167,14 +167,14 @@ namespace VitoshaBank.Services.DebitCardService
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccountsExists = null;
+            ChargeAccounts bankAccountsExists = null;
             Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountsExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                     cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
@@ -213,14 +213,14 @@ namespace VitoshaBank.Services.DebitCardService
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccountsExists = null;
+            ChargeAccounts bankAccountsExists = null;
             Cards cardsExists = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccountsExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountsExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                     cardsExists = await _context.Cards.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id && x.CardNumber == cardNumber && x.Cvv == CVV && x.CardExiprationDate == expireDate);
                 }
                 else

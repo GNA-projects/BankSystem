@@ -26,7 +26,7 @@ namespace VitoshaBank.Services.CreditPayOffService
                 }
                 else
                 {
-                    var bankAccount = _context.BankAccounts.FirstOrDefault(x => x.UserId == credit.UserId);
+                    var bankAccount = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == credit.UserId);
                     if (credit.Instalment<= bankAccount.Amount)
                     {
                         bankAccount.Amount = bankAccount.Amount - credit.Instalment;

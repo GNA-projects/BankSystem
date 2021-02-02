@@ -105,7 +105,7 @@ namespace VitoshaBank.Services.TransactionService
                 List<Transactions> userTransactions = new List<Transactions>();
                 Dictionary<string, string> userDicTransactions = new Dictionary<string, string>();
 
-                BankAccounts userBankAccount = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                ChargeAccounts userBankAccount = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 Deposits userDeposit = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 Credits userCredit = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 Wallets userWallets = await _context.Wallets.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
@@ -119,7 +119,7 @@ namespace VitoshaBank.Services.TransactionService
                 {
                     if (userBankAccount == null)
                     {
-                        userBankAccount = new BankAccounts();
+                        userBankAccount = new ChargeAccounts();
 
                         userBankAccount.Iban = "";
                     }

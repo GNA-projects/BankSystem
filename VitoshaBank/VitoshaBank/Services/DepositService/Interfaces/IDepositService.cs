@@ -18,6 +18,6 @@ namespace VitoshaBank.Services.DepositService
         public Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposit, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<MessageModel>> DeleteDeposit(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel);
         public  Task<ActionResult<MessageModel>> WithdrawMoney(Deposits deposit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel);
-        public Task<ActionResult<MessageModel>> AddMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel);
+        public Task<ActionResult<MessageModel>> AddMoney(Deposits deposit, ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel);
     }
 }

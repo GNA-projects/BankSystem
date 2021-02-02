@@ -25,7 +25,7 @@ namespace VitoshaBank.Controllers
     public class AdminController : ControllerBase
     {
         private readonly BankSystemContext _context;
-        private readonly ILogger<BankAccounts> _logger;
+        private readonly ILogger<ChargeAccounts> _logger;
         private readonly IBCryptPasswordHasherService _BCrypt;
         private readonly IConfiguration _config;
         private readonly IBankAccountService _bankAccountService;
@@ -39,7 +39,7 @@ namespace VitoshaBank.Controllers
         private readonly ISupportTicketService _ticketService;
         private readonly MessageModel _messageModel;
 
-        public AdminController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService, IBCryptPasswordHasherService bCrypt, IConfiguration config, IUsersService usersService, ICreditService creditService, IDepositService depositService, IWalletsService walletsService, ISupportTicketService ticketService)
+        public AdminController(BankSystemContext context, ILogger<ChargeAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService, IBCryptPasswordHasherService bCrypt, IConfiguration config, IUsersService usersService, ICreditService creditService, IDepositService depositService, IWalletsService walletsService, ISupportTicketService ticketService)
         {
             _context = context;
             _logger = logger;
@@ -68,7 +68,7 @@ namespace VitoshaBank.Controllers
             return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context, _messageModel);
         }
 
-        [HttpPost("create/bankaccount")]
+        [HttpPost("create/chargeaccount")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> CreateBankAccount(BankAccountRequestModel requestModel)
         {
@@ -77,7 +77,7 @@ namespace VitoshaBank.Controllers
             return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount, _IBAN, _BCrypt, _context, _debitCardService, _messageModel);
         }
 
-        [HttpPut("addmoney/bankaccount")]
+        [HttpPut("addmoney/chargeaccount")]
         [Authorize]
         //need BankAccount(IBAN), username, amount
         public async Task<ActionResult<MessageModel>> AddMoneyInBankAccount(BankAccountRequestModel requestModel)
@@ -85,7 +85,7 @@ namespace VitoshaBank.Controllers
             var currentUser = HttpContext.User;
             return await _bankAccountService.AddMoney(requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
         }
-        [HttpDelete("delete/bankaccount")]
+        [HttpDelete("delete/chargeaccount")]
         [Authorize]
         //need username
         public async Task<ActionResult<MessageModel>> DeleteBankAccount(BankAccountRequestModel requestModel)

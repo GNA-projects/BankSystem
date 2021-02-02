@@ -11,6 +11,7 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
+using VitoshaBank.Services.CreditPayOffService.Interfaces;
 using VitoshaBank.Services.CreditService;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
@@ -29,9 +30,10 @@ namespace VitoshaBank.Controllers
         private readonly IIBANGeneratorService _IBAN;
         private readonly MessageModel _messageModel;
         private readonly ITransactionService _transactionService;
+        private readonly ICreditPayOffService _creditPayOff;
         
 
-        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, ITransactionService transactionService)
+        public CreditController(BankSystemContext context, ILogger<Credits> logger, ICreditService creditService, IIBANGeneratorService IBAN, ITransactionService transactionService, ICreditPayOffService creditPayOff)
         {
             _context = context;
             _logger = logger;
@@ -39,6 +41,7 @@ namespace VitoshaBank.Controllers
             _IBAN = IBAN;
             _messageModel = new MessageModel();
             _transactionService = transactionService;
+            _creditPayOff = creditPayOff;
         }
 
         [HttpGet]
@@ -47,7 +50,7 @@ namespace VitoshaBank.Controllers
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
-            return await _creditService.GetCreditInfo(currentUser, username, _context,  _messageModel);
+            return await _creditService.GetCreditInfo(currentUser, username, _creditPayOff, _context,  _messageModel);
         }
 
         [HttpPut("purchase")]

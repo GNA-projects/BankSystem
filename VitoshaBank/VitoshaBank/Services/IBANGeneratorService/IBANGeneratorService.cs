@@ -48,7 +48,7 @@ namespace VitoshaBank.Services.IBANGeneratorService
            
             if (BankAccountType == "BankAccount")
             {
-                var lastBankAccount = dbContext.BankAccounts.ToList();
+                var lastBankAccount = dbContext.ChargeAccounts.ToList();
                 int serialNumber = 0;
                 if (lastBankAccount.Count() == 0)
                 {

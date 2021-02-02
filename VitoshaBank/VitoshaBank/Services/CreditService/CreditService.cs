@@ -9,6 +9,8 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateInterestService;
+using VitoshaBank.Services.CreditPayOffService;
+using VitoshaBank.Services.CreditPayOffService.Interfaces;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.TransactionService.Interfaces;
@@ -17,7 +19,7 @@ namespace VitoshaBank.Services.CreditService
 {
     public class CreditService : ControllerBase, ICreditService
     {
-        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -41,7 +43,7 @@ namespace VitoshaBank.Services.CreditService
                     creditResponseModel.Amount = Math.Round(creditsExists.Amount);
                     creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount,2);
                     creditResponseModel.Instalment = Math.Round(creditsExists.Instalment,2);
-
+                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
                     return StatusCode(200, creditResponseModel);
                 }
                 _messageModel.Message = "You don't have a Credit";
@@ -164,7 +166,7 @@ namespace VitoshaBank.Services.CreditService
             
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Credits creditsExists = null;
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -180,7 +182,7 @@ namespace VitoshaBank.Services.CreditService
 
                 if (creditsExists != null)
                 {
-                    bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
                     return await ValidateDepositAmountAndCredit(userAuthenticate, creditsExists, currentUser, amount, bankAccounts, _context,_transaction, _messageModel);
                 }
                 else
@@ -333,7 +335,7 @@ namespace VitoshaBank.Services.CreditService
             }
             return false;
         }
-        private async Task<ActionResult> ValidateDepositAmountAndCredit(Users userAuthenticate, Credits creditExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        private async Task<ActionResult> ValidateDepositAmountAndCredit(Users userAuthenticate, Credits creditExists, ClaimsPrincipal currentUser, decimal amount, ChargeAccounts bankAccount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             if (amount < 0)
             {

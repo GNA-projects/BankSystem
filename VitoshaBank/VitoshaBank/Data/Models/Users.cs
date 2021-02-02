@@ -10,7 +10,7 @@ namespace VitoshaBank.Data.Models
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime RegisterDate { get; set; } = DateTime.Now;
+        public DateTime RegisterDate { get; set; }
         public int? LastTransactionId { get; set; }
         public DateTime BirthDate { get; set; }
         public bool IsAdmin { get; set; }
@@ -19,11 +19,11 @@ namespace VitoshaBank.Data.Models
         public string ActivationCode { get; set; }
 
         public virtual Transactions LastTransaction { get; set; }
-        public virtual BankAccounts BankAccounts { get; set; }
         public virtual Cards Cards { get; set; }
+        public virtual ChargeAccounts Chargeaccounts { get; set; }
         public virtual Credits Credits { get; set; }
         public virtual Deposits Deposits { get; set; }
-        public virtual SupportTickets SupportTickets { get; set; }
+        public virtual SupportTickets Supporttickets { get; set; }
         public virtual Wallets Wallets { get; set; }
     }
 }

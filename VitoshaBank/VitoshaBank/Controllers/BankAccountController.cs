@@ -18,19 +18,19 @@ using VitoshaBank.Services.TransactionService.Interfaces;
 
 namespace VitoshaBank.Controllers
 {
-    [Route("api/bankaccount")]
+    [Route("api/chargeaccounts")]
     [ApiController]
     public class BankAccountController : ControllerBase
     {
         private readonly BankSystemContext _context;
-        private readonly ILogger<BankAccounts> _logger;
+        private readonly ILogger<ChargeAccounts> _logger;
         private readonly IBankAccountService _bankAccountService;
         private readonly IDebitCardService _debitCardService;
         private readonly IIBANGeneratorService _IBAN;
         private readonly ITransactionService _transactionService;
         private readonly MessageModel _messageModel;
 
-        public BankAccountController(BankSystemContext context, ILogger<BankAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService)
+        public BankAccountController(BankSystemContext context, ILogger<ChargeAccounts> logger, IBankAccountService bankAccountService, IIBANGeneratorService IBAN, IDebitCardService debitCardService, ITransactionService transactionService)
         {
             _context = context;
             _logger = logger;

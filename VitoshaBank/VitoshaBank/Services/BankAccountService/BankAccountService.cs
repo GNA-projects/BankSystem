@@ -23,7 +23,7 @@ namespace VitoshaBank.Services.BankAccountService
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                BankAccounts bankAccountExists = null;
+                ChargeAccounts bankAccountExists = null;
                 BankAccountResponseModel bankAccountResponseModel = new BankAccountResponseModel();
 
                 if (userAuthenticate == null)
@@ -33,7 +33,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
 
                 if (bankAccountExists != null)
@@ -49,10 +49,10 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
 
-            messageModel.Message = "You don't have a Bank Account!";
+            messageModel.Message = "You don't have a Charge Account!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, BankAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
         {
             string role = "";
 
@@ -65,11 +65,11 @@ namespace VitoshaBank.Services.BankAccountService
             if (role == "Admin")
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                BankAccounts bankAccountExists = null;
+                ChargeAccounts bankAccountExists = null;
 
                 if (userAuthenticate != null)
                 {
-                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
 
 
@@ -83,7 +83,7 @@ namespace VitoshaBank.Services.BankAccountService
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
                         await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, _BCrypt, messageModel);
-                        messageModel.Message = "Bank Account created succesfully";
+                        messageModel.Message = "Charge Account created succesfully";
                         return StatusCode(201, messageModel);
                     }
                     else if (ValidateUser(userAuthenticate) == false)
@@ -106,18 +106,18 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> DepositMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> DepositMoney(ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
             Deposits depositsExist = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                     depositsExist = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
@@ -145,24 +145,24 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    messageModel.Message = "Bank Account not found";
+                    messageModel.Message = "Charge Account not found";
                     return StatusCode(404, messageModel);
                 }
             }
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> SimulatePurchase(BankAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> SimulatePurchase(ChargeAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -190,25 +190,25 @@ namespace VitoshaBank.Services.BankAccountService
                     }
                     else if (ValidateBankAccount(bankAccounts, amount) == false)
                     {
-                        _messageModel.Message = "You don't have enough money in bank account!";
+                        _messageModel.Message = "You don't have enough money in Charge account!";
                         return StatusCode(406, _messageModel);
                     }
 
                 }
                 else
                 {
-                    _messageModel.Message = "Bank Account not found";
+                    _messageModel.Message = "Charge Account not found";
                     return StatusCode(404, _messageModel);
                 }
             }
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> AddMoney(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccountExists = null;
+            ChargeAccounts bankAccountExists = null;
             string role = "";
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -220,7 +220,7 @@ namespace VitoshaBank.Services.BankAccountService
 
                 if (userAuthenticate != null)
                 {
-                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -246,24 +246,24 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    messageModel.Message = "Bank Account not found";
+                    messageModel.Message = "Charge Account not found";
                     return StatusCode(404, messageModel);
                 }
             }
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> Withdraw(BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> Withdraw(ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 if (userAuthenticate != null)
                 {
-                    bankAccounts = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
                 }
                 else
                 {
@@ -303,7 +303,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 else
                 {
-                    _messageModel.Message = "BankAccount not found";
+                    _messageModel.Message = "Charge Account not found";
                     return StatusCode(404, _messageModel);
                 }
             }
@@ -323,14 +323,14 @@ namespace VitoshaBank.Services.BankAccountService
             if (role == "Admin")
             {
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                BankAccounts bankAccountExists = null;
+                ChargeAccounts bankAccountExists = null;
                 Cards cardExists = null;
                 Credits creditExists = null;
 
                 if (user != null)
                 {
-                    bankAccountExists = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == user.Id);
-                    cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.BankAccountId == bankAccountExists.Id);
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == user.Id);
+                    cardExists = await _context.Cards.FirstOrDefaultAsync(x => x.ChargeAccountId == bankAccountExists.Id);
                     creditExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == user.Id);
                 }
 
@@ -341,7 +341,7 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 if (bankAccountExists == null)
                 {
-                    messageModel.Message = "User doesn't have a bank account!";
+                    messageModel.Message = "User doesn't have a Charge account!";
                     return StatusCode(400, messageModel);
                 }
                 if (cardExists != null)
@@ -350,15 +350,15 @@ namespace VitoshaBank.Services.BankAccountService
                 }
                 if (creditExists != null)
                 {
-                    messageModel.Message = "You can't delete bank account if you have an existing credit!";
+                    messageModel.Message = "You can't delete Charge account if you have an existing credit!";
                     return StatusCode(406, messageModel);
                 }
 
                 
-                _context.BankAccounts.Remove(bankAccountExists);
+                _context.ChargeAccounts.Remove(bankAccountExists);
                 await _context.SaveChangesAsync();
 
-                messageModel.Message = $"Succsesfully deleted {user.Username} Bank Account and Debit Card!";
+                messageModel.Message = $"Succsesfully deleted {user.Username} Charge Account and Debit Card!";
                 return StatusCode(200, messageModel);
 
             }
@@ -368,7 +368,7 @@ namespace VitoshaBank.Services.BankAccountService
                 return StatusCode(403, messageModel);
             }
         }
-        private bool ValidateBankAccount(BankAccounts bankAccounts)
+        private bool ValidateBankAccount(ChargeAccounts bankAccounts)
         {
             if (bankAccounts.Amount < 0)
             {
@@ -385,7 +385,7 @@ namespace VitoshaBank.Services.BankAccountService
 
             return false;
         }
-        private bool ValidateMinAmount(BankAccounts bankAccounts, decimal amount)
+        private bool ValidateMinAmount(ChargeAccounts bankAccounts, decimal amount)
         {
             if (amount >= 10 && amount <= bankAccounts.Amount)
             {
@@ -394,7 +394,7 @@ namespace VitoshaBank.Services.BankAccountService
 
             return false;
         }
-        private bool ValidateBankAccount(BankAccounts bankAccount, decimal amount)
+        private bool ValidateBankAccount(ChargeAccounts bankAccount, decimal amount)
         {
             if (bankAccount != null && bankAccount.Amount > amount)
             {

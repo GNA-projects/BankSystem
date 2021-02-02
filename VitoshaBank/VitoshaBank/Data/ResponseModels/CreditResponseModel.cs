@@ -11,5 +11,6 @@ namespace VitoshaBank.Data.ResponseModels
         public decimal Amount { get; set; }
         public decimal CreditAmount { get; set; }
         public decimal Instalment { get; set; }
+        public string Message { get; set; }
     }
 }

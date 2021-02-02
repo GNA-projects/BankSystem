@@ -114,12 +114,12 @@ namespace VitoshaBank.Services.DepositService
                 return StatusCode(403, _messageModel);
             }
         }
-        public async Task<ActionResult<MessageModel>> AddMoney(Deposits deposit, BankAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> AddMoney(Deposits deposit, ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
 
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Deposits depositsExists = null;
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -135,7 +135,7 @@ namespace VitoshaBank.Services.DepositService
 
                 if (depositsExists != null)
                 {
-                    bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
                     return await ValidateDepositAmountAndBankAccount(userAuthenticate, depositsExists,currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
                 }
                 else
@@ -190,7 +190,7 @@ namespace VitoshaBank.Services.DepositService
             return StatusCode(403, _messageModel);
         }
 
-        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Users userAuthenticate, Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, BankAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        private async Task<ActionResult<MessageModel>> ValidateDepositAmountAndBankAccount(Users userAuthenticate, Deposits depositsExists, ClaimsPrincipal currentUser, decimal amount, ChargeAccounts bankAccounts, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
             if (amount < 0)
             {

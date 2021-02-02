@@ -13,12 +13,15 @@ using VitoshaBank.Services;
 using VitoshaBank.Services.BankAccountService;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.CalculateDividendService;
-
 using VitoshaBank.Services.CalculateInterestService;
+using VitoshaBank.Services.CreditPayOffService;
+using VitoshaBank.Services.CreditPayOffService.Interfaces;
 using VitoshaBank.Services.CreditService;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.DebitCardService;
 using VitoshaBank.Services.DebitCardService.Interfaces;
+using VitoshaBank.Services.DepositPayentService;
+using VitoshaBank.Services.DepositPayentService.Interfaces;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
@@ -57,6 +60,8 @@ namespace VitoshaBank
             services.AddScoped<ICreditService, CreditService>();
             services.AddScoped<ISupportTicketService, SupportTicketService>();
             services.AddScoped<ITransactionService, TransactionsService>();
+            services.AddScoped<ICreditPayOffService, CreditPayOff>();
+            services.AddScoped<IDividentPaymentService, DividentPayment>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

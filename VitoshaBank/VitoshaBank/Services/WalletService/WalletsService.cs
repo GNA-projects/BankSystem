@@ -122,7 +122,7 @@ namespace VitoshaBank.Services.WalletService
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Wallets walletExists = null;
-            BankAccounts bankAccounts = null;
+            ChargeAccounts bankAccounts = null;
 
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
@@ -144,7 +144,7 @@ namespace VitoshaBank.Services.WalletService
                         return StatusCode(406, _messageModel);
                     }
 
-                    bankAccounts = _context.BankAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
+                    bankAccounts = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
                     return await ValidateDepositAmountAndBankAccount(userAuthenticate, currentUser, walletExists, amount, bankAccounts, _context, _transation, _messageModel);
                 }
                 else
@@ -255,7 +255,7 @@ namespace VitoshaBank.Services.WalletService
             return false;
         }
 
-        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Users userAuthenticate, ClaimsPrincipal currentUser, Wallets walletExists, decimal amount, BankAccounts bankAccount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
+        private async Task<ActionResult> ValidateDepositAmountAndBankAccount(Users userAuthenticate, ClaimsPrincipal currentUser, Wallets walletExists, decimal amount, ChargeAccounts bankAccount, BankSystemContext _context, ITransactionService _transation, MessageModel _messageModel)
         {
             if (amount < 0)
             {
