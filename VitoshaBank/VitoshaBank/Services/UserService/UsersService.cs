@@ -162,6 +162,21 @@ namespace VitoshaBank.Services.UserService
             responseModel.Username = user.Username;
             return StatusCode(200, responseModel);
         }
+        public async Task<ActionResult<MessageModel>> AdminCheck(string username, BankSystemContext _context, MessageModel messageModel)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            if (user.IsAdmin)
+            {
+                messageModel.Message = "User is admin";
+                return StatusCode(200, messageModel);
+
+            }
+            else
+            {
+                messageModel.Message = "User is not Admin";
+                return StatusCode(400, messageModel);
+            }
+        }
 
         public async Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
