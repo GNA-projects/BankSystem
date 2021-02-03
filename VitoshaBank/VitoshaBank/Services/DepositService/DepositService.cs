@@ -9,6 +9,8 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.CalculateDividendService;
+using VitoshaBank.Services.DepositPayentService;
+using VitoshaBank.Services.DepositPayentService.Interfaces;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.TransactionService.Interfaces;
 
@@ -39,6 +41,40 @@ namespace VitoshaBank.Services.DepositService
                     depositResponseModel.IBAN = depositExists.Iban;
                     depositResponseModel.Amount = Math.Round(depositExists.Amount,2);
                     depositResponseModel.PaymentDate = depositExists.PaymentDate;
+                    return StatusCode(200, depositResponseModel);
+                }
+            }
+            else
+            {
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
+            }
+
+            _messageModel.Message = "You don't have a Deposit!";
+            return StatusCode(400, _messageModel);
+        }
+        public async Task<ActionResult<DepositResponseModel>> GetDividentInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, IDividentPaymentService _dividentPayment, MessageModel _messageModel)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Deposits depositExists = null;
+                DepositResponseModel depositResponseModel = new DepositResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
+                }
+                else
+                {
+                    depositExists = await _context.Deposits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (depositExists != null)
+                {
+                     await _dividentPayment.GetDividentPayment(depositExists, _messageModel, _context);
+                    _messageModel.Message = "Check susscessfull";
                     return StatusCode(200, depositResponseModel);
                 }
             }

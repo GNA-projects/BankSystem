@@ -17,7 +17,7 @@ namespace VitoshaBank.Services.BankAccountService.Interfaces
     public interface IBankAccountService
     {
 
-        public Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel);
+        public Task<ActionResult<ChargeAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> DeleteBankAccount(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> SimulatePurchase(ChargeAccounts bankAccount, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transaction, MessageModel messageModel);
         public Task<ActionResult<MessageModel>> DepositMoney(ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel);

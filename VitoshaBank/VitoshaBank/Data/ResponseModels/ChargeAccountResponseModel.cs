@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VitoshaBank.Data.ResponseModels
 {
-    public class BankAccountResponseModel
+    public class ChargeAccountResponseModel
     {
         public string IBAN { get; set; }
         public decimal Amount { get; set; }

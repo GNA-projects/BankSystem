@@ -11,6 +11,8 @@ using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
 using VitoshaBank.Data.ResponseModels;
+using VitoshaBank.Services.DepositPayentService;
+using VitoshaBank.Services.DepositPayentService.Interfaces;
 using VitoshaBank.Services.DepositService;
 using VitoshaBank.Services.IBANGeneratorService.Interfaces;
 using VitoshaBank.Services.TransactionService.Interfaces;
@@ -26,8 +28,9 @@ namespace VitoshaBank.Controllers
         private readonly IDepositService _depositService;
         private readonly IIBANGeneratorService _IBAN;
         private readonly ITransactionService _transactionService;
+        private readonly IDividentPaymentService _dividentPayment;
         private readonly MessageModel _messageModel;
-        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN,ITransactionService transactionService)
+        public DepositController(BankSystemContext context, ILogger<Deposits> logger, IDepositService depositService, IIBANGeneratorService IBAN,ITransactionService transactionService, IDividentPaymentService dividentPayment)
         {
             _context = context;
             _logger = logger;
@@ -35,6 +38,7 @@ namespace VitoshaBank.Controllers
             _IBAN = IBAN;
             _messageModel = new MessageModel();
             _transactionService = transactionService;
+            _dividentPayment = dividentPayment;
         }
 
         [HttpGet]
@@ -53,7 +57,8 @@ namespace VitoshaBank.Controllers
         {
             //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
             var currentUser = HttpContext.User;
-            return await _depositService.AddMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _depositService.AddMoney(requestModel.Deposit, requestModel.BankAccount, currentUser, username, requestModel.Amount, _context, _transactionService, _messageModel);
         }
         [HttpPut("withdraw")]
         [Authorize]
@@ -61,9 +66,17 @@ namespace VitoshaBank.Controllers
         {
             //need from deposit(IBAN), BankAcc(IBAN),Username,Amount
             var currentUser = HttpContext.User;
-            return await _depositService.WithdrawMoney(requestModel.Deposit, currentUser, requestModel.Username, requestModel.Amount, _context, _transactionService, _messageModel);
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _depositService.WithdrawMoney(requestModel.Deposit, currentUser, username, requestModel.Amount, _context, _transactionService, _messageModel);
         }
-
+        [HttpGet("check")]
+        [Authorize]
+        public async Task<ActionResult<DepositResponseModel>> GetDividentInfo()
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _depositService.GetDividentInfo(currentUser, username, _context,_dividentPayment, _messageModel);
+        }
 
     }
 }

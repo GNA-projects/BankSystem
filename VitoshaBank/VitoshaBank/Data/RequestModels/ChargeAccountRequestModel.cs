@@ -6,7 +6,7 @@ using VitoshaBank.Data.Models;
 
 namespace VitoshaBank.Data.RequestModels
 {
-    public class BankAccountRequestModel
+    public class ChargeAccountRequestModel
     {
         public ChargeAccounts BankAccount { get; set; }
         public string Username { get; set; }

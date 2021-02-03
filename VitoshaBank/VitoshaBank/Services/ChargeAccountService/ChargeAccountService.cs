@@ -16,15 +16,15 @@ using VitoshaBank.Services.Interfaces.UserService;
 
 namespace VitoshaBank.Services.BankAccountService
 {
-    public class BankAccountService : ControllerBase, IBankAccountService
+    public class ChargeAccountService : ControllerBase, IBankAccountService
     {
-        public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<ChargeAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
             {
                 var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
                 ChargeAccounts bankAccountExists = null;
-                BankAccountResponseModel bankAccountResponseModel = new BankAccountResponseModel();
+                ChargeAccountResponseModel bankAccountResponseModel = new ChargeAccountResponseModel();
 
                 if (userAuthenticate == null)
                 {

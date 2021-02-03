@@ -13,7 +13,7 @@ namespace VitoshaBank.Services.CreditPayOffService
     {
         public async Task<ActionResult<MessageModel>> GetCreditPayOff(Credits credit, MessageModel messageModel, BankSystemContext _context)
         {
-            if (DateTime.Now >= credit.PaymentDate)
+            while (DateTime.Now >= credit.PaymentDate)
             {
                 if (credit.Instalment <= credit.Amount)
                 {
@@ -43,10 +43,7 @@ namespace VitoshaBank.Services.CreditPayOffService
                     }
                 }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 }
