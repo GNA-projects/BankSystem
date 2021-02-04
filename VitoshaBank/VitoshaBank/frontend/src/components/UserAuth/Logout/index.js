@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext, logoutUser } from "../../../Auth";
-import { Form } from "../style";
+import VitoshaForm from "../VitoshaForm/index";
 
 export default function Logout() {
 	const { setLogged } = useContext(AuthContext);
@@ -12,9 +12,9 @@ export default function Logout() {
 		setLogged(false);
 	};
 	return (
-		<Form>
-			<Form.Icon />
-			<Form.Submit onClick={logout} text="Logout" />
-		</Form>
+		<VitoshaForm>
+			<VitoshaForm.Icon />
+			<VitoshaForm.Submit onClick={logout} text="Logout" />
+		</VitoshaForm>
 	);
 }

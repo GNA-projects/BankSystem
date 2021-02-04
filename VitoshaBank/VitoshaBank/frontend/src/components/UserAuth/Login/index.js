@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../../Auth";
 import { loginUser } from "../../../Api/user";
-import { Form } from "../style";
+import VitoshaForm from "../VitoshaForm/index";
 
 export default function Login() {
 	const { setLogged } = useContext(AuthContext);
@@ -15,20 +15,20 @@ export default function Login() {
 		history.push("/ebanking");
 	};
 	return (
-		<Form>
-			<Form.Icon />
-			<Form.Input
+		<VitoshaForm>
+			<VitoshaForm.Icon />
+			<VitoshaForm.Input
 				heading="username"
 				value={username}
 				onChange={(e) => setUsername(e.target.value)}
 			/>
-			<Form.Input
+			<VitoshaForm.Input
 				heading="password"
 				type="password"
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 			/>
-			<Form.Submit onClick={login} text="Login" />
-		</Form>
+			<VitoshaForm.Submit onClick={login} text="Login" />
+		</VitoshaForm>
 	);
 }

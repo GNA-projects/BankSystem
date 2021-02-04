@@ -82,3 +82,44 @@ export const changePass = (password) => {
 		.then((res) => alert(res.data.message))
 		.catch((err) => alert(err.response.data.message));
 };
+
+export const purchaseAmazon = (iban) => {
+	viaxios
+		.put("api/charge/purchase", {
+			BankAccount: {
+				IBAN: iban,
+			},
+			Reciever: "Amazon America",
+			Product: "Amazon Prime subscribtion",
+			Amount: 36,
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
+
+export const depositInCredit = (iban, amount) => {
+	viaxios
+		.put("api/credit/deposit", {
+			Credit: {
+				IBAN: iban,
+			},
+			Amount: amount,
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};
+export const depositInDeposit = (iban, amount) => {
+	viaxios
+		.put("api/credit/deposit", {
+			BankAccount: {
+				IBAN: "BG18VITB123456701000015",
+			},
+			Deposit: {
+				IBAN: "BG18VITB123456703000016",
+			},
+			Username: "admin1",
+			Amount: amount,
+		})
+		.then((res) => alert(res.data.message))
+		.catch((err) => alert(err.response.data.message));
+};

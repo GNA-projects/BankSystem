@@ -40,13 +40,15 @@ const ICON = styled(FontAwesomeIcon)`
 	margin-bottom: 20px;
 `;
 
-export const Form = (props) => (
-	<FORM>
-		<OUTER>
-			<INNER>{props.children}</INNER>
-		</OUTER>
-	</FORM>
-);
-Form.Icon = () => <ICON icon={faMountain}/>;
-Form.Input = InputGroup;
-Form.Submit = (props) => <SUBMIT {...props}>{props.text}</SUBMIT>;
+export default function VitoshaForm(props) {
+	return (
+		<FORM>
+			<OUTER>
+				<INNER>{props.children}</INNER>
+			</OUTER>
+		</FORM>
+	);
+}
+VitoshaForm.Icon = () => <ICON icon={faMountain} />;
+VitoshaForm.Input = InputGroup;
+VitoshaForm.Submit = (props) => <SUBMIT {...props}>{props.text}</SUBMIT>;
