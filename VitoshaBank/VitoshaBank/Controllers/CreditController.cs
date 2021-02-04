@@ -52,6 +52,14 @@ namespace VitoshaBank.Controllers
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
             return await _creditService.GetCreditInfo(currentUser, username, _creditPayOff, _context,  _messageModel);
         }
+        [HttpGet("check")]
+        [Authorize]
+        public async Task<ActionResult<CreditResponseModel>> GetPayOffInfo()
+        {
+            var currentUser = HttpContext.User;
+            string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
+            return await _creditService.GetPayOffInfo(currentUser, username, _creditPayOff, _context, _messageModel);
+        }
 
         [HttpPut("purchase")]
         [Authorize]

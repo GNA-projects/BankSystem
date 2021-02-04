@@ -41,10 +41,48 @@ namespace VitoshaBank.Services.CreditService
                 {
                     creditResponseModel.IBAN = creditsExists.Iban;
                     creditResponseModel.Amount = Math.Round(creditsExists.Amount);
-                    creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount,2);
-                    creditResponseModel.Instalment = Math.Round(creditsExists.Instalment,2);
+                    creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount, 2);
+                    creditResponseModel.Instalment = Math.Round(creditsExists.Instalment, 2);
                     await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
                     return StatusCode(200, creditResponseModel);
+                }
+                _messageModel.Message = "You don't have a Credit";
+                return StatusCode(400, _messageModel);
+            }
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
+        public async Task<ActionResult<CreditResponseModel>> GetPayOffInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Credits creditsExists = null;
+                CreditResponseModel creditResponseModel = new CreditResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
+                }
+                else
+                {
+                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (creditsExists != null)
+                {
+
+                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
+                    if (creditsExists.CreditAmountLeft == 0 && creditsExists.CreditAmount > 0)
+                    {
+                        _messageModel.Message = "You have payed your credit!";
+                        await this.DeleteCredit(currentUser, username, _context, _messageModel);
+                    }
+                    else
+                        _messageModel.Message = "Successfully payed montly pay off!";
+                    return StatusCode(200, _messageModel);
                 }
                 _messageModel.Message = "You don't have a Credit";
                 return StatusCode(400, _messageModel);
@@ -82,6 +120,7 @@ namespace VitoshaBank.Services.CreditService
                         credits.UserId = userAuthenticate.Id;
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
                         credits.Interest = 6.9m;
+                        credits.PaymentDate = DateTime.Now.AddMonths(1);
                         credits.CreditAmount = CalculateInterest.CalculateCreditAmount(credits.Amount, period, credits.Interest);
                         credits.Instalment = CalculateInterest.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
                         credits.CreditAmountLeft = credits.CreditAmount;
@@ -164,7 +203,7 @@ namespace VitoshaBank.Services.CreditService
         }
         public async Task<ActionResult<MessageModel>> AddMoney(Credits credit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel)
         {
-            
+
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
             Credits creditsExists = null;
             ChargeAccounts bankAccounts = null;
@@ -184,7 +223,7 @@ namespace VitoshaBank.Services.CreditService
                 if (creditsExists != null)
                 {
                     bankAccounts = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndCredit(userAuthenticate, creditsExists, currentUser, amount, bankAccounts, _context,_transaction, _messageModel);
+                    return await ValidateDepositAmountAndCredit(userAuthenticate, creditsExists, currentUser, amount, bankAccounts, _context, _transaction, _messageModel);
                 }
                 else
                 {
@@ -298,7 +337,7 @@ namespace VitoshaBank.Services.CreditService
         }
         private bool ValidateMinAmount(Credits credit, decimal amount)
         {
-            if (amount<=credit.Amount)
+            if (amount <= credit.Amount)
             {
                 return true;
             }

@@ -43,7 +43,7 @@ namespace VitoshaBank.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<BankAccountResponseModel>> GetBankAccountInfo()
+        public async Task<ActionResult<ChargeAccountResponseModel>> GetBankAccountInfo()
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;
@@ -53,7 +53,7 @@ namespace VitoshaBank.Controllers
 
         [HttpPut("fromdeposit")]
         [Authorize]
-        public async Task<ActionResult<MessageModel>> DepositInBankAcc(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> DepositInBankAcc(ChargeAccountRequestModel requestModel)
         {
             //amount = 0.50M;
             var currentUser = HttpContext.User;
@@ -63,7 +63,7 @@ namespace VitoshaBank.Controllers
 
         [HttpPut("purchase")]
         [Authorize]
-        public async Task<ActionResult<MessageModel>> Purchase(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> Purchase(ChargeAccountRequestModel requestModel)
         {
             
             var currentUser = HttpContext.User;
@@ -73,7 +73,7 @@ namespace VitoshaBank.Controllers
 
         [HttpPut("withdraw")]
         [Authorize]
-        public async Task<ActionResult<MessageModel>> Withdraw(BankAccountRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> Withdraw(ChargeAccountRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
             string username = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Username").Value;

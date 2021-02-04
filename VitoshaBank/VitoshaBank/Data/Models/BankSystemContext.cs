@@ -24,6 +24,8 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
 
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Cards>(entity =>
