@@ -30,7 +30,7 @@ namespace VitoshaBank.Services.SupportTicketsService
                     _context.Add(ticket);
                     await _context.SaveChangesAsync();
 
-                    _messageModel.Message = "Deposit created succesfully";
+                    _messageModel.Message = "Ticket created succesfully";
                     return StatusCode(200, _messageModel);
                 }
                 else
@@ -64,6 +64,7 @@ namespace VitoshaBank.Services.SupportTicketsService
                         if (ticket.UserId == userAuthenticate.Id)
                         {
                             SupportTicketResponseModel responseModel = new SupportTicketResponseModel();
+
                             responseModel.Title = ticket.Title;
                             responseModel.TicketDate = ticket.Date;
                             responseModel.HasResponse = ticket.HasResponce;
@@ -116,7 +117,7 @@ namespace VitoshaBank.Services.SupportTicketsService
             messageModel.Message = "You don't have Support Tickets!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> GiveResponse(ClaimsPrincipal currentUser, SupportTickets ticket, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> GiveResponse(ClaimsPrincipal currentUser, int id, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -127,12 +128,12 @@ namespace VitoshaBank.Services.SupportTicketsService
             }
             if (role == "Admin")
             {
-                var ticketExists = await _context.SupportTickets.FirstOrDefaultAsync(p => p.Id == ticket.Id);
+                var ticketExists = await _context.SupportTickets.FirstOrDefaultAsync(p => p.Id == id);
 
                 if (ticketExists != null)
                 {
-                    ticket.HasResponce = true;
-                    _context.Add(ticket);
+                    ticketExists.HasResponce = true;
+                    
                     await _context.SaveChangesAsync();
                     _messageModel.Message = "Responded to ticket succesfully!";
                     return StatusCode(200, _messageModel);

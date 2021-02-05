@@ -173,19 +173,19 @@ namespace VitoshaBank.Controllers
             var currentUser = HttpContext.User;
             return await _walletService.DeleteWallet(currentUser, requestModel.Username, _context, _messageModel);
         }
-        [HttpGet("get/supporttickets")]
+        [HttpGet("get/support")]
         [Authorize]
         public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTickets(SupportTicketRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
             return await _ticketService.GetAllTicketsInfo(currentUser, _context, _messageModel);
         }
-        [HttpPut("respond/supporttickets")]
+        [HttpPut("respond/support/{id}")]
         [Authorize]
-        public async Task<ActionResult<MessageModel>> RespondToTicket(SupportTicketRequestModel requestModel)
+        public async Task<ActionResult<MessageModel>> RespondToTicket(int id)
         {
             var currentUser = HttpContext.User;
-            return await _ticketService.GiveResponse(currentUser, requestModel.Ticket, _context, _messageModel);
+            return await _ticketService.GiveResponse(currentUser, id, _context, _messageModel);
         }
 
     }
