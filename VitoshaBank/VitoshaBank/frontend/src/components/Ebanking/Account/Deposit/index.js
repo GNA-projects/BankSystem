@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import AccountForm from "../AccountForm";
-import { getDeposit } from "../../../../Api/user";
+import { getDeposit } from "../../../../Api/User/getAccount";
 
 export default function Deposit() {
 	const history = useHistory();

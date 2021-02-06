@@ -1,28 +1,28 @@
 import { Route, Switch } from "react-router-dom";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 import { PrivateRoute, AdminRoute } from "./Auth";
 
 import Layout from "./components/Layout";
-import MyAccount from "./components/MyAccount";
+import MyAccount from "./pages/MyAccount";
 
-import Login from "./components/UserAuth/Login";
-import Logout from "./components/UserAuth/Logout";
+import Login from "./pages/Auth/Login";
+import Logout from "./pages/Auth/Logout";
 
-import Ebanking from "./components/Ebanking";
-import ChargePage from "./components/Ebanking/AccountPages/Charge";
-import DepositPage from "./components/Ebanking/AccountPages/Deposit";
-import WalletPage from "./components/Ebanking/AccountPages/Wallet";
-import CreditPage from "./components/Ebanking/AccountPages/Credit";
+import Ebanking from "./pages/Ebanking";
+import ChargePage from "./pages/Ebanking/Charge";
+import DepositPage from "./pages/Ebanking/Deposit";
+import WalletPage from "./pages/Ebanking/Wallet";
+import CreditPage from "./pages/Ebanking/Credit";
 
-import Admin from "./components/Admin";
-import CreateUser from "./components/Admin/User/Create";
-import CreateCharge from "./components/Admin/Account/Create/Charge";
-import CreateCredit from "./components/Admin/Account/Create/Credit";
-import CreateDeposit from "./components/Admin/Account/Create/Deposit";
-import CreateWallet from "./components/Admin/Account/Create/Wallet";
-import CreateDebitCard from "./components/Admin/Account/Create/DebitCard";
-import DeleteUser from "./components/Admin/User/Delete";
-import DeleteAccount from "./components/Admin/Account/Delete";
+import Admin from "./pages/Admin";
+import CreateUser from "./pages/Admin/User/Create";
+import CreateCharge from "./pages/Admin/Account/Create/Charge";
+import CreateCredit from "./pages/Admin/Account/Create/Credit";
+import CreateDeposit from "./pages/Admin/Account/Create/Deposit";
+import CreateWallet from "./pages/Admin/Account/Create/Wallet";
+import CreateDebitCard from "./pages/Admin/Account/Create/DebitCard";
+import DeleteUser from "./pages/Admin/User/Delete";
+import DeleteAccount from "./pages/Admin/Account/Delete";
 
 function App() {
 	return (

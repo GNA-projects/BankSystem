@@ -1,5 +1,5 @@
 import styled, { ThemeProvider } from "styled-components";
-import { AuthProvider } from "../../Auth/";
+import { AuthProvider } from "../../Auth";
 import TopMenu from "../TopMenu";
 import { BrowserRouter as Router } from "react-router-dom";
 

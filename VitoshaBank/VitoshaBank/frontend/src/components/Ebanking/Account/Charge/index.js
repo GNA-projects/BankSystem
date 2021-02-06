@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import AccountForm from "../AccountForm";
-import { getCharge } from "../../../../Api/user";
+import { getCharge } from "../../../../Api/User/getAccount";
 
 export default function Charge() {
 	const history = useHistory();
