@@ -180,7 +180,7 @@ namespace VitoshaBank.Controllers
             var currentUser = HttpContext.User;
             return await _ticketService.GetAllTicketsInfo(currentUser, _context, _messageModel);
         }
-        [HttpPut("respond/support/{id}")]
+        [HttpPut("respond/support")]
         [Authorize]
         public async Task<ActionResult<MessageModel>> RespondToTicket(SupportTicketRequestModel requestModel)
         {
