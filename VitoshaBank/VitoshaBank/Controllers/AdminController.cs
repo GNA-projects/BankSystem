@@ -63,7 +63,7 @@ namespace VitoshaBank.Controllers
         [Authorize]
         public async Task<ActionResult<MessageModel>> CreateUser(UserRequestModel requestModel)
         {
-            //need user(Firstname, Lastname, username, password, birthdate, email
+            //need user(Firstname, Lastname, username, password, birthdate, email)
             var currentUser = HttpContext.User;
             return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context, _messageModel);
         }
@@ -175,7 +175,7 @@ namespace VitoshaBank.Controllers
         }
         [HttpGet("get/support")]
         [Authorize]
-        public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTickets(SupportTicketRequestModel requestModel)
+        public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTickets()
         {
             var currentUser = HttpContext.User;
             return await _ticketService.GetAllTicketsInfo(currentUser, _context, _messageModel);
