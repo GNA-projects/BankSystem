@@ -75,7 +75,7 @@ namespace VitoshaBank.Services.CalculateDividendService
             {
                 //invalid term
 
-                return 0;
+                return dividendProcent;
             }
         }
 

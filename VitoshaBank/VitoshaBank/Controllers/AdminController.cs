@@ -182,10 +182,10 @@ namespace VitoshaBank.Controllers
         }
         [HttpPut("respond/support/{id}")]
         [Authorize]
-        public async Task<ActionResult<MessageModel>> RespondToTicket(int id)
+        public async Task<ActionResult<MessageModel>> RespondToTicket(SupportTicketRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _ticketService.GiveResponse(currentUser, id, _context, _messageModel);
+            return await _ticketService.GiveResponse(currentUser, requestModel.id, _context, _messageModel);
         }
 
     }

@@ -9,5 +9,6 @@ namespace VitoshaBank.Data.RequestModels
     public class SupportTicketRequestModel
     {
         public SupportTickets Ticket { get; set; }
+        public int id { get; set; }
     }
 }

@@ -20,49 +20,6 @@ namespace VitoshaBank.Services.DebitCardService
     public class DebitCardService : ControllerBase, IDebitCardService
     {
 
-        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
-        {
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                ChargeAccounts bankAccountExits = null;
-                Cards debitCardExists = null;
-                DebitCardResponseModel debitCardResponseModel = new DebitCardResponseModel();
-
-                if (userAuthenticate == null)
-                {
-                    _messageModel.Message = "User not found!";
-                    return StatusCode(404, _messageModel);
-                }
-                else
-                {
-                    bankAccountExits = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                    debitCardExists = await _context.Cards.FirstOrDefaultAsync(x => x.ChargeAccountId == bankAccountExits.Id);
-                }
-
-                if (debitCardExists != null)
-                {
-                    debitCardResponseModel.CardNumber = debitCardExists.CardNumber;
-                    if (debitCardResponseModel.CardNumber.StartsWith('5'))
-                    {
-                        debitCardResponseModel.CardBrand = "Master Card";
-                    }
-                    else
-                    {
-                        debitCardResponseModel.CardBrand = "Visa";
-                    }
-
-                    return StatusCode(200, debitCardResponseModel);
-                }
-            }
-            else
-            {
-                _messageModel.Message = "You are not authorized to do such actions";
-                return StatusCode(403, _messageModel);
-            }
-            _messageModel.Message = "You don't have a Debit Card!!";
-            return StatusCode(400, _messageModel);
-        }
         public async Task<ActionResult<MessageModel>> CreateDebitCard(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, BankSystemContext _context, Cards card, IBCryptPasswordHasherService _BCrypt, MessageModel _messageModel)
         {
             string role = "";
@@ -116,7 +73,49 @@ namespace VitoshaBank.Services.DebitCardService
                 return StatusCode(403, _messageModel);
             }
         }
+        public async Task<ActionResult<DebitCardResponseModel>> GetDebitCardInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel _messageModel)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                ChargeAccounts bankAccountExits = null;
+                Cards debitCardExists = null;
+                DebitCardResponseModel debitCardResponseModel = new DebitCardResponseModel();
 
+                if (userAuthenticate == null)
+                {
+                    _messageModel.Message = "User not found!";
+                    return StatusCode(404, _messageModel);
+                }
+                else
+                {
+                    bankAccountExits = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                    debitCardExists = await _context.Cards.FirstOrDefaultAsync(x => x.ChargeAccountId == bankAccountExits.Id);
+                }
+
+                if (debitCardExists != null)
+                {
+                    debitCardResponseModel.CardNumber = debitCardExists.CardNumber;
+                    if (debitCardResponseModel.CardNumber.StartsWith('5'))
+                    {
+                        debitCardResponseModel.CardBrand = "Master Card";
+                    }
+                    else
+                    {
+                        debitCardResponseModel.CardBrand = "Visa";
+                    }
+
+                    return StatusCode(200, debitCardResponseModel);
+                }
+            }
+            else
+            {
+                _messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, _messageModel);
+            }
+            _messageModel.Message = "You don't have a Debit Card!!";
+            return StatusCode(400, _messageModel);
+        }
         public async Task<ActionResult<MessageModel>> AddMoney(string cardNumber, string CVV, DateTime expireDate, ClaimsPrincipal currentUser, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -162,7 +161,6 @@ namespace VitoshaBank.Services.DebitCardService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-
         public async Task<ActionResult<MessageModel>> SimulatePurchase(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, string product, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -208,7 +206,6 @@ namespace VitoshaBank.Services.DebitCardService
             messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, messageModel);
         }
-
         public async Task<ActionResult<MessageModel>> Withdraw(string cardNumber, string CVV, DateTime expireDate, IBankAccountService _bankaccService, IBCryptPasswordHasherService _BCrypt, ClaimsPrincipal currentUser, string username, decimal amount, string reciever, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);

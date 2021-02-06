@@ -33,7 +33,7 @@ namespace VitoshaBank.Services.CreditPayOffService
                         credit.CreditAmountLeft = credit.CreditAmountLeft - credit.Instalment;
                         credit.PaymentDate = credit.PaymentDate.AddMonths(1);
                         await _context.SaveChangesAsync();
-                        messageModel.Message = "Credit instalment payed off successfully from Bank Account!";
+                        messageModel.Message = "Credit instalment payed off successfully from Charge Account!";
                         return StatusCode(200, messageModel);
                     }
                     else

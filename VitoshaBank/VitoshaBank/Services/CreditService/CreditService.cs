@@ -19,80 +19,7 @@ namespace VitoshaBank.Services.CreditService
 {
     public class CreditService : ControllerBase, ICreditService
     {
-        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
-        {
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                Credits creditsExists = null;
-                CreditResponseModel creditResponseModel = new CreditResponseModel();
-
-                if (userAuthenticate == null)
-                {
-                    _messageModel.Message = "User not found";
-                    return StatusCode(404, _messageModel);
-                }
-                else
-                {
-                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                }
-
-                if (creditsExists != null)
-                {
-                    creditResponseModel.IBAN = creditsExists.Iban;
-                    creditResponseModel.Amount = Math.Round(creditsExists.Amount);
-                    creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount, 2);
-                    creditResponseModel.Instalment = Math.Round(creditsExists.Instalment, 2);
-                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
-                    return StatusCode(200, creditResponseModel);
-                }
-                _messageModel.Message = "You don't have a Credit";
-                return StatusCode(400, _messageModel);
-            }
-
-            _messageModel.Message = "You are not autorized to do such actions!";
-            return StatusCode(403, _messageModel);
-        }
-        public async Task<ActionResult<CreditResponseModel>> GetPayOffInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
-        {
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                Credits creditsExists = null;
-                CreditResponseModel creditResponseModel = new CreditResponseModel();
-
-                if (userAuthenticate == null)
-                {
-                    _messageModel.Message = "User not found";
-                    return StatusCode(404, _messageModel);
-                }
-                else
-                {
-                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                }
-
-                if (creditsExists != null)
-                {
-
-                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
-                    if (creditsExists.CreditAmountLeft == 0 && creditsExists.CreditAmount > 0)
-                    {
-                        _messageModel.Message = "You have payed your credit!";
-                        await this.DeleteCredit(currentUser, username, _context, _messageModel);
-                    }
-                    else
-                        _messageModel.Message = "Successfully payed montly pay off!";
-                    return StatusCode(200, _messageModel);
-                }
-                _messageModel.Message = "You don't have a Credit";
-                return StatusCode(400, _messageModel);
-            }
-
-            _messageModel.Message = "You are not autorized to do such actions!";
-            return StatusCode(403, _messageModel);
-        }
         public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
-
         {
             string role = "";
 
@@ -149,6 +76,78 @@ namespace VitoshaBank.Services.CreditService
                 return StatusCode(403, _messageModel);
             }
         }
+        public async Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Credits creditsExists = null;
+                CreditResponseModel creditResponseModel = new CreditResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
+                }
+                else
+                {
+                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (creditsExists != null)
+                {
+                    creditResponseModel.IBAN = creditsExists.Iban;
+                    creditResponseModel.Amount = Math.Round(creditsExists.Amount,2);
+                    creditResponseModel.CreditAmount = Math.Round(creditsExists.CreditAmount, 2);
+                    creditResponseModel.Instalment = Math.Round(creditsExists.Instalment, 2);
+                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
+                    return StatusCode(200, creditResponseModel);
+                }
+                _messageModel.Message = "You don't have a Credit";
+                return StatusCode(400, _messageModel);
+            }
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
+        public async Task<ActionResult<CreditResponseModel>> GetPayOffInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel)
+        {
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                Credits creditsExists = null;
+                CreditResponseModel creditResponseModel = new CreditResponseModel();
+
+                if (userAuthenticate == null)
+                {
+                    _messageModel.Message = "User not found";
+                    return StatusCode(404, _messageModel);
+                }
+                else
+                {
+                    creditsExists = await _context.Credits.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+                if (creditsExists != null)
+                {
+
+                    await _payOffService.GetCreditPayOff(creditsExists, _messageModel, _context);
+                    if (creditsExists.CreditAmountLeft == 0 && creditsExists.CreditAmount > 0)
+                    {
+                        _messageModel.Message = "You have payed your Credit!";
+                        await this.DeleteCredit(currentUser, username, _context, _messageModel);
+                    }
+                    else
+                        _messageModel.Message = "Successfully payed montly pay off!";
+                    return StatusCode(200, _messageModel);
+                }
+                _messageModel.Message = "You don't have a Credit";
+                return StatusCode(400, _messageModel);
+            }
+
+            _messageModel.Message = "You are not autorized to do such actions!";
+            return StatusCode(403, _messageModel);
+        }
         public async Task<ActionResult<MessageModel>> SimulatePurchase(Credits credit, string product, string reciever, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -186,7 +185,7 @@ namespace VitoshaBank.Services.CreditService
                     }
                     else if (ValidateCredit(creditExists) == false)
                     {
-                        _messageModel.Message = "You don't have enough money in Bank account!";
+                        _messageModel.Message = "You don't have enough money in Charge account!";
                         return StatusCode(406, _messageModel);
                     }
 
