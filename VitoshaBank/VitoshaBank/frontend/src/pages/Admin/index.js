@@ -19,6 +19,9 @@ export default function Admin() {
 			/>
 			<AdminPanel.Link to="/admin/create/wallet" heading="Create Wallet" />
 			<AdminPanel.Link to="/admin/create/debit" heading="Create Debit Card" />
+
+			<AdminPanel.Link to="/admin/support" heading="Support" />
+
 			<AdminPanel.Link to="/admin/delete/user" heading="Delete User" red />
 			<AdminPanel.Link
 				to="/admin/delete/account"

@@ -21,6 +21,7 @@ import CreateCredit from "./pages/Admin/Account/Create/Credit";
 import CreateDeposit from "./pages/Admin/Account/Create/Deposit";
 import CreateWallet from "./pages/Admin/Account/Create/Wallet";
 import CreateDebitCard from "./pages/Admin/Account/Create/DebitCard";
+import Support from "./pages/Admin/User/Support";
 import DeleteUser from "./pages/Admin/User/Delete";
 import DeleteAccount from "./pages/Admin/Account/Delete";
 
@@ -65,6 +66,11 @@ function App() {
 					exact
 					path="/admin/create/debit"
 					component={CreateDebitCard}
+				/>
+				<AdminRoute
+					exact
+					path="/admin/support"
+					component={Support}
 				/>
 				<AdminRoute exact path="/admin/delete/user" component={DeleteUser} />
 				<AdminRoute

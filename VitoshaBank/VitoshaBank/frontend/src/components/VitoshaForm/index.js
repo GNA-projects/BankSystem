@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMountain } from "@fortawesome/free-solid-svg-icons";
-import InputGroup from "./InputGroup";
+import { InputGroup, TextGroup } from "./InputGroup";
 
 const FORM = styled.div`
 	display: flex;
@@ -51,4 +51,5 @@ export default function VitoshaForm(props) {
 }
 VitoshaForm.Icon = () => <ICON icon={faMountain} />;
 VitoshaForm.Input = InputGroup;
+VitoshaForm.TextArea = TextGroup;
 VitoshaForm.Submit = (props) => <SUBMIT {...props}>{props.text}</SUBMIT>;
