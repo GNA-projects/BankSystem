@@ -23,7 +23,11 @@ namespace VitoshaBank.Services.SupportTicketsService
 
                 if (userAuthenticate != null)
                 {
-
+                    if (ticket.Title == null || ticket.Message==null)
+                    {
+                        _messageModel.Message = "Ticket must have title and message!";
+                        return StatusCode(400, _messageModel);
+                    }
                     ticket.UserId = userAuthenticate.Id;
                     ticket.Date = DateTime.Now;
                     ticket.HasResponce = false;

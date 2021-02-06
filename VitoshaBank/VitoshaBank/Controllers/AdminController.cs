@@ -65,7 +65,7 @@ namespace VitoshaBank.Controllers
         {
             //need user(Firstname, Lastname, username, password, birthdate, email)
             var currentUser = HttpContext.User;
-            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _context, _messageModel);
+            return await _userService.CreateUser(currentUser, requestModel.User, _BCrypt, _config, _context, _messageModel);
         }
 
         [HttpPost("create/charge")]

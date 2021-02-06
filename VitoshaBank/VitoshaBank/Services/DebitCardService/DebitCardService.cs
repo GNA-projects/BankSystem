@@ -52,6 +52,7 @@ namespace VitoshaBank.Services.DebitCardService
                         card.CardNumber = GenerateCardInfo.GenerateNumber(11);
                         var CVV = GenerateCardInfo.GenerateCVV(3);
                         card.Cvv = _BCrypt.HashPassword(CVV);
+                        card.CardExiprationDate = DateTime.Now.AddMonths(60);
                         _context.Add(card);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = "Debit Card created succesfully!";

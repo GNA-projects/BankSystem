@@ -27,19 +27,19 @@ namespace VitoshaBank.Services.TransactionService
                 {
                     sender.IsIBAN = true;
                     sender.SenderInfo = transaction.SenderAccountInfo;
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
+                    reciever.RecieverInfo = transaction.RecieverAccountInfo;
 
                     if (transaction.RecieverAccountInfo.Contains("BG18VITB") && transaction.RecieverAccountInfo.Length == 23)
                     {
                         reciever.IsIBAN = true;
-                        reciever.ReciverInfo = transaction.RecieverAccountInfo;
+                        reciever.RecieverInfo = transaction.RecieverAccountInfo;
                     }
                 }
                 else if (transaction.RecieverAccountInfo.Contains("BG18VITB") && transaction.RecieverAccountInfo.Length == 23)
                 {
                     reciever.IsIBAN = true;
                     sender.SenderInfo = transaction.SenderAccountInfo;
-                    reciever.ReciverInfo = transaction.RecieverAccountInfo;
+                    reciever.RecieverInfo = transaction.RecieverAccountInfo;
                 }
                 else
                 {
@@ -241,7 +241,7 @@ namespace VitoshaBank.Services.TransactionService
                     {
                         GetTransactionsResponseModel responseModel = new GetTransactionsResponseModel();
                         responseModel.SenderInfo = transaction.SenderAccountInfo;
-                        responseModel.ReciverInfo = transaction.RecieverAccountInfo;
+                        responseModel.RecieverInfo = transaction.RecieverAccountInfo;
                         responseModel.Amount = transaction.TransactionAmount;
                         responseModel.Date = transaction.Date;
 

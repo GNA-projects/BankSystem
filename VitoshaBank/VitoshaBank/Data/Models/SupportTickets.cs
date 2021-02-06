@@ -5,7 +5,7 @@ namespace VitoshaBank.Data.Models
 {
     public partial class SupportTickets
     {
-        public int Id { get; set; }
+        public int Id { get; }
         public int UserId { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }

@@ -10,7 +10,7 @@ namespace VitoshaBank.Data.Models
             Users = new HashSet<Users>();
         }
 
-        public int Id { get; set; }
+        public int Id { get; }
         public string SenderAccountInfo { get; set; }
         public string RecieverAccountInfo { get; set; }
         public decimal TransactionAmount { get; set; }

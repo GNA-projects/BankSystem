@@ -5,7 +5,7 @@ namespace VitoshaBank.Data.Models
 {
     public partial class Deposits
     {
-        public int Id { get; set; }
+        public int Id { get; }
         public string Iban { get; set; }
         public int UserId { get; set; }
         public decimal Amount { get; set; }

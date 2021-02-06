@@ -10,7 +10,7 @@ namespace VitoshaBank.Data.Models
             SupportTickets = new HashSet<SupportTickets>();
         }
 
-        public int Id { get; set; }
+        public int Id { get; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string FirstName { get; set; }
