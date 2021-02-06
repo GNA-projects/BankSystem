@@ -23,9 +23,6 @@ namespace VitoshaBank.Data.Models
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wallets> Wallets { get; set; }
-
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Cards>(entity =>
@@ -248,8 +245,7 @@ namespace VitoshaBank.Data.Models
                     .IsUnique();
 
                 entity.HasIndex(e => e.UserId)
-                    .HasName("user_id_UNIQUE")
-                    .IsUnique();
+                    .HasName("fk_tickets_user_id_Users_id");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
@@ -260,6 +256,13 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.HasResponce).HasColumnName("hasResponce");
+
+                entity.Property(e => e.Message)
+                    .IsRequired()
+                    .HasColumnName("message")
+                    .HasColumnType("varchar(200)")
+                    .HasCharSet("utf8")
+                    .HasCollation("utf8_unicode_ci");
 
                 entity.Property(e => e.Title)
                     .IsRequired()
@@ -273,8 +276,8 @@ namespace VitoshaBank.Data.Models
                     .HasColumnType("int(11)");
 
                 entity.HasOne(d => d.User)
-                    .WithOne(p => p.SupportTickets)
-                    .HasForeignKey<SupportTickets>(d => d.UserId)
+                    .WithMany(p => p.SupportTickets)
+                    .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_tickets_user_id_Users_id");
             });
