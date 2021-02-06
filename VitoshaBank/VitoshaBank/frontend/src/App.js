@@ -13,6 +13,7 @@ import ChargePage from "./pages/Ebanking/Charge";
 import DepositPage from "./pages/Ebanking/Deposit";
 import WalletPage from "./pages/Ebanking/Wallet";
 import CreditPage from "./pages/Ebanking/Credit";
+import TransactionsPage from "./pages/Ebanking/Transactions";
 
 import Admin from "./pages/Admin";
 import CreateUser from "./pages/Admin/User/Create";
@@ -39,6 +40,7 @@ function App() {
 				<PrivateRoute exact path="/deposit" component={DepositPage} />
 				<PrivateRoute exact path="/wallet" component={WalletPage} />
 				<PrivateRoute exact path="/credit" component={CreditPage} />
+				<PrivateRoute exact path="/transactions" component={TransactionsPage} />
 
 				<AdminRoute exact path="/admin" component={Admin} />
 				<AdminRoute exact path="/admin/create/user" component={CreateUser} />

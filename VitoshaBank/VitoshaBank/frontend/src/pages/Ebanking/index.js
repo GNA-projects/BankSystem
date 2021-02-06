@@ -9,6 +9,7 @@ export default function Ebanking() {
 			<Banking.Deposit />
 			<Banking.Wallet />
 			<Banking.Credit />
+			<Banking.Transactions to='/transactions'>Transactions</Banking.Transactions>
 		</Banking>
 	);
 }

@@ -1,10 +1,13 @@
 import React, { useCallback, useState } from "react";
 import { useEffect } from "react";
-import { getAllTickets } from "../../../../Api/Admin/support";
+import { getAllTickets, respondToTicket } from "../../../../Api/Admin/support";
 
 export default function Support() {
 	const [tickets, setTickets] = useState([]);
-
+	const respond = async (id) => {
+		await respondToTicket(id);
+		getTickets();
+	};
 	const getTickets = async () => {
 		const array = await getAllTickets();
 		setTickets(array);
@@ -18,16 +21,15 @@ export default function Support() {
 		<div>
 			{tickets.map((item, i) => {
 				return (
-					<div>
-						<h1>{item.title}</h1>
-						<p>{item.id}</p>
-						<p>{item.userId}</p>
-						<p>{item.message}</p>
-						<button onClick={() => {}}></button>
+					<div key={i}>
+						<h1>Ticket title{item.title}</h1>
+						<p>Ticket id{item.id}</p>
+						<p>User id{item.userId}</p>
+						<p>Message :{item.message}</p>
+						<button onClick={() => respond(item.id)}>Respond</button>
 					</div>
 				);
 			})}
-			<button onClick={}>cc</button>
 		</div>
 	);
 }
