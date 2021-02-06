@@ -18,6 +18,60 @@ namespace VitoshaBank.Services.BankAccountService
 {
     public class ChargeAccountService : ControllerBase, IBankAccountService
     {
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
+        {
+            string role = "";
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+
+            if (role == "Admin")
+            {
+                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+                ChargeAccounts bankAccountExists = null;
+
+                if (userAuthenticate != null)
+                {
+                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
+                }
+
+
+                if (bankAccountExists == null)
+                {
+                    if (ValidateUser(userAuthenticate) && ValidateBankAccount(bankAccount))
+                    {
+                        bankAccountExists.UserId = userAuthenticate.Id;
+                        bankAccountExists.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
+                        _context.Add(bankAccountExists);
+                        await _context.SaveChangesAsync();
+                        Cards card = new Cards();
+                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccountExists, _context, card, _BCrypt, messageModel);
+                        messageModel.Message = "Charge Account created succesfully";
+                        return StatusCode(201, messageModel);
+                    }
+                    else if (ValidateUser(userAuthenticate) == false)
+                    {
+                        messageModel.Message = "User not found!";
+                        return StatusCode(404, messageModel);
+                    }
+                    else if (ValidateBankAccount(bankAccount) == false)
+                    {
+                        messageModel.Message = "Invalid parameteres!";
+                        return StatusCode(400, messageModel);
+                    }
+                }
+                messageModel.Message = "User already has a Charge Account!";
+                return StatusCode(400, messageModel);
+            }
+            else
+            {
+                messageModel.Message = "You are not authorized to do such actions";
+                return StatusCode(403, messageModel);
+            }
+        }
         public async Task<ActionResult<ChargeAccountResponseModel>> GetBankAccountInfo(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel messageModel)
         {
             if (currentUser.HasClaim(c => c.Type == "Roles"))
@@ -52,60 +106,6 @@ namespace VitoshaBank.Services.BankAccountService
             messageModel.Message = "You don't have a Charge Account!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
-        {
-            string role = "";
-
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
-                role = userRole;
-            }
-
-            if (role == "Admin")
-            {
-                var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-                ChargeAccounts bankAccountExists = null;
-
-                if (userAuthenticate != null)
-                {
-                    bankAccountExists = await _context.ChargeAccounts.FirstOrDefaultAsync(x => x.UserId == userAuthenticate.Id);
-                }
-
-
-                if (bankAccountExists == null)
-                {
-                    if (ValidateUser(userAuthenticate) && ValidateBankAccount(bankAccount))
-                    {
-                        bankAccount.UserId = userAuthenticate.Id;
-                        bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
-                        _context.Add(bankAccount);
-                        await _context.SaveChangesAsync();
-                        Cards card = new Cards();
-                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, _BCrypt, messageModel);
-                        messageModel.Message = "Charge Account created succesfully";
-                        return StatusCode(201, messageModel);
-                    }
-                    else if (ValidateUser(userAuthenticate) == false)
-                    {
-                        messageModel.Message = "User not found!";
-                        return StatusCode(404, messageModel);
-                    }
-                    else if (ValidateBankAccount(bankAccount) == false)
-                    {
-                        messageModel.Message = "Invalid parameteres!";
-                        return StatusCode(400, messageModel);
-                    }
-                }
-                messageModel.Message = "User already has a Bank Account!";
-                return StatusCode(400, messageModel);
-            }
-            else
-            {
-                messageModel.Message = "You are not authorized to do such actions";
-                return StatusCode(403, messageModel);
-            }
-        }
         public async Task<ActionResult<MessageModel>> DepositMoney(ChargeAccounts bankAccount, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel messageModel)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -136,7 +136,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.RecieverAccountInfo = bankAccounts.Iban;
                         transactions.SenderAccountInfo = depositsExist.Iban;
-                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money Deposit Account - Bank Account", _context, messageModel);
+                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money Deposit Account -> Charge Account", _context, messageModel);
                         messageModel.Message = "Money deposited succesfully!";
                         return StatusCode(200, messageModel);
                     }
@@ -178,7 +178,7 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = bankAccount.Iban;
                         transactions.RecieverAccountInfo = reciever;
-                        await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transactions, $"Purchasing {product} with Bank Account", _context, _messageModel);
+                        await _transaction.CreateTransaction(userAuthenticate, currentUser, amount, transactions, $"Purchasing {product} with Charge Account", _context, _messageModel);
                         await _context.SaveChangesAsync();
                         _messageModel.Message = $"Succesfully purhcased {product}.";
                         return StatusCode(200, _messageModel);
@@ -237,11 +237,11 @@ namespace VitoshaBank.Services.BankAccountService
                         Transactions transactions = new Transactions();
                         transactions.SenderAccountInfo = $"User {userAuthenticate.FirstName} {userAuthenticate.LastName}";
                         transactions.RecieverAccountInfo = bankAccountExists.Iban;
-                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money in Bank Account", _context, messageModel);
-                        messageModel.Message = $"Succesfully deposited {amount} leva in Bank Account.";
+                        await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transactions, "Depositing money in Charge Account", _context, messageModel);
+                        messageModel.Message = $"Succesfully deposited {amount} leva in Charge Account.";
                         return StatusCode(200, messageModel);
                     }
-                    messageModel.Message = "Invalid deposit amount!";
+                    messageModel.Message = "Invalid money amount!";
                     return StatusCode(400, messageModel);
                 }
                 else
@@ -291,7 +291,7 @@ namespace VitoshaBank.Services.BankAccountService
                     }
                     else if (ValidateBankAccount(bankAccounts, amount) == false)
                     {
-                        _messageModel.Message = "You don't have enough money in bank account!";
+                        _messageModel.Message = "You don't have enough money in Charge Account!";
                         return StatusCode(406, _messageModel);
                     }
                     else if (ValidateMinAmount(bankAccounts, amount) == false)

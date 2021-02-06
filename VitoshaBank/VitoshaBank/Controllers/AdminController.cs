@@ -87,17 +87,17 @@ namespace VitoshaBank.Controllers
         }
         [HttpDelete("delete/charge")]
         [Authorize]
-        //need username
         public async Task<ActionResult<MessageModel>> DeleteBankAccount(ChargeAccountRequestModel requestModel)
         {
+            //need username
             var currentUser = HttpContext.User;
             return await _bankAccountService.DeleteBankAccount(currentUser, requestModel.Username, _context, _messageModel);
         }
         [HttpGet("get/user/{username}")]
         [Authorize]
-        //need nothing
         public async Task<ActionResult<Users>> GetUser(string username)
         {
+            //need nothing
             var currentUser = HttpContext.User;
             return await _userService.GetUser(currentUser, username, _context, _messageModel);
         }

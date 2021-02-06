@@ -102,7 +102,10 @@ namespace VitoshaBank.Services.SupportTicketsService
                 List<SupportTickets> allTickets = new List<SupportTickets>();
                 foreach (var ticket in _context.SupportTickets)
                 {
-                    allTickets.Add(ticket);
+                    if (ticket.HasResponce == false)
+                    {
+                        allTickets.Add(ticket);
+                    }
                 }
                 if (allTickets.Count != 0)
                 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -22,56 +20,6 @@ namespace VitoshaBank.Services.UserService
 {
     public class UsersService : ControllerBase, IUsersService
     {
-        public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel responseMessage)
-        {
-            string role = "";
-
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
-                role = userRole;
-            }
-
-            if (role == "Admin")
-            {
-                return await _context.Users.ToListAsync();
-            }
-            else
-            {
-                responseMessage.Message = "You are not authorized to do such actions!";
-                return StatusCode(403, responseMessage);
-            }
-        }
-
-        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
-        {
-            string role = "";
-
-            if (currentUser.HasClaim(c => c.Type == "Roles"))
-            {
-                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
-                role = userRole;
-            }
-
-            if (role == "Admin")
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-
-                if (user == null)
-                {
-                    responseMessage.Message = "User not found";
-                    return StatusCode(404, responseMessage);
-                }
-
-                return StatusCode(200, user);
-            }
-            else
-            {
-                responseMessage.Message = "You are not authorized to do such actions";
-                return StatusCode(403, responseMessage);
-            }
-        }
-
         public async Task<ActionResult<MessageModel>> CreateUser(ClaimsPrincipal currentUser, Users user, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
@@ -153,6 +101,54 @@ namespace VitoshaBank.Services.UserService
                 return StatusCode(403, responseMessage);
             }
         }
+        public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel responseMessage)
+        {
+            string role = "";
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+
+            if (role == "Admin")
+            {
+                return await _context.Users.ToListAsync();
+            }
+            else
+            {
+                responseMessage.Message = "You are not authorized to do such actions!";
+                return StatusCode(403, responseMessage);
+            }
+        }
+        public async Task<ActionResult<Users>> GetUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
+        {
+            string role = "";
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+
+            if (role == "Admin")
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+
+                if (user == null)
+                {
+                    responseMessage.Message = "User not found";
+                    return StatusCode(404, responseMessage);
+                }
+
+                return StatusCode(200, user);
+            }
+            else
+            {
+                responseMessage.Message = "You are not authorized to do such actions";
+                return StatusCode(403, responseMessage);
+            }
+        }
         public async Task<ActionResult<MessageModel>> GetUsername(string username,BankSystemContext _context, MessageModel messageModel)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -177,7 +173,6 @@ namespace VitoshaBank.Services.UserService
                 return StatusCode(400, messageModel);
             }
         }
-
         public async Task<ActionResult<MessageModel>> LoginUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, MessageModel responseMessage)
         {
 
@@ -203,7 +198,6 @@ namespace VitoshaBank.Services.UserService
 
             return response;
         }
-
         public async Task<ActionResult<MessageModel>> ChangePassword(string username, string newPassword, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt, MessageModel responseMessage)
         {
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -234,7 +228,23 @@ namespace VitoshaBank.Services.UserService
                 return StatusCode(404, responseMessage);
             }
         }
+        public async Task<ActionResult> VerifyAccount(string activationCode, BankSystemContext _context, MessageModel _messageModel)
+        {
+            var value = _context.Users.Where(a => a.ActivationCode == activationCode).FirstOrDefault();
+            if (value != null)
+            {
+                value.IsConfirmed = true;
+                await _context.SaveChangesAsync();
+                _messageModel.Message = "Dear user, Your email successfully activated now you can able to login";
+                return StatusCode(200, _messageModel);
+            }
+            else
+            {
+                _messageModel.Message = "Dear user, Your email is not activated";
+                return StatusCode(400, _messageModel);
+            }
 
+        }
         public async Task<ActionResult<MessageModel>> DeleteUser(ClaimsPrincipal currentUser, string username, BankSystemContext _context, MessageModel responseMessage)
         {
             string role = "";
@@ -264,26 +274,7 @@ namespace VitoshaBank.Services.UserService
                 responseMessage.Message = "You are not authorized to do such actions";
                 return StatusCode(403, responseMessage);
             }
-        }
-        public async Task<ActionResult> VerifyAccount(string activationCode, BankSystemContext _context, MessageModel _messageModel)
-        {
-            var value = _context.Users.Where(a => a.ActivationCode == activationCode).FirstOrDefault();
-            if (value != null)
-            {
-                value.IsConfirmed = true;
-                await _context.SaveChangesAsync();
-                _messageModel.Message = "Dear user, Your email successfully activated now you can able to login";
-                return StatusCode(200, _messageModel);
-            }
-            else
-            {
-                _messageModel.Message = "Dear user, Your email is not activated";
-                return StatusCode(400, _messageModel);
-            }
-
-        }
-
-        
+        }        
         private async Task<Users> AuthenticateUser(Users userLogin, BankSystemContext _context, IBCryptPasswordHasherService _BCrypt)
         {
             var userAuthenticateUsername = await _context.Users.FirstOrDefaultAsync(x => x.Username == userLogin.Username);
@@ -339,7 +330,6 @@ namespace VitoshaBank.Services.UserService
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
         private void SendVerificationLinkEmail(string email, string activationcode, string username, string password)
         {
             var varifyUrl = "https" + "://" + "localhost" + ":" + "44377" + "/api/users/activateaccount/" + activationcode;
@@ -348,7 +338,7 @@ namespace VitoshaBank.Services.UserService
             var frontEmailPassowrd = "GNAjuxtapose123";
             string subject = "Your account is successfully created";
             string body = $"<br/><br/>We are excited to tell you that your account username is: {username}" +
-              $"<br/><br/> and your password is: {password}. Feel free to change your passowrd from the account menu after you log in. Please click on the below link to verify your account" +
+              $"<br/><br/>and your password is: {password}.<br/><br/>" + $"<br/><br/>Feel free to change your passowrd from the account menu after you log in. Please click on the below link to verify your account" +
               " <br/><br/><a href='" + varifyUrl + "'>" + varifyUrl + "</a>";
 
             var smtp = new SmtpClient
