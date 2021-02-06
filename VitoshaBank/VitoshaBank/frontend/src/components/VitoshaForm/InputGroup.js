@@ -20,7 +20,20 @@ const INPUT = styled.input`
 	border: 1px;
 	border-radius: 20px;
 `;
-export default function InputGroup(props) {
+const TEXTAREA = styled.textarea`
+	font-size: 16px;
+	background-color: rgb(255, 255, 255, 0.1);
+	padding: 15px 20px;
+	color: white;
+	outline: none;
+	border: 1px;
+	border-radius: 20px;
+	height: 160px;
+	width: 300px;
+	max-height: 160px;
+	max-width: 300px;
+`;
+export function InputGroup(props) {
 	return (
 		<GROUP>
 			<HEADING>{props.heading}</HEADING>
@@ -29,6 +42,19 @@ export default function InputGroup(props) {
 				onChange={props.onChange}
 				value={props.value}
 			></INPUT>
+		</GROUP>
+	);
+}
+
+export function TextGroup(props) {
+	return (
+		<GROUP>
+			<HEADING>{props.heading}</HEADING>
+			<TEXTAREA
+				type={props.type}
+				onChange={props.onChange}
+				value={props.value}
+			></TEXTAREA>
 		</GROUP>
 	);
 }
