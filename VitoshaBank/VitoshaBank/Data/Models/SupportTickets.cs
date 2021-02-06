@@ -8,6 +8,7 @@ namespace VitoshaBank.Data.Models
         public int Id { get; set; }
         public int UserId { get; set; }
         public string Title { get; set; }
+        public string Message { get; set; }
         public DateTime Date { get; set; }
         public bool HasResponce { get; set; }
 

@@ -40,7 +40,7 @@ namespace VitoshaBank.Services.BankAccountService
                 {
                     bankAccountResponseModel.IBAN = bankAccountExists.Iban;
                     bankAccountResponseModel.Amount = Math.Round(bankAccountExists.Amount, 2);
-                    return StatusCode(200, bankAccountExists);
+                    return StatusCode(200, bankAccountResponseModel);
                 }
             }
             else

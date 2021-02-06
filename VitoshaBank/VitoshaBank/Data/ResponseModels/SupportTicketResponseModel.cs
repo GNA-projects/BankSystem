@@ -11,5 +11,6 @@ namespace VitoshaBank.Data.ResponseModels
         public DateTime TicketDate { get; set; }
         public bool HasResponse { get; set; }
         public string Username { get; set; }
+        public string Message { get; internal set; }
     }
 }

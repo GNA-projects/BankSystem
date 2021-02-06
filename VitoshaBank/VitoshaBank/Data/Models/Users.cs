@@ -5,6 +5,11 @@ namespace VitoshaBank.Data.Models
 {
     public partial class Users
     {
+        public Users()
+        {
+            SupportTickets = new HashSet<SupportTickets>();
+        }
+
         public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -23,7 +28,7 @@ namespace VitoshaBank.Data.Models
         public virtual ChargeAccounts ChargeAccounts { get; set; }
         public virtual Credits Credits { get; set; }
         public virtual Deposits Deposits { get; set; }
-        public virtual SupportTickets SupportTickets { get; set; }
         public virtual Wallets Wallets { get; set; }
+        public virtual ICollection<SupportTickets> SupportTickets { get; set; }
     }
 }

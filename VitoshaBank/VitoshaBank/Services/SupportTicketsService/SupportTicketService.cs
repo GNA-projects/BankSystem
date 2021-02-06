@@ -66,6 +66,7 @@ namespace VitoshaBank.Services.SupportTicketsService
                             SupportTicketResponseModel responseModel = new SupportTicketResponseModel();
 
                             responseModel.Title = ticket.Title;
+                            responseModel.Message = ticket.Message;
                             responseModel.TicketDate = ticket.Date;
                             responseModel.HasResponse = ticket.HasResponce;
                             userTickets.Add(responseModel);

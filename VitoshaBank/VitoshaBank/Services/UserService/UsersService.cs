@@ -124,11 +124,11 @@ namespace VitoshaBank.Services.UserService
                 var vanillaPassword = user.Password;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.ActivationCode = Guid.NewGuid().ToString();
-                if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
-                {
-                    responseMessage.Message = "User cannot be less than 18 years old";
-                    return StatusCode(400, responseMessage);
-                }
+                //if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
+                //{
+                //    responseMessage.Message = "User cannot be less than 18 years old";
+                //    return StatusCode(400, responseMessage);
+                //}
                 _context.Add(user);
                 int i = await _context.SaveChangesAsync();
 
