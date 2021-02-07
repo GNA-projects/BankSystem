@@ -34,33 +34,33 @@ namespace VitoshaBank.Services.UserService
             if (role == "Admin")
             {
                 UserResponseModel userResponseModel = new UserResponseModel();
-                if (user.FirstName.Length < 1)
+                if (user.FirstName.Length < 1 || user.FirstName.Length > 60)
                 {
 
-                    responseMessage.Message = "First name cannot be less than 1 symbol";
+                    responseMessage.Message = "First name cannot be less than 1 symbol or larger than 60 symbols";
                     return StatusCode(400, responseMessage);
 
                 }
-                if (user.LastName.Length < 1)
+                if (user.LastName.Length < 1 || user.LastName.Length > 60)
                 {
 
-                    responseMessage.Message = "Last name cannot be less than 1 symbol";
+                    responseMessage.Message = "Last name cannot be less than 1 symbol or larger than 60 symbols";
                     return StatusCode(400, responseMessage);
 
                 }
-                if (user.Email.Length < 6)
+                if (user.Email.Length < 6 || user.Email.Length > 60)
                 {
 
-                    responseMessage.Message = "Email cannot be less than 1 symbol";
+                    responseMessage.Message = "Email cannot be less than 1 symbol or larger than 60 symbols";
                     return StatusCode(400, responseMessage);
 
                 }
                 userResponseModel.FirstName = user.FirstName;
                 userResponseModel.LastName = user.LastName;
                 userResponseModel.Email = user.Email;
-                if (user.Username.Length < 6)
+                if (user.Username.Length < 6 || user.Username.Length > 60)
                 {
-                    responseMessage.Message = "Username cannot be less than 6 symbols";
+                    responseMessage.Message = "Username cannot be less than 6 symbols or larger than 60 symbols";
                     return StatusCode(400, responseMessage);
                 }
                 userResponseModel.Username = user.Username;
@@ -72,11 +72,6 @@ namespace VitoshaBank.Services.UserService
                 var vanillaPassword = user.Password;
                 user.Password = _BCrypt.HashPassword(user.Password);
                 user.ActivationCode = Guid.NewGuid().ToString();
-                //if ((user.RegisterDate - user.BirthDate).TotalDays < 6570)
-                //{
-                //    responseMessage.Message = "User cannot be less than 18 years old";
-                //    return StatusCode(400, responseMessage);
-                //}
                 _context.Add(user);
                 int i = await _context.SaveChangesAsync();
 
