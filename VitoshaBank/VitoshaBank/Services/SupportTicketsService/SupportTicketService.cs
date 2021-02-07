@@ -31,7 +31,7 @@ namespace VitoshaBank.Services.SupportTicketsService
                             _messageModel.Message = "Ticket must have title and message!";
                             return StatusCode(400, _messageModel);
                         }
-                        if (ticket.Title.Length > 2 && ticket.Message.Length > 2 && ticket.Title.Length<60 && ticket.Message.Length<200)
+                        if (ticket.Title.Length > 2 && ticket.Message.Length > 2 && ticket.Title.Length < 60 && ticket.Message.Length < 200)
                         {
 
                             ticket.UserId = userAuthenticate.Id;
@@ -124,12 +124,15 @@ namespace VitoshaBank.Services.SupportTicketsService
             if (role == "Admin")
             {
                 List<SupportTicketResponseModel> allTickets = new List<SupportTicketResponseModel>();
-                foreach (var ticket in _context.SupportTickets)
+                List<SupportTickets> tickets = new List<SupportTickets>();
+                tickets = _context.SupportTickets.ToList();
+                foreach (var ticket in tickets)
                 {
                     if (ticket.HasResponce == false)
                     {
                         SupportTicketResponseModel responseModel = new SupportTicketResponseModel();
                         var user = await _context.Users.FirstOrDefaultAsync(p => p.Id == ticket.UserId);
+                        responseModel.Id = ticket.Id;
                         responseModel.Message = ticket.Message;
                         responseModel.Title = ticket.Title;
                         responseModel.Username = user.Username;
@@ -161,7 +164,8 @@ namespace VitoshaBank.Services.SupportTicketsService
             }
             if (role == "Admin")
             {
-                var ticketExists = await _context.SupportTickets.FirstOrDefaultAsync(p => p.Id == id);
+
+                SupportTickets ticketExists = await _context.SupportTickets.FirstOrDefaultAsync(p => p.Id == id);
 
                 if (ticketExists != null)
                 {

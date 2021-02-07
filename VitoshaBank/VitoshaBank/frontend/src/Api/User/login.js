@@ -13,9 +13,9 @@ export const loginUser = (username, password) => {
 			alert("Welcome, You Are Logged In!");
 			return true;
 		})
-		.catch(() => {
+		.catch((err) => {
 			sessionStorage.removeItem("jwt");
-			alert("Check credentials, something went wrong!");
+			alert(err.response.data.message);
 			return false;
 		});
 };

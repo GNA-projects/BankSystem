@@ -22,10 +22,10 @@ export default function Support() {
 			{tickets.map((item, i) => {
 				return (
 					<div key={i}>
-						<h1>Ticket title{item.title}</h1>
-						<p>Ticket id{item.id}</p>
-						<p>User id{item.userId}</p>
-						<p>Message :{item.message}</p>
+						<h1>Ticket title: {item.title}</h1>
+						<p>Ticket id: {item.id}</p>
+						<p>Username: {item.username}</p>
+						<p>Message: {item.message}</p>
 						<button onClick={() => respond(item.id)}>Respond</button>
 					</div>
 				);

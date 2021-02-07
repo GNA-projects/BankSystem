@@ -43,12 +43,12 @@ namespace VitoshaBank.Services.BankAccountService
                 {
                     if (ValidateUser(userAuthenticate) && ValidateBankAccount(bankAccount))
                     {
-                        bankAccountExists.UserId = userAuthenticate.Id;
-                        bankAccountExists.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
-                        _context.Add(bankAccountExists);
+                        bankAccount.UserId = userAuthenticate.Id;
+                        bankAccount.Iban = _IBAN.GenerateIBANInVitoshaBank("BankAccount", _context);
+                        _context.Add(bankAccount);
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
-                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccountExists, _context, card, _BCrypt, messageModel);
+                        await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, _BCrypt, messageModel);
                         messageModel.Message = "Charge Account created succesfully";
                         return StatusCode(201, messageModel);
                     }

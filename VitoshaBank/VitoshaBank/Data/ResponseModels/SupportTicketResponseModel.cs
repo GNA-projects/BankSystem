@@ -7,6 +7,7 @@ namespace VitoshaBank.Data.ResponseModels
 {
     public class SupportTicketResponseModel
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public DateTime TicketDate { get; set; }
         public bool HasResponse { get; set; }
