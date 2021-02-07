@@ -19,10 +19,12 @@ export default function CreateDeposit() {
 				values={{ value: uname, setValue: setUname }}
 			></AdminForm.Input>
 			<AdminForm.Input
+				type="number"
 				heading="Amount"
 				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
 			<AdminForm.Input
+				type="number"
 				heading="Term of Payment"
 				values={{ value: period, setValue: setPeriod }}
 			></AdminForm.Input>

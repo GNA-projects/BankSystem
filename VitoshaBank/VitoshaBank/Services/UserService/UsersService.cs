@@ -24,7 +24,9 @@ namespace VitoshaBank.Services.UserService
 		{
 			string role = "";
 			List<Transactions> userTransaction = new List<Transactions>();
-			Users userExists = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username);
+			Users userUsernameExists = await _context.Users.FirstOrDefaultAsync(x => x.Username == user.Username);
+			Users userEmailExists = await _context.Users.FirstOrDefaultAsync(x => x.Email == user.Email);
+
 
 			if (currentUser.HasClaim(c => c.Type == "Roles"))
 			{
@@ -34,7 +36,7 @@ namespace VitoshaBank.Services.UserService
 
 			if (role == "Admin")
 			{
-				if (userExists == null)
+				if (userUsernameExists == null && userEmailExists == null)
 				{
 
 					UserResponseModel userResponseModel = new UserResponseModel();
@@ -57,6 +59,13 @@ namespace VitoshaBank.Services.UserService
 
 						responseMessage.Message = "Email cannot be less than 1 symbol or larger than 60 symbols";
 						return StatusCode(400, responseMessage);
+
+					}
+                    if (!user.Email.Contains("@"))
+                    {
+						responseMessage.Message = "Invalid Email";
+						return StatusCode(400, responseMessage);
+
 
 					}
 					userResponseModel.FirstName = user.FirstName;
@@ -96,7 +105,7 @@ namespace VitoshaBank.Services.UserService
 				}
 				else
 				{
-					responseMessage.Message = "Username is taken. Choose another one";
+					responseMessage.Message = "Username or Mail taken. Choose another one";
 					return StatusCode(400, responseMessage);
 				}
 			}
@@ -263,6 +272,17 @@ namespace VitoshaBank.Services.UserService
 			if (role == "Admin")
 			{
 				var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+				var accExists1 = _context.ChargeAccounts.Where(x => x.UserId == user.Id);
+				var accExists2 = _context.Credits.Where(x => x.UserId == user.Id);
+				var accExists3 = _context.Wallets.Where(x => x.UserId == user.Id);
+				var accExists4 = _context.Deposits.Where(x => x.UserId == user.Id);
+
+                if (accExists1 != null || accExists2 != null || accExists3 != null || accExists4 != null)
+                {
+					responseMessage.Message = "User has Bank Accounts";
+					return StatusCode(404, responseMessage);
+				}
+
 				if (user == null)
 				{
 					responseMessage.Message = "User not found";

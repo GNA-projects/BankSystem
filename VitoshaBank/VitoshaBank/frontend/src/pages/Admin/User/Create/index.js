@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import AdminForm from "../../../../components/Admin/AdminForm";
 import { createUser } from "../../../../Api/Admin/create";
 

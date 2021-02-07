@@ -19,10 +19,12 @@ export default function CreateCredit() {
 				values={{ value: uname, setValue: setUname }}
 			></AdminForm.Input>
 			<AdminForm.Input
+				type="number"
 				heading="Amount"
 				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
 			<AdminForm.Input
+				type="number"
 				heading="Period"
 				values={{ value: period, setValue: setPeriod }}
 			></AdminForm.Input>

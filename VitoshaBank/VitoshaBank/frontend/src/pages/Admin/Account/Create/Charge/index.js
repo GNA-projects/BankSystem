@@ -17,10 +17,13 @@ export default function CreateCharge() {
 				values={{ value: uname, setValue: setUname }}
 			></AdminForm.Input>
 			<AdminForm.Input
+				type="number"
 				heading="Amount"
 				values={{ value: amount, setValue: setAmount }}
 			></AdminForm.Input>
-			<AdminForm.Button onClick={handleCreate}>Create Charge Account</AdminForm.Button>
+			<AdminForm.Button onClick={handleCreate}>
+				Create Charge Account
+			</AdminForm.Button>
 		</AdminForm>
 	);
 }

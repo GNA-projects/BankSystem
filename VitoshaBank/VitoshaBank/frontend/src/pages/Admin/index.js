@@ -28,11 +28,6 @@ export default function Admin() {
 				heading="Delete Account"
 				red
 			/>
-			<AdminPanel.Link
-				to="/admin/delete/debit"
-				heading="Delete Debit Card"
-				red
-			/>
 		</AdminPanel>
 	);
 }
