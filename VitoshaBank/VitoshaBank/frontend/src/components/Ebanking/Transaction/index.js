@@ -46,7 +46,7 @@ export default function Transaction(props) {
 			<INFO>
 				<SENDER>Sender: {props.sender}</SENDER>
 				<SENDER>Receiver: {props.receiver}</SENDER>
-				<DATE>{props.date}</DATE>
+				<SENDER>Reason: {props.reason}</SENDER>
 			</INFO>
 			<AMOUNT>{props.amount}</AMOUNT>
 		</BLOCK>

@@ -1,5 +1,6 @@
 import { Redirect, Route } from "react-router-dom";
 import React, { useState } from "react";
+import { authme } from "../Api/Admin/authme";
 
 export const AuthContext = React.createContext({});
 
@@ -13,6 +14,14 @@ export const devLogin = () => {
 export const checkJwt = () => {
 	return sessionStorage["jwt"] ? true : false;
 };
+
+export const adminAuthMe = async () => {
+	let isOk = false;
+	isOk = await authme();
+	if(isOk === false) window.location.href='/'
+	return isOk;
+};
+
 
 export function PrivateRoute({ component: Component, ...rest }) {
 	return (
@@ -29,7 +38,7 @@ export function AdminRoute({ component: Component, ...rest }) {
 		<Route
 			{...rest}
 			render={(props) =>
-				checkJwt() ? <Component {...props} /> : <Redirect to="/" />
+				adminAuthMe() ? <Component {...props} /> : <Redirect to="/" />
 			}
 		/>
 	);
@@ -38,7 +47,7 @@ export function AdminRoute({ component: Component, ...rest }) {
 export function AuthProvider(props) {
 	const [logged, setLogged] = useState(checkJwt);
 	return (
-		<AuthContext.Provider value={{logged, setLogged}}>
+		<AuthContext.Provider value={{ logged, setLogged }}>
 			{props.children}
 		</AuthContext.Provider>
 	);

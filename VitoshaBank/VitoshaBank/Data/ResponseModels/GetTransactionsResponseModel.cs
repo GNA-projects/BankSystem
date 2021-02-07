@@ -11,5 +11,6 @@ namespace VitoshaBank.Data.ResponseModels
         public string RecieverInfo { get; set; }
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
+        public string Reason { get; set; }
     }
 }

@@ -243,6 +243,7 @@ namespace VitoshaBank.Services.TransactionService
                         responseModel.SenderInfo = transaction.SenderAccountInfo;
                         responseModel.RecieverInfo = transaction.RecieverAccountInfo;
                         responseModel.Amount = transaction.TransactionAmount;
+                        responseModel.Reason = transaction.Reason;
                         responseModel.Date = transaction.Date;
 
                         allTransactions.Add(responseModel);

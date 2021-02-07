@@ -12,7 +12,7 @@ export default function MyAccount() {
 	const [ticketMessage, setTicketMessage] = useState();
 	const handlePassSubmit = () => {
 		if (pass === confirm) changePassword(pass);
-		else alert("passwords do not mach");
+		else alert("Passwords do not mach!");
 	};
 	const handleTicketSubmit = () => {
 		sendTicket(ticketTitle, ticketMessage);

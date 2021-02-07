@@ -15,7 +15,7 @@ export default function Transactions() {
 	return (
 		<div>
 			{transactions.map((item, i) => {
-				return <Transaction key={i} sender={item.senderInfo} receiver={item.recieverInfo} date={item.date} amount={item.amount} />;
+				return <Transaction key={i} sender={item.senderInfo} receiver={item.recieverInfo} reason={item.reason} amount={item.amount} />;
 			})}
 		</div>
 	);

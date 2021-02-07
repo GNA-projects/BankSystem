@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
@@ -59,6 +60,25 @@ namespace VitoshaBank.Controllers
 
         }
 
+        [HttpGet("authme")]
+        [Authorize]
+        public async Task<ActionResult> AuthMe()
+        {
+            var currentUser = HttpContext.User;
+      
+            string role = "";
+
+            if (currentUser.HasClaim(c => c.Type == "Roles"))
+            {
+                string userRole = currentUser.Claims.FirstOrDefault(currentUser => currentUser.Type == "Roles").Value;
+                role = userRole;
+            }
+            if (role == "Admin")
+            {
+                return Ok();
+            }
+            else { return Unauthorized(); }
+        }
 
         [HttpPost("create/user")]
         [Authorize]
