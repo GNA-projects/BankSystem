@@ -246,6 +246,7 @@ namespace VitoshaBank.Services.TransactionService
                         responseModel.Date = transaction.Date;
 
                         allTransactions.Add(responseModel);
+                        allTransactions = allTransactions.OrderBy(x => x.Date).ToList();
                     }
 
                 }
@@ -257,7 +258,6 @@ namespace VitoshaBank.Services.TransactionService
                     return StatusCode(404, _messageModel);
 
                 }
-
                 return StatusCode(200, allTransactions);
             }
 

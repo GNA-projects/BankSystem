@@ -18,7 +18,7 @@ export const createUser = (uname, fname, lname, password, mail, admin) => {
 export const createCharge = (uname, amount) => {
     viaxios
         .post("/api/admin/create/charge", {
-            Charge: {
+            BankAccount: {
                 Amount: amount,
             },
             Username: uname,

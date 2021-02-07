@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
@@ -153,7 +156,7 @@ namespace VitoshaBank.Services.SupportTicketsService
             messageModel.Message = "You don't have Support Tickets!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<MessageModel>> GiveResponse(ClaimsPrincipal currentUser, int id, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> GiveResponse(ClaimsPrincipal currentUser, int id, IConfiguration _config, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -166,12 +169,13 @@ namespace VitoshaBank.Services.SupportTicketsService
             {
 
                 SupportTickets ticketExists = await _context.SupportTickets.FirstOrDefaultAsync(p => p.Id == id);
+                Users userExists = await _context.Users.FirstOrDefaultAsync(x => x.Id == ticketExists.UserId);
 
                 if (ticketExists != null)
                 {
                     ticketExists.HasResponce = true;
-
                     await _context.SaveChangesAsync();
+                    SendEmail(userExists.Email, userExists.Username, _config);
                     _messageModel.Message = "Responded to ticket succesfully!";
                     return StatusCode(200, _messageModel);
                 }
@@ -185,6 +189,33 @@ namespace VitoshaBank.Services.SupportTicketsService
                 return StatusCode(400, _messageModel);
             }
 
+        }
+
+        private void SendEmail(string email, string username, IConfiguration _config)
+        {
+            var fromMail = new MailAddress(_config["Email:Email"], $"Support ticket");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = _config["Pass:Pass"];
+            string subject = "Support ticket closed";
+            string body = $"<br/><br/> {username}, we are excited to tell you that we have responded to your support ticket.";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
         }
     }
 }

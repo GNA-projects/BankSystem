@@ -31,7 +31,7 @@ namespace VitoshaBank.Controllers
         private readonly MessageModel _messageModel;
 
 
-        public DebitCardController(BankSystemContext context, ILogger<Cards> logger, IDebitCardService debitCardService, IBankAccountService bankaccService, ITransactionService transactionService)
+        public DebitCardController(BankSystemContext context, ILogger<Cards> logger, IDebitCardService debitCardService, IBankAccountService bankaccService, ITransactionService transactionService, IBCryptPasswordHasherService BCrypt)
         {
             _context = context;
             _logger = logger;
@@ -39,6 +39,7 @@ namespace VitoshaBank.Controllers
             _bankaccService = bankaccService;
             _messageModel = new MessageModel();
             _transactionService = transactionService;
+            _BCrypt = BCrypt;
         }
 
         [HttpGet]

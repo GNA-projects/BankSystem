@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
@@ -61,7 +64,7 @@ namespace VitoshaBank.Services.WalletService
             _messageModel.Message = "You don't have a wallet!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateWallet(ClaimsPrincipal currentUser, string username, Wallets wallet, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -91,9 +94,11 @@ namespace VitoshaBank.Services.WalletService
                         wallet.CardNumber = GenerateCardInfo.GenerateNumber(11);
                         var CVV = GenerateCardInfo.GenerateCVV(3);
                         wallet.Cvv = _BCrypt.HashPassword(CVV);
+                        wallet.CardExipirationDate = DateTime.Now.AddMonths(60);
                         _context.Add(wallet);
                         await _context.SaveChangesAsync();
 
+                        SendEmail(userAuthenticate.Email, _config);
                         _messageModel.Message = "Wallet created succesfully!";
                         return StatusCode(200, _messageModel);
                     }
@@ -326,6 +331,33 @@ namespace VitoshaBank.Services.WalletService
 
             _messageModel.Message = $"Succesfully purhcased {product}.";
             return StatusCode(200, _messageModel);
+        }
+
+        private void SendEmail(string email, IConfiguration _config)
+        {
+            var fromMail = new MailAddress(_config["Email:Email"], $"Wallet created");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = _config["Pass:Pass"];
+            string subject = "Your wallet is successfully created";
+            string body = "<br/><br/>We are excited to tell you that your wallet was created succesfully. You can use it instanstly."; 
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
         }
     }
 }

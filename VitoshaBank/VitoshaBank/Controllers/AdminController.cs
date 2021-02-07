@@ -75,7 +75,7 @@ namespace VitoshaBank.Controllers
         {
             //need username, BankAccount(amount)
             var currentUser = HttpContext.User;
-            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount, _IBAN, _BCrypt, _context, _debitCardService, _messageModel);
+            return await _bankAccountService.CreateBankAccount(currentUser, requestModel.Username, requestModel.BankAccount, _IBAN, _BCrypt, _config, _context, _debitCardService, _messageModel);
         }
 
         [HttpPut("addmoney/charge")]
@@ -116,7 +116,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateCredit(CreditRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, requestModel.Period, _IBAN, _context, _messageModel);
+            return await _creditService.CreateCredit(currentUser, requestModel.Username, requestModel.Credit, requestModel.Period, _IBAN, _config,_context, _messageModel);
         }
         [HttpDelete("delete/credit")]
         [Authorize]
@@ -148,7 +148,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateDeposit(DepositRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _context, _messageModel);
+            return await _depositService.CreateDeposit(currentUser, requestModel.Username, requestModel.Deposit, _IBAN, _config, _context, _messageModel);
         }
         [HttpDelete("delete/deposit")]
         [Authorize]
@@ -164,7 +164,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> CreateWallet(WalletRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _BCrypt, _context, _messageModel);
+            return await _walletService.CreateWallet(currentUser, requestModel.Username, requestModel.Wallet, _IBAN, _BCrypt, _config, _context, _messageModel);
         }
         [HttpDelete("delete/wallet")]
         [Authorize]
@@ -186,7 +186,7 @@ namespace VitoshaBank.Controllers
         public async Task<ActionResult<MessageModel>> RespondToTicket(SupportTicketRequestModel requestModel)
         {
             var currentUser = HttpContext.User;
-            return await _ticketService.GiveResponse(currentUser, requestModel.Id, _context, _messageModel);
+            return await _ticketService.GiveResponse(currentUser, requestModel.Id, _config, _context, _messageModel);
         }
 
     }

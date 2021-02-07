@@ -64,6 +64,11 @@ namespace VitoshaBank.Services.DebitCardService
                         return StatusCode(404, _messageModel);
                     }
                 }
+                else
+                {
+                    _messageModel.Message = "No Bank Account found";
+                    return StatusCode(404, _messageModel);
+                }
 
                 _messageModel.Message = "User already has a Debit Card!";
                 return StatusCode(400, _messageModel);

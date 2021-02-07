@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
@@ -19,7 +22,7 @@ namespace VitoshaBank.Services.CreditService
 {
     public class CreditService : ControllerBase, ICreditService
     {
-        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, IConfiguration _config, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -53,6 +56,7 @@ namespace VitoshaBank.Services.CreditService
                         credits.CreditAmountLeft = credits.CreditAmount;
                         _context.Add(credits);
                         await _context.SaveChangesAsync();
+                        SendEmail(userAuthenticate.Email, _config);
                         _messageModel.Message = "Credit created successfully!";
                         return StatusCode(200, _messageModel);
                     }
@@ -411,6 +415,33 @@ namespace VitoshaBank.Services.CreditService
             }
             _messageModel.Message = $"Succesfully deposited {amount} leva.";
             return StatusCode(200, _messageModel);
+        }
+
+        private void SendEmail(string email, IConfiguration _config)
+        {
+            var fromMail = new MailAddress(_config["Email:Email"], $"Credit account created");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = _config["Pass:Pass"];
+            string subject = "Your credit account is successfully created";
+            string body = "<br/><br/>We are excited to tell you that your credit account is created succesfully. You can use it instantly.";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
         }
     }
 }

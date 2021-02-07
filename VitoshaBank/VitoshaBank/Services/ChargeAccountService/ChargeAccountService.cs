@@ -13,12 +13,15 @@ using VitoshaBank.Data.MessageModels;
 using System;
 using VitoshaBank.Services.TransactionService.Interfaces;
 using VitoshaBank.Services.Interfaces.UserService;
+using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
+using System.Net;
 
 namespace VitoshaBank.Services.BankAccountService
 {
     public class ChargeAccountService : ControllerBase, IBankAccountService
     {
-        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
+        public async Task<ActionResult<MessageModel>> CreateBankAccount(ClaimsPrincipal currentUser, string username, ChargeAccounts bankAccount, IIBANGeneratorService _IBAN, IBCryptPasswordHasherService _BCrypt, IConfiguration _config, BankSystemContext _context, IDebitCardService _debitCardService, MessageModel messageModel)
         {
             string role = "";
 
@@ -49,6 +52,7 @@ namespace VitoshaBank.Services.BankAccountService
                         await _context.SaveChangesAsync();
                         Cards card = new Cards();
                         await _debitCardService.CreateDebitCard(currentUser, username, bankAccount, _context, card, _BCrypt, messageModel);
+                        SendEmail(userAuthenticate.Email, _config);
                         messageModel.Message = "Charge Account created succesfully";
                         return StatusCode(201, messageModel);
                     }
@@ -412,6 +416,33 @@ namespace VitoshaBank.Services.BankAccountService
                 return true;
             }
             return false;
+        }
+
+        private void SendEmail(string email, IConfiguration _config)
+        {
+            var fromMail = new MailAddress(_config["Email:Email"], $"Charge Account created");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = _config["Pass:Pass"];
+            string subject = "Your charge account and debit card are successfully created";
+            string body = "<br/><br/>We are excited to tell you that your charge account and debit card were created succesfully. You can use it instantly.";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
         }
     }
 }

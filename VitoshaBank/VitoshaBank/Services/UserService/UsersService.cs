@@ -34,7 +34,7 @@ namespace VitoshaBank.Services.UserService
 
 			if (role == "Admin")
 			{
-				if (userExists != null)
+				if (userExists == null)
 				{
 
 					UserResponseModel userResponseModel = new UserResponseModel();
@@ -97,7 +97,7 @@ namespace VitoshaBank.Services.UserService
 				else
 				{
 					responseMessage.Message = "Username is taken. Choose another one";
-					return StatusCode(400, Response);
+					return StatusCode(400, responseMessage);
 				}
 			}
 			else

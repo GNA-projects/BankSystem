@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace VitoshaBank.Services.CreditService.Interfaces
 {
     public interface ICreditService
     {
-        public Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel);
+        public Task<ActionResult<MessageModel>> CreateCredit(ClaimsPrincipal currentUser, string username, Credits credits, int period, IIBANGeneratorService _IBAN, IConfiguration _config, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<CreditResponseModel>> GetCreditInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel);
         public Task<ActionResult<MessageModel>> AddMoney(Credits credit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transaction, MessageModel _messageModel);
         public  Task<ActionResult<CreditResponseModel>> GetPayOffInfo(ClaimsPrincipal currentUser, string username, ICreditPayOffService _payOffService, BankSystemContext _context, MessageModel _messageModel);

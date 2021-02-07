@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
@@ -88,7 +91,7 @@ namespace VitoshaBank.Services.DepositService
             _messageModel.Message = "You don't have a Deposit!";
             return StatusCode(400, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, BankSystemContext _context, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> CreateDeposit(ClaimsPrincipal currentUser, string username, Deposits deposits, IIBANGeneratorService _IBAN, IConfiguration _config, BankSystemContext _context, MessageModel _messageModel)
         {
             string role = "";
 
@@ -120,13 +123,15 @@ namespace VitoshaBank.Services.DepositService
                     {
                         deposits.UserId = userAuthenticate.Id;
                         deposits.Iban = _IBAN.GenerateIBANInVitoshaBank("Deposit", _context);
-                        if (deposits.TermOfPayment == 3 && deposits.TermOfPayment == 6 && deposits.TermOfPayment == 12 && deposits.TermOfPayment == 1)
+                        if (deposits.TermOfPayment == 3 || deposits.TermOfPayment == 6 || deposits.TermOfPayment == 12 || deposits.TermOfPayment == 1)
                         {
                             deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
 
                             deposits.Divident = CalculateDivident.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
                             _context.Add(deposits);
                             await _context.SaveChangesAsync();
+
+                            SendEmail(userAuthenticate.Email, _config);
 
                             _messageModel.Message = "Deposit created succesfully";
                             return StatusCode(200, _messageModel);
@@ -334,6 +339,33 @@ namespace VitoshaBank.Services.DepositService
                 return true;
             }
             return false;
+        }
+
+        private void SendEmail(string email, IConfiguration _config)
+        {
+            var fromMail = new MailAddress(_config["Email:Email"], $"Deposit account created");
+            var toMail = new MailAddress(email);
+            var frontEmailPassowrd = _config["Pass:Pass"];
+            string subject = "Your deposit account is successfully created";
+            string body = "<br/><br/>We are excited to tell you that your deposit account is created succesfully. You can use it instantly.";
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromMail.Address, frontEmailPassowrd)
+
+            };
+            using (var message = new MailMessage(fromMail, toMail)
+            {
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            })
+                smtp.Send(message);
         }
 
     }
