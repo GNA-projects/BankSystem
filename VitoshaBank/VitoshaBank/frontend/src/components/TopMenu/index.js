@@ -1,53 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
-import {
-  NavContainer,
-  DropdownContainer,
-  DropdownItem,
-  BurgerButton,
-  DropdownItemHeading,
-  DropdownItemIcon,
-} from "./style";
+import { Navigation, Dropdown } from "./style";
 
-import logo from "../../Images/logo.png";
-import { faPiggyBank } from "@fortawesome/free-solid-svg-icons";
-import { faUserNinja } from "@fortawesome/free-solid-svg-icons";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
-import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../../Auth/";
 
 export default function TopMenu() {
-  const [dropDown, setDropdown] = useState(false);
-  const history = useHistory();
+	const { logged } = useContext(AuthContext);
 
-  const goHome = () => {
-      history.push('/home')
-  }
-  return (
-    <div>
-      <NavContainer>
-        <BurgerButton
-          src={logo}
-          onClick={() => setDropdown(!dropDown)}
-        ></BurgerButton>
-      </NavContainer>
-      <DropdownContainer active={dropDown}>
-        <DropdownItem onClick={goHome}>
-          <DropdownItemIcon icon={faHome}></DropdownItemIcon>
-          <DropdownItemHeading>Home</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem>
-          <DropdownItemIcon icon={faPiggyBank}></DropdownItemIcon>
-          <DropdownItemHeading>Ebanking</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem>
-          <DropdownItemIcon icon={faUserNinja}></DropdownItemIcon>
-          <DropdownItemHeading>About</DropdownItemHeading>
-        </DropdownItem>
-        <DropdownItem>
-          <DropdownItemIcon icon={faSignOutAlt}></DropdownItemIcon>
-          <DropdownItemHeading>Logout</DropdownItemHeading>
-        </DropdownItem>
-      </DropdownContainer>
-    </div>
-  );
+	const [dropDown, setDropdown] = useState(false);
+	const history = useHistory();
+
+	const toPath = (path) => {
+		history.push(`/${path}`);
+		setDropdown(false);
+	};
+
+	return (
+		<React.Fragment>
+			<Navigation>
+				<Navigation.Burger onClick={() => setDropdown(!dropDown)} />
+				<Navigation.Logged>{logged ? "V" : "X"}</Navigation.Logged>
+			</Navigation>
+
+			<Dropdown active={dropDown}>
+				<Dropdown.Item onClick={() => toPath("account")} about heading="My Account" />
+				<Dropdown.Item
+					onClick={() => toPath("ebanking")}
+					bank
+					heading="Ebanking"
+				/>
+				<Dropdown.Item onClick={() => toPath("")} home heading="Home" />
+				<Dropdown.Item
+					onClick={() => toPath("logout")}
+					logout
+					heading="Logout"
+				/>
+			</Dropdown>
+		</React.Fragment>
+	);
 }
