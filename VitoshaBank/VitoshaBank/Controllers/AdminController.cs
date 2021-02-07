@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using VitoshaBank.Data.MessageModels;
 using VitoshaBank.Data.Models;
 using VitoshaBank.Data.RequestModels;
+using VitoshaBank.Data.ResponseModels;
 using VitoshaBank.Services.BankAccountService.Interfaces;
 using VitoshaBank.Services.CreditService.Interfaces;
 using VitoshaBank.Services.DebitCardService.Interfaces;
@@ -175,7 +176,7 @@ namespace VitoshaBank.Controllers
         }
         [HttpGet("get/support")]
         [Authorize]
-        public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTickets()
+        public async Task<ActionResult<ICollection<SupportTicketResponseModel>>> GetAllTickets()
         {
             var currentUser = HttpContext.User;
             return await _ticketService.GetAllTicketsInfo(currentUser, _context, _messageModel);

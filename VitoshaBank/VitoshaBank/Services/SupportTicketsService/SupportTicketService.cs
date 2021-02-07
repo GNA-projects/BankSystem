@@ -23,19 +23,39 @@ namespace VitoshaBank.Services.SupportTicketsService
 
                 if (userAuthenticate != null)
                 {
-                    if (ticket.Title == null || ticket.Message==null)
+                    if (ticket != null)
                     {
-                        _messageModel.Message = "Ticket must have title and message!";
+
+                        if (ticket.Title == null || ticket.Message == null)
+                        {
+                            _messageModel.Message = "Ticket must have title and message!";
+                            return StatusCode(400, _messageModel);
+                        }
+                        if (ticket.Title.Length > 2 && ticket.Message.Length > 2 && ticket.Title.Length<60 && ticket.Message.Length<200)
+                        {
+
+                            ticket.UserId = userAuthenticate.Id;
+                            ticket.Date = DateTime.Now;
+                            ticket.HasResponce = false;
+                            _context.Add(ticket);
+                            await _context.SaveChangesAsync();
+
+                            _messageModel.Message = "Ticket created succesfully";
+                            return StatusCode(200, _messageModel);
+                        }
+                        else
+                        {
+
+                            _messageModel.Message = "Ticket must have title and message less than 200 symbols!";
+                            return StatusCode(400, _messageModel);
+
+                        }
+                    }
+                    else
+                    {
+                        _messageModel.Message = "Invalid Ticket Input";
                         return StatusCode(400, _messageModel);
                     }
-                    ticket.UserId = userAuthenticate.Id;
-                    ticket.Date = DateTime.Now;
-                    ticket.HasResponce = false;
-                    _context.Add(ticket);
-                    await _context.SaveChangesAsync();
-
-                    _messageModel.Message = "Ticket created succesfully";
-                    return StatusCode(200, _messageModel);
                 }
                 else
                 {
@@ -93,7 +113,7 @@ namespace VitoshaBank.Services.SupportTicketsService
             messageModel.Message = "You don't have Support Tickets!";
             return StatusCode(400, messageModel);
         }
-        public async Task<ActionResult<ICollection<SupportTickets>>> GetAllTicketsInfo(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel messageModel)
+        public async Task<ActionResult<ICollection<SupportTicketResponseModel>>> GetAllTicketsInfo(ClaimsPrincipal currentUser, BankSystemContext _context, MessageModel messageModel)
         {
             string role = "";
             if (currentUser.HasClaim(c => c.Type == "Roles"))
@@ -103,12 +123,17 @@ namespace VitoshaBank.Services.SupportTicketsService
             }
             if (role == "Admin")
             {
-                List<SupportTickets> allTickets = new List<SupportTickets>();
+                List<SupportTicketResponseModel> allTickets = new List<SupportTicketResponseModel>();
                 foreach (var ticket in _context.SupportTickets)
                 {
                     if (ticket.HasResponce == false)
                     {
-                        allTickets.Add(ticket);
+                        SupportTicketResponseModel responseModel = new SupportTicketResponseModel();
+                        var user = await _context.Users.FirstOrDefaultAsync(p => p.Id == ticket.UserId);
+                        responseModel.Message = ticket.Message;
+                        responseModel.Title = ticket.Title;
+                        responseModel.Username = user.Username;
+                        allTickets.Add(responseModel);
                     }
                 }
                 if (allTickets.Count != 0)
@@ -141,7 +166,7 @@ namespace VitoshaBank.Services.SupportTicketsService
                 if (ticketExists != null)
                 {
                     ticketExists.HasResponce = true;
-                    
+
                     await _context.SaveChangesAsync();
                     _messageModel.Message = "Responded to ticket succesfully!";
                     return StatusCode(200, _messageModel);

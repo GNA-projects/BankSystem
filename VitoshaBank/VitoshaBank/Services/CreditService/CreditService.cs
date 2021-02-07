@@ -48,7 +48,7 @@ namespace VitoshaBank.Services.CreditService
                         credits.Iban = _IBAN.GenerateIBANInVitoshaBank("Credit", _context);
                         credits.Interest = 6.9m;
                         credits.PaymentDate = DateTime.Now.AddMonths(1);
-                        credits.CreditAmount = CalculateInterest.CalculateCreditAmount(credits.Amount, period, credits.Interest);
+                        credits.CreditAmount = CalculateInterest.CalculateCreditAmount(credits.Amount, 5, credits.Interest);
                         credits.Instalment = CalculateInterest.CalculateInstalment(credits.CreditAmount, credits.Interest, 5);
                         credits.CreditAmountLeft = credits.CreditAmount;
                         _context.Add(credits);

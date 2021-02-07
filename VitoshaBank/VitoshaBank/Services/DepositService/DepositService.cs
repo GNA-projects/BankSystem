@@ -39,8 +39,9 @@ namespace VitoshaBank.Services.DepositService
                 if (depositExists != null)
                 {
                     depositResponseModel.IBAN = depositExists.Iban;
-                    depositResponseModel.Amount = Math.Round(depositExists.Amount,2);
+                    depositResponseModel.Amount = Math.Round(depositExists.Amount, 2);
                     depositResponseModel.PaymentDate = depositExists.PaymentDate;
+
                     return StatusCode(200, depositResponseModel);
                 }
             }
@@ -73,7 +74,7 @@ namespace VitoshaBank.Services.DepositService
 
                 if (depositExists != null)
                 {
-                     await _dividentPayment.GetDividentPayment(depositExists, _messageModel, _context);
+                    await _dividentPayment.GetDividentPayment(depositExists, _messageModel, _context);
                     _messageModel.Message = "Check susscessfull";
                     return StatusCode(200, depositResponseModel);
                 }
@@ -118,16 +119,23 @@ namespace VitoshaBank.Services.DepositService
                     if (ValidateUser(userAuthenticate) && ValidateDeposits(deposits))
                     {
                         deposits.UserId = userAuthenticate.Id;
-                        //deposits.TermOfPayment = 6;
                         deposits.Iban = _IBAN.GenerateIBANInVitoshaBank("Deposit", _context);
-                        deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
-                        //deposits.Amount = 45;
-                        deposits.Divident = CalculateDivident.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
-                        _context.Add(deposits);
-                        await _context.SaveChangesAsync();
+                        if (deposits.TermOfPayment == 3 && deposits.TermOfPayment == 6 && deposits.TermOfPayment == 12 && deposits.TermOfPayment == 1)
+                        {
+                            deposits.PaymentDate = DateTime.Now.AddMonths(deposits.TermOfPayment);
 
-                        _messageModel.Message = "Deposit created succesfully";
-                        return StatusCode(200, _messageModel);
+                            deposits.Divident = CalculateDivident.GetDividentPercent(deposits.Amount, deposits.TermOfPayment);
+                            _context.Add(deposits);
+                            await _context.SaveChangesAsync();
+
+                            _messageModel.Message = "Deposit created succesfully";
+                            return StatusCode(200, _messageModel);
+                        }
+                        else
+                        {
+                            _messageModel.Message = "Deposit Term of paymet must be 1, 3, 6 or 12 months";
+                            return StatusCode(400, _messageModel);
+                        }
                     }
                     else if (ValidateUser(userAuthenticate) == false)
                     {
@@ -172,7 +180,7 @@ namespace VitoshaBank.Services.DepositService
                 if (depositsExists != null)
                 {
                     bankAccounts = _context.ChargeAccounts.FirstOrDefault(x => x.UserId == userAuthenticate.Id);
-                    return await ValidateDepositAmountAndBankAccount(userAuthenticate, depositsExists,currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
+                    return await ValidateDepositAmountAndBankAccount(userAuthenticate, depositsExists, currentUser, amount, bankAccounts, _context, _transactionService, _messageModel);
                 }
                 else
                 {
@@ -184,7 +192,7 @@ namespace VitoshaBank.Services.DepositService
             _messageModel.Message = "You are not autorized to do such actions!";
             return StatusCode(403, _messageModel);
         }
-        public async Task<ActionResult<MessageModel>> WithdrawMoney(Deposits deposit,  ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
+        public async Task<ActionResult<MessageModel>> WithdrawMoney(Deposits deposit, ClaimsPrincipal currentUser, string username, decimal amount, BankSystemContext _context, ITransactionService _transactionService, MessageModel _messageModel)
         {
 
             var userAuthenticate = await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
@@ -204,10 +212,10 @@ namespace VitoshaBank.Services.DepositService
 
                 if (depositsExists != null)
                 {
-                    depositsExists.Amount = depositsExists.Amount -amount;
+                    depositsExists.Amount = depositsExists.Amount - amount;
                     depositsExists.PaymentDate = DateTime.Now.AddMonths(depositsExists.TermOfPayment);
                     await _context.SaveChangesAsync();
-                    
+
                     Transactions transaction = new Transactions();
                     transaction.SenderAccountInfo = depositsExists.Iban;
                     transaction.RecieverAccountInfo = $"{userAuthenticate.FirstName} {userAuthenticate.LastName}";
@@ -250,7 +258,7 @@ namespace VitoshaBank.Services.DepositService
                     transaction.RecieverAccountInfo = depositsExists.Iban;
                     await _context.SaveChangesAsync();
                     await _transactionService.CreateTransaction(userAuthenticate, currentUser, amount, transaction, "Added money - Bank Account - Deposit account", _context, _messageModel);
-                    
+
                 }
                 else if (bankAccounts.Amount < amount)
                 {
